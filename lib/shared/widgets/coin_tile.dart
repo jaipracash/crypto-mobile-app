@@ -1,0 +1,114 @@
+import 'package:flutter/material.dart';
+
+import '../../core/constants/app_colors.dart';
+import '../../core/constants/app_sizes.dart';
+import '../../core/constants/app_strings.dart';
+import '../../core/utils/formatters.dart';
+import '../../features/market/domain/coin.dart';
+import 'change_pill.dart';
+import 'coin_avatar.dart';
+import 'sparkline.dart';
+
+class CoinTile extends StatelessWidget {
+  const CoinTile({
+    required this.coin,
+    required this.currency,
+    required this.onTap,
+    required this.onToggleWatchlist,
+    super.key,
+  });
+  final Coin coin;
+  final String currency;
+  final VoidCallback onTap;
+  final VoidCallback onToggleWatchlist;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(AppSizes.radiusMd),
+      child: SizedBox(
+        height: AppSizes.coinTileHeight,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: AppSizes.sm),
+          child: Row(
+            children: [
+              SizedBox(
+                width: AppSizes.rankColumn,
+                child: Text(
+                  coin.rank?.toString() ?? '—',
+                  textAlign: TextAlign.center,
+                  style: theme.textTheme.bodySmall,
+                ),
+              ),
+              const SizedBox(width: AppSizes.sm),
+              CoinAvatar(symbol: coin.symbol, imageUrl: coin.image),
+              const SizedBox(width: AppSizes.md),
+              Expanded(
+                flex: 5,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      coin.name,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    Text(
+                      coin.symbol.toUpperCase(),
+                      style: theme.textTheme.bodySmall,
+                    ),
+                  ],
+                ),
+              ),
+              Expanded(
+                flex: 4,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text(
+                      Formatters.currency(coin.price, currency),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: AppSizes.xs),
+                    ChangePill(change: coin.change24hPct, compact: true),
+                  ],
+                ),
+              ),
+              const SizedBox(width: AppSizes.sm),
+              Sparkline(
+                values: coin.sparkline7d,
+                positive: (coin.change24hPct ?? 0) >= 0,
+              ),
+              IconButton(
+                tooltip: coin.isWatchlisted
+                    ? AppStrings.removeFromWatchlist
+                    : AppStrings.addToWatchlist,
+                onPressed: onToggleWatchlist,
+                icon: Icon(
+                  coin.isWatchlisted
+                      ? Icons.star_rounded
+                      : Icons.star_border_rounded,
+                ),
+                color: coin.isWatchlisted
+                    ? AppColors.watchlistStar
+                    : theme.colorScheme.onSurfaceVariant,
+                visualDensity: VisualDensity.compact,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}

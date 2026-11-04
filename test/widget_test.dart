@@ -1,30 +1,66 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-
-import 'package:crypto_research_app/main.dart';
+import 'package:gecko_lite/features/market/domain/coin.dart';
+import 'package:gecko_lite/shared/widgets/async_value_view.dart';
+import 'package:gecko_lite/shared/widgets/coin_tile.dart';
+import 'package:gecko_lite/shared/widgets/shimmer_box.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+  testWidgets('CoinTile shows coin identity and market price', (tester) async {
+    const coin = Coin(
+      id: 'bitcoin',
+      symbol: 'btc',
+      name: 'Bitcoin',
+      price: 67420.15,
+      rank: 1,
+      change24hPct: 2.4,
+      isWatchlisted: true,
+    );
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: CoinTile(
+            coin: coin,
+            currency: 'usd',
+            onTap: () {},
+            onToggleWatchlist: () {},
+          ),
+        ),
+      ),
+    );
+    expect(find.text('Bitcoin'), findsOneWidget);
+    expect(find.text('BTC'), findsOneWidget);
+    expect(find.textContaining('67,420'), findsOneWidget);
+    expect(find.byTooltip('Remove from watchlist'), findsOneWidget);
+  });
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+  testWidgets('AsyncValueView renders loading, error, and empty states', (
+    tester,
+  ) async {
+    Widget view(AsyncValue<List<int>> value) => MaterialApp(
+      home: Scaffold(
+        body: AsyncValueView<List<int>>(
+          value: value,
+          onRetry: () {},
+          isEmpty: (items) => items.isEmpty,
+          emptyTitle: 'No data',
+          builder: (items) => Text('${items.length} values'),
+        ),
+      ),
+    );
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
+    await tester.pumpWidget(view(const AsyncLoading<List<int>>()));
+    expect(find.byType(ShimmerBox), findsWidgets);
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    await tester.pumpWidget(
+      view(AsyncError<List<int>>(Exception('offline'), StackTrace.current)),
+    );
+    await tester.pumpAndSettle();
+    expect(find.text('Try again'), findsOneWidget);
+
+    await tester.pumpWidget(view(const AsyncData<List<int>>([])));
+    await tester.pumpAndSettle();
+    expect(find.text('No data'), findsOneWidget);
   });
 }

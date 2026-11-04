@@ -1,0 +1,37 @@
+abstract final class AppSizes {
+  static const xs = 4.0;
+  static const sm = 8.0;
+  static const md = 12.0;
+  static const lg = 16.0;
+  static const xl = 24.0;
+  static const xxl = 32.0;
+  static const screenPadding = 16.0;
+  static const radiusSm = 8.0;
+  static const radiusMd = 12.0;
+  static const radiusLg = 16.0;
+  static const radiusPill = 999.0;
+  static const coinLogo = 36.0;
+  static const detailCoinLogo = 56.0;
+  static const coinTileHeight = 72.0;
+  static const sparklineWidth = 64.0;
+  static const sparklineHeight = 28.0;
+  static const chartHeight = 260.0;
+  static const chipHeight = 32.0;
+  static const rankColumn = 28.0;
+  static const iconSmall = 16.0;
+  static const iconMedium = 18.0;
+  static const loadingRowGap = 12.0;
+  static const loadingBoxHeight = 48.0;
+  static const statsChartHeight = 140.0;
+  static const donutCenter = 34.0;
+  static const donutSectionGap = 2.0;
+  static const donutRadius = 24.0;
+  static const legendDot = 8.0;
+  static const chartGridWidth = 0.8;
+  static const chartCrosshairWidth = 1.0;
+  static const chartTouchDot = 4.0;
+  static const chartTouchBorder = 2.0;
+  static const loadingItemCount = 6;
+  static const emptyStateHeightFraction = 0.65;
+  static const sparklineLineWidth = 1.8;
+}
