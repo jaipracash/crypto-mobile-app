@@ -2,8 +2,9 @@
 
 GeckoLite is a Flutter crypto research app built with Flutter Riverpod 2.x and a
 feature-first clean architecture. It consumes the companion FastAPI service and
-supports market browsing, coin details and charts, market statistics, a
-per-device watchlist, and persisted display preferences.
+supports market browsing, coin details and charts, global market metrics, a
+per-device watchlist, and persisted display preferences. The Home screen loads a
+single top-N market page and applies sorting and filters locally.
 
 ## Requirements
 
@@ -65,10 +66,9 @@ mapped to typed `Failure` values, and source headers are surfaced in the UI.
   formatting helpers.
 - `lib/shared/widgets/`: common loading, error, empty, market tile, chart, and
   connectivity UI.
-- `lib/features/market/`: market list, filtering, sorting, search, and its
-  repository.
+- `lib/features/market/`: Home market list, filtering, sorting, search, bottom
+  sheets, controllers, and its repository.
 - `lib/features/coin_details/`: coin fundamentals, price chart, and links.
-- `lib/features/stats/`: global market metrics, dominance, movers, and trending.
 - `lib/features/watchlist/`: device watchlist and optimistic updates.
 - `lib/features/settings/`: theme, currency, and auto-refresh preferences.
 - `test/`: formatter and repository unit tests plus shared widget tests.

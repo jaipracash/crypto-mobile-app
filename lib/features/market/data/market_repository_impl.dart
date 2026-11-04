@@ -2,7 +2,6 @@ import 'package:dio/dio.dart';
 
 import '../../../core/error/app_exception.dart';
 import '../../../core/error/failure.dart';
-import '../domain/coin.dart';
 import '../domain/market_models.dart';
 import '../domain/market_repository.dart';
 import 'coin_dto.dart';
@@ -19,14 +18,17 @@ class MarketRepositoryImpl implements MarketRepository {
     required int perPage,
     required String order,
     required String currency,
+    String? category,
   }) async {
     try {
-      final response = await _remote.getCoins({
+      final query = <String, dynamic>{
         'page': page,
         'per_page': perPage,
         'order': order,
         'currency': currency,
-      });
+      };
+      if (category != null) query['category'] = category;
+      final response = await _remote.getCoins(query);
       return CoinPageDto(
         Map<String, dynamic>.from(response.data as Map),
         response.headers.value('X-Data-Source') ?? 'live',
@@ -64,46 +66,23 @@ class MarketRepositoryImpl implements MarketRepository {
   }
 
   @override
-  Future<List<TrendingCoin>> getTrending() async {
+  Future<TrendingData> getTrending() async {
     try {
       final response = await _remote.getTrending();
       final json = Map<String, dynamic>.from(response.data as Map);
       final source = response.headers.value('X-Data-Source') ?? 'live';
-      return (json['items'] as List<dynamic>? ?? const [])
-          .whereType<Map<String, dynamic>>()
-          .map((item) => TrendingCoinDto(item, source))
-          .map((dto) => dto.toEntity())
-          .toList(growable: false);
-    } on DioException catch (error) {
-      throw mapDioFailure(error);
-    }
-  }
-
-  @override
-  Future<MarketMovers> getMovers({
-    required int limit,
-    required String currency,
-  }) async {
-    try {
-      final response = await _remote.getMovers(limit, currency);
-      final json = Map<String, dynamic>.from(response.data as Map);
-      final source = response.headers.value('X-Data-Source') ?? 'live';
-      final dto = MarketMoversDto(json, source);
-      return MarketMovers(
-        gainers: _parseCoins(json['gainers']),
-        losers: _parseCoins(json['losers']),
-        dataSource: dto.toEntity().dataSource,
+      return TrendingData(
+        items: (json['items'] as List<dynamic>? ?? const [])
+            .whereType<Map<String, dynamic>>()
+            .map(CoinDto.new)
+            .map((dto) => dto.toEntity())
+            .toList(growable: false),
+        dataSource: source,
       );
     } on DioException catch (error) {
       throw mapDioFailure(error);
     }
   }
-
-  List<Coin> _parseCoins(dynamic rows) => (rows as List<dynamic>? ?? const [])
-      .whereType<Map<String, dynamic>>()
-      .map(CoinDto.new)
-      .map((dto) => dto.toEntity())
-      .toList(growable: false);
 }
 
 Failure mapDioFailure(DioException error) {

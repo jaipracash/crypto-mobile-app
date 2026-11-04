@@ -1,5 +1,5 @@
 import '../domain/market_models.dart';
-import '../domain/coin.dart';
+
 import 'coin_dto.dart';
 
 class CoinPageDto {
@@ -46,36 +46,4 @@ class MarketSnapshotDto {
     activeCoins: (json['active_coins'] as num?)?.toInt(),
     dataSource: source,
   );
-}
-
-class TrendingCoinDto {
-  const TrendingCoinDto(this.json, this.source);
-  final Map<String, dynamic> json;
-  final String source;
-  TrendingCoin toEntity() => TrendingCoin(
-    id: json['id']?.toString() ?? '',
-    name: json['name']?.toString() ?? '',
-    symbol: json['symbol']?.toString() ?? '',
-    image: json['image']?.toString(),
-    rank: (json['rank'] as num?)?.toInt(),
-    priceBtc: (json['price_btc'] as num?)?.toDouble(),
-    dataSource: source,
-  );
-}
-
-class MarketMoversDto {
-  const MarketMoversDto(this.json, this.source);
-  final Map<String, dynamic> json;
-  final String source;
-  MarketMovers toEntity() => MarketMovers(
-    gainers: _coins(json['gainers']),
-    losers: _coins(json['losers']),
-    dataSource: source,
-  );
-
-  List<Coin> _coins(dynamic rows) => (rows as List<dynamic>? ?? const [])
-      .whereType<Map<String, dynamic>>()
-      .map(CoinDto.new)
-      .map((dto) => dto.toEntity())
-      .toList(growable: false);
 }

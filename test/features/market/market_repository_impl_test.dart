@@ -7,6 +7,7 @@ import 'package:gecko_lite/features/market/data/market_repository_impl.dart';
 class FakeMarketRemoteDataSource implements MarketRemoteDataSource {
   FakeMarketRemoteDataSource({this.fail = false});
   final bool fail;
+  Map<String, dynamic>? coinQuery;
 
   Response<dynamic> _response(Object data) => Response<dynamic>(
     requestOptions: RequestOptions(path: '/api/coins'),
@@ -28,6 +29,7 @@ class FakeMarketRemoteDataSource implements MarketRemoteDataSource {
   @override
   Future<Response<dynamic>> getCoins(Map<String, dynamic> query) async {
     _maybeFail();
+    coinQuery = query;
     return _response({
       'page': query['page'],
       'per_page': query['per_page'],
@@ -40,6 +42,10 @@ class FakeMarketRemoteDataSource implements MarketRemoteDataSource {
           'name': 'Bitcoin',
           'rank': 1,
           'price': 100,
+          'change_1h_pct': 0.1,
+          'change_24h_pct': 2.4,
+          'change_7d_pct': 4.8,
+          'change_30d_pct': 12.0,
           'sparkline_7d': [98, 100],
           'is_watchlisted': true,
         },
@@ -58,25 +64,29 @@ class FakeMarketRemoteDataSource implements MarketRemoteDataSource {
 
   @override
   Future<Response<dynamic>> getTrending() async => _response({'items': []});
-
-  @override
-  Future<Response<dynamic>> getMovers(int limit, String currency) async =>
-      _response({'gainers': [], 'losers': []});
 }
 
 void main() {
   test('maps coin page DTOs and X-Data-Source header', () async {
-    final repository = MarketRepositoryImpl(FakeMarketRemoteDataSource());
+    final remote = FakeMarketRemoteDataSource();
+    final repository = MarketRepositoryImpl(remote);
     final page = await repository.getCoins(
       page: 1,
-      perPage: 20,
+      perPage: 250,
       order: 'market_cap_desc',
       currency: 'usd',
+      category: 'layer-1',
     );
     expect(page.items.single.id, 'bitcoin');
     expect(page.items.single.isWatchlisted, isTrue);
     expect(page.dataSource, 'mock');
     expect(page.hasMore, isFalse);
+    expect(page.items.single.change1hPct, 0.1);
+    expect(page.items.single.change24hPct, 2.4);
+    expect(page.items.single.change7dPct, 4.8);
+    expect(page.items.single.change30dPct, 12.0);
+    expect(remote.coinQuery?['per_page'], 250);
+    expect(remote.coinQuery?['category'], 'layer-1');
   });
 
   test('converts network errors to a typed Failure', () async {

@@ -1,7 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
-import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_sizes.dart';
 
 class CoinAvatar extends StatelessWidget {
@@ -18,11 +17,10 @@ class CoinAvatar extends StatelessWidget {
   Widget build(BuildContext context) {
     final fallback = CircleAvatar(
       radius: size / 2,
-      backgroundColor: AppColors.brand.withValues(alpha: 0.16),
+      backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
       child: Text(
         symbol.isEmpty ? '?' : symbol.characters.first.toUpperCase(),
-        style: Theme.of(context).textTheme.titleMedium
-            ?.copyWith(color: AppColors.brand),
+        style: Theme.of(context).textTheme.titleMedium,
       ),
     );
     if (imageUrl == null || imageUrl!.isEmpty) return fallback;

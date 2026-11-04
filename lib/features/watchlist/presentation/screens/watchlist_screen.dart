@@ -82,7 +82,6 @@ class WatchlistScreen extends ConsumerWidget {
                       coin: coin.copyWith(isWatchlisted: true),
                       currency: currency,
                       onTap: () => context.push('/coin/${coin.id}'),
-                      onToggleWatchlist: () => _remove(context, ref, coin),
                     ),
                   ),
                 ),

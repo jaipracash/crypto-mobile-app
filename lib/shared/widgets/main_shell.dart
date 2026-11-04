@@ -21,12 +21,9 @@ class MainShell extends StatelessWidget {
       onDestinationSelected: navigationShell.goBranch,
       destinations: const [
         NavigationDestination(
-          icon: Icon(Icons.show_chart_rounded),
-          label: AppStrings.market,
-        ),
-        NavigationDestination(
-          icon: Icon(Icons.pie_chart_outline_rounded),
-          label: AppStrings.stats,
+          icon: Icon(Icons.home_outlined),
+          selectedIcon: Icon(Icons.home_rounded),
+          label: AppStrings.home,
         ),
         NavigationDestination(
           icon: Icon(Icons.star_outline_rounded),

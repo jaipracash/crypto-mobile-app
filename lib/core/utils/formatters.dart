@@ -2,9 +2,11 @@ import 'dart:math' as math;
 
 import 'package:intl/intl.dart';
 
+import '../constants/app_strings.dart';
+
 abstract final class Formatters {
   static String currency(double? value, String currencyCode) {
-    if (value == null) return '—';
+    if (value == null) return AppStrings.notAvailable;
     final absolute = value.abs();
     final decimals = absolute >= 1 || absolute == 0
         ? 2
@@ -20,25 +22,25 @@ abstract final class Formatters {
   }
 
   static String compact(double? value, {String currencyCode = 'usd'}) {
-    if (value == null) return '—';
+    if (value == null) return AppStrings.notAvailable;
     final format = NumberFormat.compact(locale: 'en');
     final prefix = currencyCode.toLowerCase() == 'inr' ? '₹' : r'$';
     return '$prefix${format.format(value)}';
   }
 
   static String percent(double? value) {
-    if (value == null) return '—';
+    if (value == null) return AppStrings.notAvailable;
     final sign = value > 0 ? '+' : '';
     return '$sign${value.toStringAsFixed(2)}%';
   }
 
   static String supply(double? value) {
-    if (value == null) return '∞';
+    if (value == null) return AppStrings.unlimited;
     return NumberFormat.compact(locale: 'en').format(value);
   }
 
   static String date(DateTime? value) {
-    if (value == null) return '—';
+    if (value == null) return AppStrings.notAvailable;
     return DateFormat('MMM d, yyyy').format(value.toLocal());
   }
 

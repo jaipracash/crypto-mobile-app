@@ -5,7 +5,6 @@ abstract class MarketRemoteDataSource {
   Future<Map<String, dynamic>> search(String query);
   Future<Response<dynamic>> getGlobal(String currency);
   Future<Response<dynamic>> getTrending();
-  Future<Response<dynamic>> getMovers(int limit, String currency);
 }
 
 class MarketRemoteDataSourceImpl implements MarketRemoteDataSource {
@@ -32,11 +31,4 @@ class MarketRemoteDataSourceImpl implements MarketRemoteDataSource {
   @override
   Future<Response<dynamic>> getTrending() =>
       _dio.get<dynamic>('/api/market/trending');
-
-  @override
-  Future<Response<dynamic>> getMovers(int limit, String currency) =>
-      _dio.get<dynamic>(
-        '/api/market/movers',
-        queryParameters: {'limit': limit, 'currency': currency},
-      );
 }

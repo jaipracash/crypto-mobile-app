@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_sizes.dart';
-import '../../core/constants/app_strings.dart';
 import '../../core/utils/formatters.dart';
 import '../../features/market/domain/coin.dart';
 import 'change_pill.dart';
@@ -14,13 +12,11 @@ class CoinTile extends StatelessWidget {
     required this.coin,
     required this.currency,
     required this.onTap,
-    required this.onToggleWatchlist,
     super.key,
   });
   final Coin coin;
   final String currency;
   final VoidCallback onTap;
-  final VoidCallback onToggleWatchlist;
 
   @override
   Widget build(BuildContext context) {
@@ -89,21 +85,6 @@ class CoinTile extends StatelessWidget {
               Sparkline(
                 values: coin.sparkline7d,
                 positive: (coin.change24hPct ?? 0) >= 0,
-              ),
-              IconButton(
-                tooltip: coin.isWatchlisted
-                    ? AppStrings.removeFromWatchlist
-                    : AppStrings.addToWatchlist,
-                onPressed: onToggleWatchlist,
-                icon: Icon(
-                  coin.isWatchlisted
-                      ? Icons.star_rounded
-                      : Icons.star_border_rounded,
-                ),
-                color: coin.isWatchlisted
-                    ? AppColors.watchlistStar
-                    : theme.colorScheme.onSurfaceVariant,
-                visualDensity: VisualDensity.compact,
               ),
             ],
           ),

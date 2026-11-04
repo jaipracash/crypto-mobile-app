@@ -8,8 +8,6 @@ import '../../features/market/data/market_repository_impl.dart';
 import '../../features/market/domain/market_repository.dart';
 import '../../features/settings/data/settings_repository_impl.dart';
 import '../../features/settings/domain/settings_repository.dart';
-import '../../features/stats/data/stats_repository_impl.dart';
-import '../../features/stats/domain/stats_repository.dart';
 import '../../features/watchlist/data/watchlist_remote_datasource.dart';
 import '../../features/watchlist/data/watchlist_repository_impl.dart';
 import '../../features/watchlist/domain/watchlist_repository.dart';
@@ -37,10 +35,6 @@ final watchlistRemoteDataSourceProvider = Provider<WatchlistRemoteDataSource>(
 final watchlistRepositoryProvider = Provider<WatchlistRepository>(
   (ref) =>
       WatchlistRepositoryImpl(ref.watch(watchlistRemoteDataSourceProvider)),
-);
-
-final statsRepositoryProvider = Provider<StatsRepository>(
-  (ref) => StatsRepositoryImpl(ref.watch(marketRepositoryProvider)),
 );
 
 final settingsRepositoryProvider = Provider<SettingsRepository>(

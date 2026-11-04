@@ -1,0 +1,204 @@
+import 'dart:async';
+
+import 'package:flutter/material.dart';
+
+import '../../../../core/constants/app_colors.dart';
+import '../../../../core/constants/app_sizes.dart';
+import '../../../../core/constants/app_strings.dart';
+import '../../../../core/utils/formatters.dart';
+import '../../../../shared/widgets/change_pill.dart';
+import '../../../../shared/widgets/coin_avatar.dart';
+import '../../../../shared/widgets/shimmer_box.dart';
+import '../../domain/coin.dart';
+import '../controllers/market_controller.dart';
+
+class CoinRow extends StatefulWidget {
+  const CoinRow({
+    required this.coin,
+    required this.currency,
+    required this.period,
+    required this.onTap,
+    super.key,
+  });
+
+  final Coin coin;
+  final String currency;
+  final ChangePeriod period;
+  final VoidCallback onTap;
+
+  @override
+  State<CoinRow> createState() => _CoinRowState();
+}
+
+class _CoinRowState extends State<CoinRow> {
+  Timer? _flashTimer;
+  bool? _priceRose;
+
+  @override
+  void didUpdateWidget(covariant CoinRow oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.coin.price != widget.coin.price &&
+        oldWidget.coin.price != null &&
+        widget.coin.price != null) {
+      _flashTimer?.cancel();
+      _priceRose = widget.coin.price! >= oldWidget.coin.price!;
+      _flashTimer = Timer(const Duration(milliseconds: 850), () {
+        if (mounted) setState(() => _priceRose = null);
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _flashTimer?.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final dark = theme.brightness == Brightness.dark;
+    final flashColor = _priceRose == null
+        ? theme.colorScheme.onSurface
+        : _priceRose!
+        ? (dark ? AppColors.darkGain : AppColors.lightGain)
+        : (dark ? AppColors.darkLoss : AppColors.lightLoss);
+    return InkWell(
+      onTap: widget.onTap,
+      child: SizedBox(
+        height: AppSizes.coinRowHeight,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSizes.screenPadding,
+          ),
+          child: Row(
+            children: [
+              SizedBox(
+                width: AppSizes.rankColumn,
+                child: Text(
+                  widget.coin.rank?.toString() ?? AppStrings.notAvailable,
+                  textAlign: TextAlign.center,
+                  style: theme.textTheme.bodySmall,
+                ),
+              ),
+              const SizedBox(width: AppSizes.sm),
+              CoinAvatar(
+                symbol: widget.coin.symbol,
+                imageUrl: widget.coin.image,
+              ),
+              const SizedBox(width: AppSizes.md),
+              Expanded(
+                flex: 5,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      widget.coin.name,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    Text(
+                      '${widget.coin.symbol.toUpperCase()} · ${AppStrings.marketCapShort} ${Formatters.compact(widget.coin.marketCap, currencyCode: widget.currency)}',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: theme.textTheme.bodySmall,
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: AppSizes.sm),
+              Expanded(
+                flex: 4,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    AnimatedDefaultTextStyle(
+                      duration: const Duration(milliseconds: 180),
+                      style: theme.textTheme.bodyMedium!.copyWith(
+                        color: flashColor,
+                        fontWeight: FontWeight.w600,
+                        fontFeatures: const [FontFeature.tabularFigures()],
+                      ),
+                      child: Text(
+                        Formatters.currency(widget.coin.price, widget.currency),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    const SizedBox(height: AppSizes.xs),
+                    ChangePill(
+                      change: widget.period.value(widget.coin),
+                      compact: true,
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class CoinRowSkeleton extends StatelessWidget {
+  const CoinRowSkeleton({super.key});
+
+  @override
+  Widget build(BuildContext context) => SizedBox(
+    height: AppSizes.coinRowHeight,
+    child: Padding(
+      padding: const EdgeInsets.symmetric(horizontal: AppSizes.screenPadding),
+      child: Row(
+        children: [
+          const ShimmerBox(
+            width: AppSizes.rankColumn,
+            height: AppSizes.loadingBoxHeight,
+          ),
+          const SizedBox(width: AppSizes.sm),
+          const ShimmerBox(
+            width: AppSizes.coinLogo,
+            height: AppSizes.coinLogo,
+            radius: AppSizes.radiusPill,
+          ),
+          const SizedBox(width: AppSizes.md),
+          const Expanded(
+            flex: 5,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                ShimmerBox(height: AppSizes.loadingBoxHeight / 2),
+                SizedBox(height: AppSizes.xs),
+                ShimmerBox(height: AppSizes.loadingBoxHeight / 3),
+              ],
+            ),
+          ),
+          const SizedBox(width: AppSizes.sm),
+          const Expanded(
+            flex: 4,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                ShimmerBox(
+                  width: AppSizes.loadingPriceWidth,
+                  height: AppSizes.loadingBoxHeight / 2,
+                ),
+                SizedBox(height: AppSizes.xs),
+                ShimmerBox(
+                  width: AppSizes.loadingChangeWidth,
+                  height: AppSizes.chipHeight / 2,
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
+}

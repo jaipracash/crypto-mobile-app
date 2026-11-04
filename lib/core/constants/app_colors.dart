@@ -21,7 +21,7 @@ abstract final class AppColors {
   static const warning = Color(0xFFF59E0B);
   static const btc = Color(0xFFF7931A);
   static const eth = Color(0xFF627EEA);
-  static const other = Color(0xFF8DC647);
+  static const other = Color(0xFF8B5CF6);
   static const watchlistStar = Color(0xFFF5B700);
   static const lightShimmerBase = Color(0xFFE9EDF2);
   static const lightShimmerHighlight = Color(0xFFF8FAFC);

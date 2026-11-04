@@ -66,44 +66,10 @@ class MarketSnapshot extends Equatable {
   ];
 }
 
-class TrendingCoin extends Equatable {
-  const TrendingCoin({
-    required this.id,
-    required this.name,
-    required this.symbol,
-    this.image,
-    this.rank,
-    this.priceBtc,
-    this.dataSource = 'live',
-  });
-  final String id;
-  final String name;
-  final String symbol;
-  final String? image;
-  final int? rank;
-  final double? priceBtc;
+class TrendingData extends Equatable {
+  const TrendingData({required this.items, this.dataSource = 'live'});
+  final List<Coin> items;
   final String dataSource;
   @override
-  List<Object?> get props => [
-    id,
-    name,
-    symbol,
-    image,
-    rank,
-    priceBtc,
-    dataSource,
-  ];
-}
-
-class MarketMovers extends Equatable {
-  const MarketMovers({
-    required this.gainers,
-    required this.losers,
-    this.dataSource = 'live',
-  });
-  final List<Coin> gainers;
-  final List<Coin> losers;
-  final String dataSource;
-  @override
-  List<Object?> get props => [gainers, losers, dataSource];
+  List<Object?> get props => [items, dataSource];
 }

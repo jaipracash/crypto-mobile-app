@@ -6,12 +6,9 @@ abstract class MarketRepository {
     required int perPage,
     required String order,
     required String currency,
+    String? category,
   });
   Future<List<SearchCoin>> search(String query);
   Future<MarketSnapshot> getGlobal(String currency);
-  Future<List<TrendingCoin>> getTrending();
-  Future<MarketMovers> getMovers({
-    required int limit,
-    required String currency,
-  });
+  Future<TrendingData> getTrending();
 }

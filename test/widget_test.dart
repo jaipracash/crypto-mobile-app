@@ -20,19 +20,15 @@ void main() {
     await tester.pumpWidget(
       MaterialApp(
         home: Scaffold(
-          body: CoinTile(
-            coin: coin,
-            currency: 'usd',
-            onTap: () {},
-            onToggleWatchlist: () {},
-          ),
+          body: CoinTile(coin: coin, currency: 'usd', onTap: () {}),
         ),
       ),
     );
     expect(find.text('Bitcoin'), findsOneWidget);
     expect(find.text('BTC'), findsOneWidget);
     expect(find.textContaining('67,420'), findsOneWidget);
-    expect(find.byTooltip('Remove from watchlist'), findsOneWidget);
+    expect(find.byTooltip('Remove from watchlist'), findsNothing);
+    expect(find.byIcon(Icons.star_rounded), findsNothing);
   });
 
   testWidgets('AsyncValueView renders loading, error, and empty states', (

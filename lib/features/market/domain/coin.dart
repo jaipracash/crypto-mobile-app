@@ -10,7 +10,10 @@ class Coin extends Equatable {
     this.price,
     this.marketCap,
     this.volume24h,
+    this.change1hPct,
     this.change24hPct,
+    this.change7dPct,
+    this.change30dPct,
     this.circulatingSupply,
     this.totalSupply,
     this.maxSupply,
@@ -26,27 +29,51 @@ class Coin extends Equatable {
   final double? price;
   final double? marketCap;
   final double? volume24h;
+  final double? change1hPct;
   final double? change24hPct;
+  final double? change7dPct;
+  final double? change30dPct;
   final double? circulatingSupply;
   final double? totalSupply;
   final double? maxSupply;
   final List<double> sparkline7d;
   final bool isWatchlisted;
 
-  Coin copyWith({bool? isWatchlisted}) => Coin(
-    id: id,
-    symbol: symbol,
-    name: name,
-    image: image,
-    rank: rank,
-    price: price,
-    marketCap: marketCap,
-    volume24h: volume24h,
-    change24hPct: change24hPct,
-    circulatingSupply: circulatingSupply,
-    totalSupply: totalSupply,
-    maxSupply: maxSupply,
-    sparkline7d: sparkline7d,
+  Coin copyWith({
+    String? id,
+    String? symbol,
+    String? name,
+    String? image,
+    int? rank,
+    double? price,
+    double? marketCap,
+    double? volume24h,
+    double? change1hPct,
+    double? change24hPct,
+    double? change7dPct,
+    double? change30dPct,
+    double? circulatingSupply,
+    double? totalSupply,
+    double? maxSupply,
+    List<double>? sparkline7d,
+    bool? isWatchlisted,
+  }) => Coin(
+    id: id ?? this.id,
+    symbol: symbol ?? this.symbol,
+    name: name ?? this.name,
+    image: image ?? this.image,
+    rank: rank ?? this.rank,
+    price: price ?? this.price,
+    marketCap: marketCap ?? this.marketCap,
+    volume24h: volume24h ?? this.volume24h,
+    change1hPct: change1hPct ?? this.change1hPct,
+    change24hPct: change24hPct ?? this.change24hPct,
+    change7dPct: change7dPct ?? this.change7dPct,
+    change30dPct: change30dPct ?? this.change30dPct,
+    circulatingSupply: circulatingSupply ?? this.circulatingSupply,
+    totalSupply: totalSupply ?? this.totalSupply,
+    maxSupply: maxSupply ?? this.maxSupply,
+    sparkline7d: sparkline7d ?? this.sparkline7d,
     isWatchlisted: isWatchlisted ?? this.isWatchlisted,
   );
 
@@ -60,7 +87,10 @@ class Coin extends Equatable {
     price,
     marketCap,
     volume24h,
+    change1hPct,
     change24hPct,
+    change7dPct,
+    change30dPct,
     circulatingSupply,
     totalSupply,
     maxSupply,

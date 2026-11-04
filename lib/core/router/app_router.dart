@@ -3,9 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../features/coin_details/presentation/screens/coin_details_screen.dart';
-import '../../features/market/presentation/screens/market_screen.dart';
+import '../../features/market/presentation/screens/home_screen.dart';
 import '../../features/settings/presentation/screens/settings_screen.dart';
-import '../../features/stats/presentation/screens/stats_screen.dart';
 import '../../features/watchlist/presentation/screens/watchlist_screen.dart';
 import '../../shared/widgets/main_shell.dart';
 import 'routes.dart';
@@ -25,15 +24,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             routes: [
               GoRoute(
                 path: Routes.market,
-                builder: (_, _) => const MarketScreen(),
-              ),
-            ],
-          ),
-          StatefulShellBranch(
-            routes: [
-              GoRoute(
-                path: Routes.stats,
-                builder: (_, _) => const StatsScreen(),
+                builder: (_, _) => const HomeScreen(),
               ),
             ],
           ),

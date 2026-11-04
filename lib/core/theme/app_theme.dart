@@ -74,7 +74,9 @@ abstract final class AppTheme {
       ),
       navigationBarTheme: NavigationBarThemeData(
         backgroundColor: surface,
-        indicatorColor: AppColors.brand.withValues(alpha: 0.18),
+        indicatorColor: dark
+            ? AppColors.darkSurfaceVariant
+            : AppColors.lightSurfaceVariant,
         labelTextStyle: WidgetStatePropertyAll(
           AppTypography.textTheme(primary, secondary).labelMedium,
         ),
