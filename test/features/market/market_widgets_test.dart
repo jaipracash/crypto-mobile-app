@@ -1,3 +1,4 @@
+import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -9,6 +10,7 @@ import 'package:gecko_lite/features/market/domain/market_models.dart';
 import 'package:gecko_lite/features/market/presentation/controllers/market_controller.dart';
 import 'package:gecko_lite/features/market/presentation/widgets/coin_row.dart';
 import 'package:gecko_lite/features/market/presentation/widgets/market_sheets.dart';
+import 'package:gecko_lite/shared/widgets/change_pill.dart';
 import 'package:gecko_lite/shared/widgets/sparkline.dart';
 
 void main() {
@@ -43,6 +45,21 @@ void main() {
     final sparkline = tester.widget<Sparkline>(find.byType(Sparkline));
     expect(sparkline.filled, isTrue);
     expect(sparkline.positive, isTrue);
+    expect(sparkline.width, 66);
+    expect(sparkline.height, 28);
+    expect(
+      tester
+          .widget<LineChart>(find.byType(LineChart))
+          .data
+          .lineBarsData
+          .single
+          .isCurved,
+      isTrue,
+    );
+    expect(
+      tester.getTopLeft(find.byType(Sparkline)).dy,
+      lessThan(tester.getTopLeft(find.byType(ChangePill)).dy),
+    );
     expect(find.byTooltip(AppStrings.addToWatchlist), findsNothing);
     expect(find.byTooltip(AppStrings.removeFromWatchlist), findsNothing);
     expect(find.byIcon(Icons.star_border_rounded), findsNothing);
@@ -159,6 +176,12 @@ void main() {
 
     await tester.tap(find.text(AppStrings.filter));
     await tester.pumpAndSettle();
+    expect(find.byType(FilledButton), findsNWidgets(2));
+    for (final chip in tester.widgetList<ChoiceChip>(find.byType(ChoiceChip))) {
+      expect(chip.shape, isA<StadiumBorder>());
+      expect(chip.showCheckmark, isFalse);
+      expect(chip.avatar, isNull);
+    }
     await tester.drag(
       find.byType(SingleChildScrollView),
       const Offset(0, -500),

@@ -51,8 +51,10 @@ class Sparkline extends StatelessWidget {
                   .map((entry) => FlSpot(entry.$1.toDouble(), entry.$2))
                   .toList(),
               isCurved: true,
+              curveSmoothness: 0.18,
               barWidth: AppSizes.sparklineLineWidth,
               color: color,
+              isStrokeCapRound: true,
               dotData: const FlDotData(show: false),
               belowBarData: BarAreaData(
                 show: filled,

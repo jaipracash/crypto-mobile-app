@@ -89,7 +89,7 @@ class _CoinRowState extends State<CoinRow> {
               ),
               const SizedBox(width: AppSizes.md),
               Expanded(
-                flex: 5,
+                flex: 4,
                 child: Row(
                   children: [
                     Expanded(
@@ -117,9 +117,9 @@ class _CoinRowState extends State<CoinRow> {
                   ],
                 ),
               ),
-              const SizedBox(width: AppSizes.sm),
+              const SizedBox(width: AppSizes.xs),
               Expanded(
-                flex: 4,
+                flex: 6,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.end,
@@ -147,17 +147,17 @@ class _CoinRowState extends State<CoinRow> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    ChangePill(
-                      change: widget.period.value(widget.coin),
-                      compact: true,
-                    ),
-                    const SizedBox(height: AppSizes.xs),
                     Sparkline(
                       values: widget.coin.sparkline7d,
                       positive: (widget.period.value(widget.coin) ?? 0) >= 0,
-                      width: 58,
-                      height: 22,
+                      width: 66,
+                      height: 28,
                       filled: true,
+                    ),
+                    const SizedBox(height: AppSizes.xs),
+                    ChangePill(
+                      change: widget.period.value(widget.coin),
+                      compact: true,
                     ),
                   ],
                 ),
@@ -199,11 +199,11 @@ class CoinTableHeader extends StatelessWidget {
           const SizedBox(width: AppSizes.coinLogo),
           const SizedBox(width: AppSizes.md),
           Expanded(
-            flex: 5,
+            flex: 4,
             child: Text(AppStrings.coin, style: _style(context)),
           ),
           Expanded(
-            flex: 4,
+            flex: 6,
             child: Text(
               AppStrings.price,
               textAlign: TextAlign.right,

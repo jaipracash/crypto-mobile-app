@@ -20,6 +20,7 @@ abstract final class AppSizes {
   static const rankColumn = 28.0;
   static const iconSmall = 16.0;
   static const iconMedium = 18.0;
+  static const iconLarge = 24.0;
   static const loadingRowGap = 12.0;
   static const loadingBoxHeight = 48.0;
   static const statsChartHeight = 140.0;
@@ -48,7 +49,7 @@ abstract final class AppSizes {
   static const homeTabUnderlineHeight = 2.0;
   static const filterBadgeRadius = 9.0;
   static const filterBadgeTextSize = 10.0;
-  static const filterButtonExtent = 40.0;
+  static const filterButtonExtent = 44.0;
   static const loadingPriceWidth = 92.0;
   static const loadingChangeWidth = 60.0;
   static const tabIndicatorWidth = 32.0;

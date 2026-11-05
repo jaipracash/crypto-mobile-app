@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_sizes.dart';
 import '../../../../core/constants/app_strings.dart';
 import '../../../../core/utils/formatters.dart';
@@ -254,7 +253,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               const SnackBar(content: Text(AppStrings.noNotifications)),
             );
           },
-          icon: _controlIcon('assets/notification-6-svgrepo-com.svg'),
+          icon: _controlIcon(
+            'assets/notification-6-svgrepo-com.svg',
+            size: AppSizes.xxl,
+          ),
         ),
       ],
     );
@@ -267,14 +269,43 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         Row(
           children: [
             Expanded(
-              child: SingleChildScrollView(
-                controller: _tabsController,
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: HomeTab.values
-                      .map((item) => _homeTab(item, tab))
-                      .toList(),
+              child: SizedBox(
+                height: AppSizes.homeTabHeight,
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    SingleChildScrollView(
+                      controller: _tabsController,
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: HomeTab.values
+                            .map((item) => _homeTab(item, tab))
+                            .toList(),
+                      ),
+                    ),
+                    Positioned(
+                      top: 0,
+                      bottom: 0,
+                      right: 0,
+                      child: IgnorePointer(
+                        child: Container(
+                          width: AppSizes.xxl,
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.centerLeft,
+                              end: Alignment.centerRight,
+                              colors: [
+                                Theme.of(context).colorScheme.surface
+                                    .withValues(alpha: 0),
+                                Theme.of(context).colorScheme.surface,
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
@@ -283,12 +314,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  IconButton(
-                    tooltip: AppStrings.sortCoins,
-                    onPressed: () => _openSheet(const SortSheet()),
-                    icon: _controlIcon('assets/sort-vertical-svgrepo-com.svg'),
-                    padding: EdgeInsets.zero,
-                    visualDensity: VisualDensity.compact,
+                  SizedBox(
+                    width: AppSizes.filterButtonExtent,
+                    height: AppSizes.homeTabHeight,
+                    child: IconButton(
+                      tooltip: AppStrings.sortCoins,
+                      onPressed: () => _openSheet(const SortSheet()),
+                      icon: _controlIcon(
+                        'assets/sort-vertical-svgrepo-com.svg',
+                      ),
+                      padding: EdgeInsets.zero,
+                      visualDensity: VisualDensity.compact,
+                    ),
                   ),
                   SizedBox(
                     width: AppSizes.filterButtonExtent,
@@ -348,49 +385,47 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         HomeTab.losers => 66,
       },
       height: AppSizes.homeTabHeight,
-      child: Column(
+      child: Stack(
+        alignment: Alignment.bottomCenter,
         children: [
-          const Spacer(),
-          Text(
-            _tabLabel(item),
-            style: Theme.of(context).textTheme.labelLarge?.copyWith(
-              color: item == selectedTab
-                  ? Theme.of(context).colorScheme.primary
-                  : Theme.of(context).colorScheme.onSurfaceVariant,
-              fontWeight: item == selectedTab
-                  ? FontWeight.w700
-                  : FontWeight.w500,
-            ),
-          ),
-          const SizedBox(height: AppSizes.xs),
-          SizedBox(
-            height: AppSizes.homeTabUnderlineHeight,
-            child: Align(
-              alignment: Alignment.bottomCenter,
-              child: Container(
-                width: item == selectedTab ? AppSizes.tabIndicatorWidth : 0,
-                height: AppSizes.homeTabUnderlineHeight,
+          Center(
+            child: Text(
+              _tabLabel(item),
+              style: Theme.of(context).textTheme.labelLarge?.copyWith(
                 color: item == selectedTab
-                    ? AppColors.brand
-                    : Colors.transparent,
+                    ? Theme.of(context).colorScheme.primary
+                    : Theme.of(context).colorScheme.onSurfaceVariant,
+                fontWeight: item == selectedTab
+                    ? FontWeight.w700
+                    : FontWeight.w500,
               ),
             ),
           ),
-          const Spacer(),
+          if (item == selectedTab)
+            Container(
+              width: AppSizes.tabIndicatorWidth,
+              height: AppSizes.homeTabUnderlineHeight,
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.primary,
+                borderRadius: BorderRadius.circular(AppSizes.radiusPill),
+              ),
+            ),
         ],
       ),
     ),
   );
 
-  Widget _controlIcon(String asset) => SvgPicture.asset(
-    asset,
-    width: AppSizes.iconMedium,
-    height: AppSizes.iconMedium,
-    colorFilter: ColorFilter.mode(
-      Theme.of(context).colorScheme.onSurfaceVariant,
-      BlendMode.srcIn,
-    ),
-  );
+  Widget _controlIcon(String asset, {double size = AppSizes.iconLarge}) =>
+      SvgPicture.asset(
+        asset,
+        width: size,
+        height: size,
+        fit: BoxFit.contain,
+        colorFilter: ColorFilter.mode(
+          Theme.of(context).colorScheme.onSurfaceVariant,
+          BlendMode.srcIn,
+        ),
+      );
 
   String _tabLabel(HomeTab tab) => switch (tab) {
     HomeTab.all => AppStrings.allCoins,
@@ -577,7 +612,7 @@ class _HomeControlsDelegate extends SliverPersistentHeaderDelegate {
     BuildContext context,
     double shrinkOffset,
     bool overlapsContent,
-  ) => child;
+  ) => SizedBox(height: maxExtent, child: child);
 
   @override
   bool shouldRebuild(covariant _HomeControlsDelegate oldDelegate) =>

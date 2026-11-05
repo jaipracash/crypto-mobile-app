@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gecko_lite/core/error/failure.dart';
+import 'package:gecko_lite/features/market/data/coin_dto.dart';
 import 'package:gecko_lite/features/market/data/market_remote_datasource.dart';
 import 'package:gecko_lite/features/market/data/market_repository_impl.dart';
 
@@ -67,6 +68,26 @@ class FakeMarketRemoteDataSource implements MarketRemoteDataSource {
 }
 
 void main() {
+  test('maps nested CoinGecko trending item data', () {
+    final coin = const CoinDto({
+      'id': 'bitcoin',
+      'symbol': 'btc',
+      'name': 'Bitcoin',
+      'market_cap_rank': 1,
+      'data': {
+        'price': '\$67,420.15',
+        'market_cap': '\$1.32T',
+        'total_volume': '\$28.4B',
+        'price_change_percentage_24h': {'usd': '2.4'},
+      },
+    }).toEntity();
+
+    expect(coin.price, 67420.15);
+    expect(coin.marketCap, 1.32e12);
+    expect(coin.volume24h, 28.4e9);
+    expect(coin.change24hPct, 2.4);
+  });
+
   test('maps coin page DTOs and X-Data-Source header', () async {
     final remote = FakeMarketRemoteDataSource();
     final repository = MarketRepositoryImpl(remote);

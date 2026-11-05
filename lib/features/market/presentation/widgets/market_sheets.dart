@@ -39,10 +39,8 @@ class BottomSheetScaffold extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Material(
     color: Theme.of(context).colorScheme.surface,
-    shape: const RoundedRectangleBorder(
-      borderRadius: BorderRadius.vertical(
-        top: Radius.circular(AppSizes.radiusLg),
-      ),
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(AppSizes.radiusLg),
     ),
     clipBehavior: Clip.antiAlias,
     child: SafeArea(
@@ -62,9 +60,14 @@ class BottomSheetScaffold extends StatelessWidget {
           ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: AppSizes.lg),
-            child: Align(
-              alignment: Alignment.centerLeft,
-              child: Text(title, style: Theme.of(context).textTheme.titleLarge),
+            child: SizedBox(
+              width: double.infinity,
+              child: Center(
+                child: Text(
+                  title,
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+              ),
             ),
           ),
           Flexible(fit: FlexFit.loose, child: child),
@@ -134,17 +137,29 @@ class _FilterSheetState extends ConsumerState<FilterSheet> {
       padding: const EdgeInsets.symmetric(horizontal: AppSizes.screenPadding),
       child: Row(
         children: [
-          TextButton(
-            onPressed: () => setState(() => _draft = _draft.reset()),
-            child: const Text(AppStrings.reset),
+          Expanded(
+            child: FilledButton(
+              onPressed: () => setState(() => _draft = _draft.reset()),
+              child: const Text(AppStrings.reset),
+              style: _sheetButtonStyle(
+                context,
+                backgroundColor: Theme.of(context)
+                    .colorScheme
+                    .surfaceContainerHighest,
+                foregroundColor: Theme.of(context).colorScheme.onSurface,
+              ),
+            ),
           ),
-          const Spacer(),
-          FilledButton(
-            onPressed: () {
-              ref.read(marketFiltersProvider.notifier).set(_draft);
-              Navigator.of(context).pop();
-            },
-            child: Text('${AppStrings.apply} (${_draft.activeCount})'),
+          const SizedBox(width: AppSizes.sm),
+          Expanded(
+            child: FilledButton(
+              onPressed: () {
+                ref.read(marketFiltersProvider.notifier).set(_draft);
+                Navigator.of(context).pop();
+              },
+              child: Text('${AppStrings.apply} (${_draft.activeCount})'),
+              style: _sheetButtonStyle(context),
+            ),
           ),
         ],
       ),
@@ -212,14 +227,11 @@ class _FilterSheetState extends ConsumerState<FilterSheet> {
         runSpacing: AppSizes.xs,
         children: options.map((option) {
           final isSelected = option.$1 == selected;
-          return ChoiceChip(
-            label: Text(option.$2),
+          return _sheetChoiceChip(
+            context,
+            label: option.$2,
             selected: isSelected,
-            onSelected: (_) => onChanged(option.$1),
-            showCheckmark: false,
-            avatar: isSelected
-                ? const Icon(Icons.check_rounded, size: AppSizes.iconSmall)
-                : null,
+            onSelected: () => onChanged(option.$1),
           );
         }).toList(),
       ),
@@ -266,6 +278,7 @@ class _SortSheetState extends ConsumerState<SortSheet> {
             Navigator.of(context).pop();
           },
           child: const Text(AppStrings.apply),
+          style: _sheetButtonStyle(context),
         ),
       ),
     ),
@@ -290,14 +303,11 @@ class _SortSheetState extends ConsumerState<SortSheet> {
             runSpacing: AppSizes.xs,
             children: MarketSortField.values.map((field) {
               final selected = field == _field;
-              return ChoiceChip(
-                label: Text(_sortLabel(field)),
+              return _sheetChoiceChip(
+                context,
+                label: _sortLabel(field),
                 selected: selected,
-                showCheckmark: false,
-                avatar: selected
-                    ? const Icon(Icons.check_rounded, size: AppSizes.iconSmall)
-                    : null,
-                onSelected: (_) => setState(() => _field = field),
+                onSelected: () => setState(() => _field = field),
               );
             }).toList(),
           ),
@@ -316,11 +326,11 @@ class _SortSheetState extends ConsumerState<SortSheet> {
     ),
   );
 
-  Widget _directionChip(String label, bool ascending) => ChoiceChip(
-    label: Text(label),
+  Widget _directionChip(String label, bool ascending) => _sheetChoiceChip(
+    context,
+    label: label,
     selected: _ascending == ascending,
-    showCheckmark: false,
-    onSelected: (_) => setState(() => _ascending = ascending),
+    onSelected: () => setState(() => _ascending = ascending),
   );
 
   String _sortLabel(MarketSortField field) => switch (field) {
@@ -330,6 +340,48 @@ class _SortSheetState extends ConsumerState<SortSheet> {
     MarketSortField.volume => AppStrings.volume,
   };
 }
+
+Widget _sheetChoiceChip(
+  BuildContext context, {
+  required String label,
+  required bool selected,
+  required VoidCallback onSelected,
+}) => ChoiceChip(
+  label: Text(
+    label,
+    style: Theme.of(context).textTheme.labelMedium?.copyWith(
+      color: selected
+          ? Theme.of(context).colorScheme.onPrimary
+          : Theme.of(context).colorScheme.onSurface,
+    ),
+  ),
+  selected: selected,
+  onSelected: (_) => onSelected(),
+  showCheckmark: false,
+  materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+  visualDensity: VisualDensity.compact,
+  padding: const EdgeInsets.symmetric(horizontal: AppSizes.xs),
+  labelPadding: const EdgeInsets.symmetric(horizontal: AppSizes.xs),
+  selectedColor: Theme.of(context).colorScheme.primary,
+  backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
+  shape: const StadiumBorder(),
+  side: BorderSide.none,
+);
+
+ButtonStyle _sheetButtonStyle(
+  BuildContext context, {
+  Color? backgroundColor,
+  Color? foregroundColor,
+}) => FilledButton.styleFrom(
+  backgroundColor: backgroundColor,
+  foregroundColor: foregroundColor,
+  minimumSize: const Size(0, 44),
+  padding: const EdgeInsets.symmetric(horizontal: AppSizes.md),
+  shape: RoundedRectangleBorder(
+    borderRadius: BorderRadius.circular(AppSizes.radiusMd),
+  ),
+  textStyle: Theme.of(context).textTheme.labelLarge,
+);
 
 class MarketOverviewPanel extends StatelessWidget {
   const MarketOverviewPanel({
