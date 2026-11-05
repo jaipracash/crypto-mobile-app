@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/constants/app_sizes.dart';
@@ -49,7 +50,18 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                 textInputAction: TextInputAction.search,
                 decoration: InputDecoration(
                   hintText: AppStrings.searchCoins,
-                  prefixIcon: const Icon(Icons.search),
+                  prefixIcon: Padding(
+                    padding: const EdgeInsets.all(AppSizes.md),
+                    child: SvgPicture.asset(
+                      'assets/search-alt-2-svgrepo-com.svg',
+                      width: AppSizes.iconMedium,
+                      height: AppSizes.iconMedium,
+                      colorFilter: ColorFilter.mode(
+                        Theme.of(context).colorScheme.onSurfaceVariant,
+                        BlendMode.srcIn,
+                      ),
+                    ),
+                  ),
                   suffixIcon: query.isEmpty
                       ? null
                       : IconButton(

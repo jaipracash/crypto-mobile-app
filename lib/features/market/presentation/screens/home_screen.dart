@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/constants/app_colors.dart';
@@ -29,6 +30,14 @@ class HomeScreen extends ConsumerStatefulWidget {
 }
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
+  final ScrollController _tabsController = ScrollController();
+
+  @override
+  void dispose() {
+    _tabsController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -90,7 +99,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   delegate: _HomeControlsDelegate(
                     minHeight: AppSizes.homePinnedHeaderHeight,
                     maxHeight: AppSizes.homePinnedHeaderHeight,
-                    child: _homeControls(tab, period, filters),
+                    child: _homeControls(tab, filters),
                   ),
                 ),
                 SliverToBoxAdapter(
@@ -105,7 +114,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                               : () => ref
                                     .read(coinListControllerProvider.notifier)
                                     .refresh(),
-                          loading: const _CoinRowsLoading(),
+                          loading: _CoinRowsLoading(period: period),
                           builder: (_) => _coinListSection(
                             tab: tab,
                             source: source,
@@ -128,6 +137,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     return AsyncValueView<MarketSnapshot>(
       value: overview,
       onRetry: () => ref.read(globalStatsControllerProvider.notifier).refresh(),
+      loading: const SizedBox(
+        height: AppSizes.marketCardHeight * 2,
+        child: Center(child: CircularProgressIndicator()),
+      ),
       builder: (snapshot) => Column(
         children: [
           DataSourceBanner(source: snapshot.dataSource),
@@ -162,31 +175,33 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           ),
         )
       else
-        ListView.builder(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          itemCount: coins.length,
-          itemBuilder: (context, index) {
-            final coin = coins[index];
-            return Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                CoinRow(
-                  coin: coin,
-                  currency: currency,
-                  period: period,
-                  onTap: () => context.push('/coin/${coin.id}'),
-                ),
-                Divider(
-                  height: AppSizes.hairline,
-                  thickness: AppSizes.hairline,
-                  indent: AppSizes.screenPadding,
-                  endIndent: AppSizes.screenPadding,
-                  color: Theme.of(context).dividerColor,
-                ),
-              ],
-            );
-          },
+        Column(
+          children: [
+            CoinTableHeader(
+              period: period,
+              onPeriodTap: () => _openSheet(const PeriodSheet()),
+            ),
+            Divider(
+              height: AppSizes.hairline,
+              thickness: AppSizes.hairline,
+              color: Theme.of(context).dividerColor,
+            ),
+            for (final coin in coins) ...[
+              CoinRow(
+                coin: coin,
+                currency: currency,
+                period: period,
+                onTap: () => context.push('/coin/${coin.id}'),
+              ),
+              Divider(
+                height: AppSizes.hairline,
+                thickness: AppSizes.hairline,
+                indent: AppSizes.screenPadding,
+                endIndent: AppSizes.screenPadding,
+                color: Theme.of(context).dividerColor,
+              ),
+            ],
+          ],
         ),
     ],
   );
@@ -201,7 +216,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             onTap: () => context.go(Routes.search),
             decoration: InputDecoration(
               hintText: AppStrings.searchCoins,
-              prefixIcon: const Icon(Icons.search),
+              prefixIcon: Padding(
+                padding: const EdgeInsets.all(AppSizes.md),
+                child: SvgPicture.asset(
+                  'assets/search-alt-2-svgrepo-com.svg',
+                  width: AppSizes.iconMedium,
+                  height: AppSizes.iconMedium,
+                  colorFilter: ColorFilter.mode(
+                    Theme.of(context).colorScheme.onSurfaceVariant,
+                    BlendMode.srcIn,
+                  ),
+                ),
+              ),
               filled: true,
               fillColor: Theme.of(context).colorScheme.surfaceContainerHighest,
               border: OutlineInputBorder(
@@ -234,24 +260,25 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
-  Widget _homeControls(
-    HomeTab tab,
-    ChangePeriod period,
-    MarketFilters filters,
-  ) => Material(
+  Widget _homeControls(HomeTab tab, MarketFilters filters) => Material(
     color: Theme.of(context).colorScheme.surface,
     child: Column(
       children: [
         Row(
           children: [
             Expanded(
-              child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: HomeTab.values
-                      .map((item) => _homeTab(item, tab))
-                      .toList(),
+              child: Scrollbar(
+                controller: _tabsController,
+                thumbVisibility: true,
+                child: SingleChildScrollView(
+                  controller: _tabsController,
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: HomeTab.values
+                        .map((item) => _homeTab(item, tab))
+                        .toList(),
+                  ),
                 ),
               ),
             ),
@@ -310,74 +337,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           thickness: AppSizes.hairline,
           color: Theme.of(context).dividerColor,
         ),
-        SizedBox(
-          height: AppSizes.homeColumnHeaderHeight,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppSizes.screenPadding,
-            ),
-            child: Row(
-              children: [
-                Expanded(
-                  flex: 5,
-                  child: Row(
-                    children: [
-                      SizedBox(
-                        width: AppSizes.rankColumn,
-                        child: Text(
-                          '#',
-                          textAlign: TextAlign.center,
-                          style: Theme.of(context).textTheme.labelMedium
-                              ?.copyWith(
-                                fontSize: AppSizes.homeColumnTitleFontSize,
-                                fontWeight: FontWeight.w600,
-                              ),
-                        ),
-                      ),
-                      const SizedBox(width: AppSizes.sm),
-                      const SizedBox(width: AppSizes.coinLogo),
-                      const SizedBox(width: AppSizes.md),
-                      Expanded(
-                        child: _SortHeader(
-                          label: AppStrings.coin,
-                          alignStart: true,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Expanded(flex: 4, child: _SortHeader(label: AppStrings.price)),
-                Expanded(
-                  flex: 3,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      Flexible(child: _SortHeader(label: '${period.label} %')),
-                      Tooltip(
-                        message: AppStrings.changePeriod,
-                        child: InkWell(
-                          onTap: () => _openSheet(const PeriodSheet()),
-                          child: const Padding(
-                            padding: EdgeInsets.only(left: AppSizes.xs),
-                            child: Icon(
-                              Icons.expand_more,
-                              size: AppSizes.iconMedium,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-        Divider(
-          height: AppSizes.hairline,
-          thickness: AppSizes.hairline,
-          color: Theme.of(context).dividerColor,
-        ),
       ],
     ),
   );
@@ -385,7 +344,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   Widget _homeTab(HomeTab item, HomeTab selectedTab) => InkWell(
     onTap: () => ref.read(homeTabProvider.notifier).select(item),
     child: SizedBox(
-      width: item == HomeTab.overview ? 76 : 64,
+      width: switch (item) {
+        HomeTab.overview => 88,
+        HomeTab.all => 60,
+        HomeTab.trending => 88,
+        HomeTab.gainers => 84,
+        HomeTab.losers => 76,
+      },
       height: AppSizes.homeTabHeight,
       child: Column(
         children: [
@@ -440,39 +405,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 }
 
-class _SortHeader extends StatelessWidget {
-  const _SortHeader({required this.label, this.alignStart = false});
-
-  final String label;
-  final bool alignStart;
-
-  @override
-  Widget build(BuildContext context) => Row(
-    mainAxisAlignment: alignStart
-        ? MainAxisAlignment.start
-        : MainAxisAlignment.end,
-    children: [
-      Flexible(
-        child: Text(
-          label,
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-          style: Theme.of(context).textTheme.labelMedium?.copyWith(
-            fontSize: AppSizes.homeColumnTitleFontSize,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-      ),
-    ],
-  );
-}
-
 class _CoinRowsLoading extends StatelessWidget {
-  const _CoinRowsLoading();
+  const _CoinRowsLoading({required this.period});
+
+  final ChangePeriod period;
 
   @override
   Widget build(BuildContext context) => Column(
     children: [
+      CoinTableHeader(period: period, onPeriodTap: () {}),
       for (var index = 0; index < AppSizes.loadingItemCount; index++) ...[
         const CoinRowSkeleton(),
         const Divider(height: AppSizes.hairline, thickness: AppSizes.hairline),

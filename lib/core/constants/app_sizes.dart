@@ -39,7 +39,7 @@ abstract final class AppSizes {
   static const sheetHandleHeight = 4.0;
   static const sheetMaxHeightFraction = 0.88;
   static const homeExpandedHeight = 198.0;
-  static const homePinnedHeaderHeight = 88.0;
+  static const homePinnedHeaderHeight = 46.0;
   static const searchResultsHeight = 210.0;
   static const marketCardHeight = 84.0;
   static const coinRowHeight = 76.0;

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../core/constants/app_strings.dart';
@@ -19,25 +20,76 @@ class MainShell extends StatelessWidget {
     bottomNavigationBar: NavigationBar(
       selectedIndex: navigationShell.currentIndex,
       onDestinationSelected: navigationShell.goBranch,
-      destinations: const [
+      destinations: [
         NavigationDestination(
-          icon: Icon(Icons.home_outlined),
-          selectedIcon: Icon(Icons.home_rounded),
+          icon: _navigationIcon(
+            context,
+            'assets/dart-svgrepo-com.svg',
+            selected: false,
+          ),
+          selectedIcon: _navigationIcon(
+            context,
+            'assets/dart-svgrepo-com.svg',
+            selected: true,
+          ),
           label: AppStrings.home,
         ),
         NavigationDestination(
-          icon: Icon(Icons.search_rounded),
+          icon: _navigationIcon(
+            context,
+            'assets/search-alt-2-svgrepo-com.svg',
+            selected: false,
+          ),
+          selectedIcon: _navigationIcon(
+            context,
+            'assets/search-alt-2-svgrepo-com.svg',
+            selected: true,
+          ),
           label: AppStrings.search,
         ),
         NavigationDestination(
-          icon: Icon(Icons.star_outline_rounded),
+          icon: _navigationIcon(
+            context,
+            'assets/watchlist.svg',
+            selected: false,
+          ),
+          selectedIcon: _navigationIcon(
+            context,
+            'assets/watchlist.svg',
+            selected: true,
+          ),
           label: AppStrings.watchlist,
         ),
         NavigationDestination(
-          icon: Icon(Icons.settings_outlined),
+          icon: _navigationIcon(
+            context,
+            'assets/profile-svgrepo-com.svg',
+            selected: false,
+          ),
+          selectedIcon: _navigationIcon(
+            context,
+            'assets/profile-svgrepo-com.svg',
+            selected: true,
+          ),
           label: AppStrings.settings,
         ),
       ],
     ),
   );
+
+  Widget _navigationIcon(
+    BuildContext context,
+    String asset, {
+    required bool selected,
+  }) {
+    final color = selected
+        ? Theme.of(context).colorScheme.onSecondaryContainer
+        : Theme.of(context).colorScheme.onSurfaceVariant;
+    return SvgPicture.asset(
+      asset,
+      width: 24,
+      height: 24,
+      colorFilter: ColorFilter.mode(color, BlendMode.srcIn),
+    );
+  }
 }

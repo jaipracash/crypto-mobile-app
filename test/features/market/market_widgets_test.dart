@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gecko_lite/core/constants/app_strings.dart';
 import 'package:gecko_lite/features/market/domain/coin.dart';
@@ -35,11 +36,78 @@ void main() {
       ),
     );
     expect(find.text('Bitcoin'), findsOneWidget);
-    expect(find.text('BTC · MCap \$1.3T'), findsOneWidget);
+    expect(find.text('BTC'), findsOneWidget);
+    expect(find.textContaining('1.3T'), findsOneWidget);
     expect(find.byTooltip(AppStrings.addToWatchlist), findsNothing);
     expect(find.byTooltip(AppStrings.removeFromWatchlist), findsNothing);
     expect(find.byIcon(Icons.star_border_rounded), findsNothing);
     expect(find.byIcon(Icons.star_rounded), findsNothing);
+  });
+
+  testWidgets('market table fits narrow screens without horizontal scrolling', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    const coin = Coin(
+      id: 'bitcoin',
+      symbol: 'btc',
+      name: 'Bitcoin',
+      rank: 1,
+      price: 67420,
+      marketCap: 1300000000000,
+      change24hPct: 2.4,
+    );
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: SizedBox(
+            width: 390,
+            child: Column(
+              children: [
+                CoinTableHeader(period: ChangePeriod.day, onPeriodTap: () {}),
+                CoinRow(
+                  coin: coin,
+                  currency: 'usd',
+                  period: ChangePeriod.day,
+                  onTap: () {},
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+
+    expect(find.text(AppStrings.marketCapShort), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('provided navigation SVG assets render', (tester) async {
+    const assets = [
+      'assets/dart-svgrepo-com.svg',
+      'assets/search-alt-2-svgrepo-com.svg',
+      'assets/profile-svgrepo-com.svg',
+      'assets/watchlist.svg',
+    ];
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: Wrap(
+            children: assets
+                .map((asset) => SvgPicture.asset(asset, width: 24))
+                .toList(),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.byType(SvgPicture), findsNWidgets(4));
+    expect(tester.takeException(), isNull);
   });
 
   testWidgets('FilterSheet edits a draft until Apply and Reset', (

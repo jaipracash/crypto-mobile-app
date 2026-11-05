@@ -176,6 +176,10 @@ class _CoinDetailsScreenState extends ConsumerState<CoinDetailsScreen> {
         AsyncValueView(
           value: chart,
           onRetry: () => ref.invalidate(chartControllerProvider(widget.coinId)),
+          loading: const SizedBox(
+            height: AppSizes.chartHeight,
+            child: Center(child: CircularProgressIndicator()),
+          ),
           isEmpty: (value) => value.prices.isEmpty,
           emptyTitle: AppStrings.noChartData,
           builder: (value) => PriceChart(

@@ -89,23 +89,29 @@ class _CoinRowState extends State<CoinRow> {
               const SizedBox(width: AppSizes.md),
               Expanded(
                 flex: 5,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                child: Row(
                   children: [
-                    Text(
-                      widget.coin.name,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        fontWeight: FontWeight.w600,
+                    Expanded(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            widget.coin.name,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          Text(
+                            '${widget.coin.symbol.toUpperCase()} · ${AppStrings.marketCapShort} ${Formatters.compact(widget.coin.marketCap, currencyCode: widget.currency)}',
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: theme.textTheme.bodySmall,
+                          ),
+                        ],
                       ),
-                    ),
-                    Text(
-                      '${widget.coin.symbol.toUpperCase()} · ${AppStrings.marketCapShort} ${Formatters.compact(widget.coin.marketCap, currencyCode: widget.currency)}',
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: theme.textTheme.bodySmall,
                     ),
                   ],
                 ),
@@ -128,6 +134,7 @@ class _CoinRowState extends State<CoinRow> {
                         Formatters.currency(widget.coin.price, widget.currency),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
+                        textAlign: TextAlign.right,
                       ),
                     ),
                     const SizedBox(height: AppSizes.xs),
@@ -146,6 +153,81 @@ class _CoinRowState extends State<CoinRow> {
   }
 }
 
+class CoinTableHeader extends StatelessWidget {
+  const CoinTableHeader({
+    required this.period,
+    required this.onPeriodTap,
+    super.key,
+  });
+
+  final ChangePeriod period;
+  final VoidCallback onPeriodTap;
+
+  @override
+  Widget build(BuildContext context) => SizedBox(
+    height: AppSizes.homeColumnHeaderHeight,
+    child: Padding(
+      padding: const EdgeInsets.symmetric(horizontal: AppSizes.screenPadding),
+      child: Row(
+        children: [
+          SizedBox(
+            width: AppSizes.rankColumn,
+            child: Text(
+              '#',
+              textAlign: TextAlign.center,
+              style: _style(context),
+            ),
+          ),
+          const SizedBox(width: AppSizes.sm),
+          const SizedBox(width: AppSizes.coinLogo),
+          const SizedBox(width: AppSizes.md),
+          Expanded(
+            flex: 5,
+            child: Text(AppStrings.coin, style: _style(context)),
+          ),
+          Expanded(
+            flex: 4,
+            child: Text(
+              AppStrings.price,
+              textAlign: TextAlign.right,
+              style: _style(context),
+            ),
+          ),
+          Expanded(
+            flex: 3,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Flexible(
+                  child: InkWell(
+                    onTap: onPeriodTap,
+                    child: Text('${period.label} %', style: _style(context)),
+                  ),
+                ),
+                InkWell(
+                  onTap: onPeriodTap,
+                  child: const Icon(
+                    Icons.expand_more,
+                    size: AppSizes.iconSmall,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
+
+  TextStyle? _style(BuildContext context) => Theme.of(context)
+      .textTheme
+      .labelMedium
+      ?.copyWith(
+        fontSize: AppSizes.homeColumnTitleFontSize,
+        fontWeight: FontWeight.w600,
+      );
+}
+
 class CoinRowSkeleton extends StatelessWidget {
   const CoinRowSkeleton({super.key});
 
@@ -156,9 +238,12 @@ class CoinRowSkeleton extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: AppSizes.screenPadding),
       child: Row(
         children: [
-          const ShimmerBox(
+          const SizedBox(
             width: AppSizes.rankColumn,
-            height: AppSizes.loadingBoxHeight,
+            child: ShimmerBox(
+              width: AppSizes.rankColumn,
+              height: AppSizes.loadingBoxHeight,
+            ),
           ),
           const SizedBox(width: AppSizes.sm),
           const ShimmerBox(
@@ -169,32 +254,40 @@ class CoinRowSkeleton extends StatelessWidget {
           const SizedBox(width: AppSizes.md),
           const Expanded(
             flex: 5,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
+            child: Row(
               children: [
-                ShimmerBox(height: AppSizes.loadingBoxHeight / 2),
-                SizedBox(height: AppSizes.xs),
-                ShimmerBox(height: AppSizes.loadingBoxHeight / 3),
+                Expanded(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      ShimmerBox(height: AppSizes.loadingBoxHeight / 2),
+                      SizedBox(height: AppSizes.xs),
+                      ShimmerBox(height: AppSizes.loadingBoxHeight / 3),
+                    ],
+                  ),
+                ),
               ],
             ),
           ),
-          const SizedBox(width: AppSizes.sm),
           const Expanded(
             flex: 4,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                ShimmerBox(
-                  width: AppSizes.loadingPriceWidth,
-                  height: AppSizes.loadingBoxHeight / 2,
-                ),
-                SizedBox(height: AppSizes.xs),
-                ShimmerBox(
-                  width: AppSizes.loadingChangeWidth,
-                  height: AppSizes.chipHeight / 2,
-                ),
-              ],
+            child: Align(
+              alignment: Alignment.centerRight,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  ShimmerBox(
+                    width: AppSizes.loadingPriceWidth,
+                    height: AppSizes.loadingBoxHeight / 2,
+                  ),
+                  SizedBox(height: AppSizes.xs),
+                  ShimmerBox(
+                    width: AppSizes.loadingChangeWidth,
+                    height: AppSizes.chipHeight / 2,
+                  ),
+                ],
+              ),
             ),
           ),
         ],
