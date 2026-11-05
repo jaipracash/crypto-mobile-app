@@ -33,7 +33,8 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             routes: [
               GoRoute(
                 path: Routes.search,
-                builder: (_, _) => const SearchScreen(),
+                builder: (_, state) =>
+                    SearchScreen(animateFromHome: state.extra == true),
               ),
             ],
           ),

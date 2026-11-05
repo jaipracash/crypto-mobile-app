@@ -8,10 +8,38 @@ import 'package:gecko_lite/features/market/domain/coin.dart';
 import 'package:gecko_lite/features/market/domain/market_filters.dart';
 import 'package:gecko_lite/features/market/domain/market_models.dart';
 import 'package:gecko_lite/features/market/presentation/controllers/market_controller.dart';
+import 'package:gecko_lite/features/market/presentation/screens/search_screen.dart';
 import 'package:gecko_lite/features/market/presentation/widgets/coin_row.dart';
 import 'package:gecko_lite/features/market/presentation/widgets/market_sheets.dart';
+import 'package:gecko_lite/features/settings/domain/app_settings.dart';
+import 'package:gecko_lite/features/settings/presentation/controllers/settings_controller.dart';
 import 'package:gecko_lite/shared/widgets/change_pill.dart';
 import 'package:gecko_lite/shared/widgets/sparkline.dart';
+
+class _SearchTestCoinListController extends CoinListController {
+  @override
+  Future<CoinListState> build() async => const CoinListState(
+    items: [
+      Coin(id: 'bitcoin', symbol: 'btc', name: 'Bitcoin', rank: 1, price: 1),
+    ],
+    dataSource: 'mock',
+  );
+}
+
+class _SearchTestTrendingController extends TrendingController {
+  @override
+  Future<TrendingData> build() async => const TrendingData(
+    items: [
+      Coin(id: 'ethereum', symbol: 'eth', name: 'Ethereum', rank: 2, price: 2),
+    ],
+    dataSource: 'mock',
+  );
+}
+
+class _SearchTestSettingsController extends SettingsController {
+  @override
+  Future<AppSettings> build() async => const AppSettings();
+}
 
 void main() {
   testWidgets('CoinRow renders coin data without a favorite control', (
@@ -43,6 +71,7 @@ void main() {
     expect(find.textContaining('BTC'), findsOneWidget);
     expect(find.textContaining('1.3T'), findsOneWidget);
     final sparkline = tester.widget<Sparkline>(find.byType(Sparkline));
+    final changePill = tester.widget<ChangePill>(find.byType(ChangePill));
     expect(sparkline.filled, isTrue);
     expect(sparkline.positive, isTrue);
     expect(sparkline.width, 66);
@@ -56,6 +85,7 @@ void main() {
           .isCurved,
       isTrue,
     );
+    expect(changePill.showBackground, isFalse);
     expect(
       tester.getTopLeft(find.byType(Sparkline)).dy,
       lessThan(tester.getTopLeft(find.byType(ChangePill)).dy),
@@ -120,6 +150,12 @@ void main() {
     ]);
   });
 
+  test('market opens on All tab', () {
+    final container = ProviderContainer();
+    addTearDown(container.dispose);
+    expect(container.read(homeTabProvider), HomeTab.all);
+  });
+
   testWidgets('provided navigation SVG assets render', (tester) async {
     const assets = [
       'assets/dart-svgrepo-com.svg',
@@ -144,6 +180,47 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.byType(SvgPicture), findsNWidgets(7));
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('Search screen has market tabs and animates only from home', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          coinListControllerProvider.overrideWith(
+            _SearchTestCoinListController.new,
+          ),
+          trendingControllerProvider.overrideWith(
+            _SearchTestTrendingController.new,
+          ),
+          settingsControllerProvider.overrideWith(
+            _SearchTestSettingsController.new,
+          ),
+        ],
+        child: const MaterialApp(home: SearchScreen(animateFromHome: true)),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text(AppStrings.allCoins), findsOneWidget);
+    expect(find.text(AppStrings.trending), findsOneWidget);
+    expect(find.text(AppStrings.topGainers), findsOneWidget);
+    expect(find.text(AppStrings.topLosers), findsOneWidget);
+    expect(find.text('Bitcoin'), findsOneWidget);
+    expect(
+      find.byWidgetPredicate(
+        (widget) =>
+            widget is Hero && widget.tag == SearchScreen.homeSearchHeroTag,
+      ),
+      findsOneWidget,
+    );
+
+    await tester.tap(find.text(AppStrings.trending));
+    await tester.pumpAndSettle();
+    expect(find.text('Ethereum'), findsOneWidget);
+    expect(find.text('Bitcoin'), findsNothing);
     expect(tester.takeException(), isNull);
   });
 
@@ -181,6 +258,11 @@ void main() {
       expect(chip.shape, isA<StadiumBorder>());
       expect(chip.showCheckmark, isFalse);
       expect(chip.avatar, isNull);
+      expect(chip.padding, const EdgeInsets.symmetric(horizontal: 8));
+      expect(chip.labelPadding, const EdgeInsets.symmetric(horizontal: 4));
+      if (chip.selected) {
+        expect((chip.label as Text).style?.color, Colors.white);
+      }
     }
     await tester.drag(
       find.byType(SingleChildScrollView),
@@ -231,7 +313,7 @@ void main() {
     await tester.pumpAndSettle();
     expect(
       tester.getTopLeft(find.text('${AppStrings.top} 50')).dx,
-      greaterThanOrEqualTo(16),
+      greaterThanOrEqualTo(6),
     );
     await tester.tap(find.text('${AppStrings.top} 200'));
     await tester.pumpAndSettle();

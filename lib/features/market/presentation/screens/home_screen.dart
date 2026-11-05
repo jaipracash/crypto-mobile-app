@@ -20,6 +20,7 @@ import '../../domain/market_models.dart';
 import '../controllers/market_controller.dart';
 import '../widgets/coin_row.dart';
 import '../widgets/market_sheets.dart';
+import 'search_screen.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -180,24 +181,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               period: period,
               onPeriodTap: () => _openSheet(const PeriodSheet()),
             ),
-            Divider(
-              height: AppSizes.hairline,
-              thickness: AppSizes.hairline,
-              color: Theme.of(context).dividerColor,
-            ),
             for (final coin in coins) ...[
               CoinRow(
                 coin: coin,
                 currency: currency,
                 period: period,
                 onTap: () => context.push('/coin/${coin.id}'),
-              ),
-              Divider(
-                height: AppSizes.hairline,
-                thickness: AppSizes.hairline,
-                indent: AppSizes.screenPadding,
-                endIndent: AppSizes.screenPadding,
-                color: Theme.of(context).dividerColor,
               ),
             ],
           ],
@@ -210,38 +199,46 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Expanded(
-          child: TextField(
-            readOnly: true,
-            onTap: () => context.go(Routes.search),
-            decoration: InputDecoration(
-              hintText: AppStrings.searchCoins,
-              prefixIcon: Padding(
-                padding: const EdgeInsets.all(AppSizes.md),
-                child: SvgPicture.asset(
-                  'assets/search-alt-2-svgrepo-com.svg',
-                  width: AppSizes.iconMedium,
-                  height: AppSizes.iconMedium,
-                  colorFilter: ColorFilter.mode(
-                    Theme.of(context).colorScheme.onSurfaceVariant,
-                    BlendMode.srcIn,
+          child: Hero(
+            tag: SearchScreen.homeSearchHeroTag,
+            child: Material(
+              color: Colors.transparent,
+              child: TextField(
+                readOnly: true,
+                onTap: () => context.push(Routes.search, extra: true),
+                decoration: InputDecoration(
+                  hintText: AppStrings.searchCoins,
+                  prefixIcon: Padding(
+                    padding: const EdgeInsets.all(AppSizes.md),
+                    child: SvgPicture.asset(
+                      'assets/search-alt-2-svgrepo-com.svg',
+                      width: AppSizes.iconMedium,
+                      height: AppSizes.iconMedium,
+                      colorFilter: ColorFilter.mode(
+                        Theme.of(context).colorScheme.onSurfaceVariant,
+                        BlendMode.srcIn,
+                      ),
+                    ),
                   ),
+                  filled: true,
+                  fillColor: Theme.of(context)
+                      .colorScheme
+                      .surfaceContainerHighest,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(AppSizes.radiusMd),
+                    borderSide: BorderSide.none,
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(AppSizes.radiusMd),
+                    borderSide: BorderSide.none,
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(AppSizes.radiusMd),
+                    borderSide: BorderSide.none,
+                  ),
+                  isDense: true,
                 ),
               ),
-              filled: true,
-              fillColor: Theme.of(context).colorScheme.surfaceContainerHighest,
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(AppSizes.radiusMd),
-                borderSide: BorderSide.none,
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(AppSizes.radiusMd),
-                borderSide: BorderSide.none,
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(AppSizes.radiusMd),
-                borderSide: BorderSide.none,
-              ),
-              isDense: true,
             ),
           ),
         ),
@@ -365,11 +362,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             ),
           ],
         ),
-        Divider(
-          height: AppSizes.hairline,
-          thickness: AppSizes.hairline,
-          color: Theme.of(context).dividerColor,
-        ),
       ],
     ),
   );
@@ -397,7 +389,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     : Theme.of(context).colorScheme.onSurfaceVariant,
                 fontWeight: item == selectedTab
                     ? FontWeight.w700
-                    : FontWeight.w500,
+                    : FontWeight.w600,
               ),
             ),
           ),
@@ -459,10 +451,8 @@ class _CoinRowsLoading extends StatelessWidget {
   Widget build(BuildContext context) => Column(
     children: [
       CoinTableHeader(period: period, onPeriodTap: () {}),
-      for (var index = 0; index < AppSizes.loadingItemCount; index++) ...[
+      for (var index = 0; index < AppSizes.loadingItemCount; index++)
         const CoinRowSkeleton(),
-        const Divider(height: AppSizes.hairline, thickness: AppSizes.hairline),
-      ],
     ],
   );
 }

@@ -103,13 +103,16 @@ class _CoinRowState extends State<CoinRow> {
                             overflow: TextOverflow.ellipsis,
                             style: theme.textTheme.bodySmall?.copyWith(
                               fontWeight: FontWeight.w600,
+                              height: 1.0,
                             ),
                           ),
                           Text(
                             '${widget.coin.symbol.toUpperCase()} · ${Formatters.compact(widget.coin.marketCap, currencyCode: widget.currency)}',
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
-                            style: theme.textTheme.bodySmall,
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              height: 1.0,
+                            ),
                           ),
                         ],
                       ),
@@ -119,7 +122,7 @@ class _CoinRowState extends State<CoinRow> {
               ),
               const SizedBox(width: AppSizes.xs),
               Expanded(
-                flex: 6,
+                flex: 5,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.end,
@@ -141,6 +144,7 @@ class _CoinRowState extends State<CoinRow> {
                   ],
                 ),
               ),
+              const SizedBox(width: AppSizes.sm),
               Expanded(
                 flex: 3,
                 child: Column(
@@ -158,6 +162,7 @@ class _CoinRowState extends State<CoinRow> {
                     ChangePill(
                       change: widget.period.value(widget.coin),
                       compact: true,
+                      showBackground: false,
                     ),
                   ],
                 ),
@@ -202,14 +207,16 @@ class CoinTableHeader extends StatelessWidget {
             flex: 4,
             child: Text(AppStrings.coin, style: _style(context)),
           ),
+          const SizedBox(width: AppSizes.xs),
           Expanded(
-            flex: 6,
+            flex: 5,
             child: Text(
               AppStrings.price,
               textAlign: TextAlign.right,
               style: _style(context),
             ),
           ),
+          const SizedBox(width: AppSizes.sm),
           Expanded(
             flex: 3,
             child: Row(

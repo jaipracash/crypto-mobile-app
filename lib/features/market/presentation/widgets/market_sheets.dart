@@ -40,7 +40,9 @@ class BottomSheetScaffold extends StatelessWidget {
   Widget build(BuildContext context) => Material(
     color: Theme.of(context).colorScheme.surface,
     shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(AppSizes.radiusLg),
+      borderRadius: const BorderRadius.vertical(
+        top: Radius.circular(AppSizes.radiusLg),
+      ),
     ),
     clipBehavior: Clip.antiAlias,
     child: SafeArea(
@@ -58,6 +60,7 @@ class BottomSheetScaffold extends StatelessWidget {
               borderRadius: BorderRadius.circular(AppSizes.radiusPill),
             ),
           ),
+          const SizedBox(height: AppSizes.sm),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: AppSizes.lg),
             child: SizedBox(
@@ -70,6 +73,7 @@ class BottomSheetScaffold extends StatelessWidget {
               ),
             ),
           ),
+          const SizedBox(height: AppSizes.sm),
           Flexible(fit: FlexFit.loose, child: child),
           footer ?? const SizedBox.shrink(),
         ],
@@ -134,13 +138,14 @@ class _FilterSheetState extends ConsumerState<FilterSheet> {
   Widget build(BuildContext context) => BottomSheetScaffold(
     title: AppStrings.filter,
     footer: Padding(
-      padding: const EdgeInsets.symmetric(horizontal: AppSizes.screenPadding),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSizes.sheetContentInset,
+      ),
       child: Row(
         children: [
           Expanded(
             child: FilledButton(
               onPressed: () => setState(() => _draft = _draft.reset()),
-              child: const Text(AppStrings.reset),
               style: _sheetButtonStyle(
                 context,
                 backgroundColor: Theme.of(context)
@@ -148,6 +153,7 @@ class _FilterSheetState extends ConsumerState<FilterSheet> {
                     .surfaceContainerHighest,
                 foregroundColor: Theme.of(context).colorScheme.onSurface,
               ),
+              child: const Text(AppStrings.reset),
             ),
           ),
           const SizedBox(width: AppSizes.sm),
@@ -157,8 +163,8 @@ class _FilterSheetState extends ConsumerState<FilterSheet> {
                 ref.read(marketFiltersProvider.notifier).set(_draft);
                 Navigator.of(context).pop();
               },
-              child: Text('${AppStrings.apply} (${_draft.activeCount})'),
               style: _sheetButtonStyle(context),
+              child: Text('${AppStrings.apply} (${_draft.activeCount})'),
             ),
           ),
         ],
@@ -166,9 +172,9 @@ class _FilterSheetState extends ConsumerState<FilterSheet> {
     ),
     child: SingleChildScrollView(
       padding: const EdgeInsets.fromLTRB(
-        AppSizes.screenPadding,
-        AppSizes.md,
-        AppSizes.screenPadding,
+        AppSizes.sheetContentInset,
+        AppSizes.sm,
+        AppSizes.sheetContentInset,
         AppSizes.lg,
       ),
       child: Column(
@@ -220,7 +226,11 @@ class _FilterSheetState extends ConsumerState<FilterSheet> {
     children: [
       Padding(
         padding: const EdgeInsets.only(bottom: AppSizes.sm),
-        child: Text(title, style: Theme.of(context).textTheme.titleSmall),
+        child: Text(
+          title,
+          style: Theme.of(context).textTheme.titleSmall
+              ?.copyWith(fontWeight: FontWeight.w600),
+        ),
       ),
       Wrap(
         spacing: AppSizes.sm,
@@ -263,7 +273,9 @@ class _SortSheetState extends ConsumerState<SortSheet> {
   Widget build(BuildContext context) => BottomSheetScaffold(
     title: AppStrings.sortCoins,
     footer: Padding(
-      padding: const EdgeInsets.symmetric(horizontal: AppSizes.screenPadding),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSizes.sheetContentInset,
+      ),
       child: SizedBox(
         width: double.infinity,
         child: FilledButton(
@@ -277,17 +289,17 @@ class _SortSheetState extends ConsumerState<SortSheet> {
                 );
             Navigator.of(context).pop();
           },
-          child: const Text(AppStrings.apply),
           style: _sheetButtonStyle(context),
+          child: const Text(AppStrings.apply),
         ),
       ),
     ),
     child: Padding(
-      padding: const EdgeInsets.fromLTRB(
-        AppSizes.screenPadding,
-        AppSizes.lg,
-        AppSizes.screenPadding,
-        AppSizes.xl,
+      padding: const EdgeInsets.only(
+        left: AppSizes.sheetContentInset,
+        top: AppSizes.lg,
+        right: AppSizes.sheetContentInset,
+        bottom: AppSizes.xl,
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -295,7 +307,8 @@ class _SortSheetState extends ConsumerState<SortSheet> {
         children: [
           Text(
             AppStrings.sortBy,
-            style: Theme.of(context).textTheme.titleSmall,
+            style: Theme.of(context).textTheme.titleSmall
+                ?.copyWith(fontWeight: FontWeight.w600),
           ),
           const SizedBox(height: AppSizes.sm),
           Wrap(
@@ -312,7 +325,11 @@ class _SortSheetState extends ConsumerState<SortSheet> {
             }).toList(),
           ),
           const SizedBox(height: AppSizes.lg),
-          Text(AppStrings.order, style: Theme.of(context).textTheme.titleSmall),
+          Text(
+            AppStrings.order,
+            style: Theme.of(context).textTheme.titleSmall
+                ?.copyWith(fontWeight: FontWeight.w600),
+          ),
           const SizedBox(height: AppSizes.sm),
           Wrap(
             spacing: AppSizes.sm,
@@ -349,18 +366,16 @@ Widget _sheetChoiceChip(
 }) => ChoiceChip(
   label: Text(
     label,
-    style: Theme.of(context).textTheme.labelMedium?.copyWith(
-      color: selected
-          ? Theme.of(context).colorScheme.onPrimary
-          : Theme.of(context).colorScheme.onSurface,
+    style: Theme.of(context).textTheme.labelLarge?.copyWith(
+      fontWeight: FontWeight.w500,
+      color: selected ? Colors.white : Theme.of(context).colorScheme.onSurface,
     ),
   ),
   selected: selected,
   onSelected: (_) => onSelected(),
   showCheckmark: false,
   materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-  visualDensity: VisualDensity.compact,
-  padding: const EdgeInsets.symmetric(horizontal: AppSizes.xs),
+  padding: const EdgeInsets.symmetric(horizontal: AppSizes.sm),
   labelPadding: const EdgeInsets.symmetric(horizontal: AppSizes.xs),
   selectedColor: Theme.of(context).colorScheme.primary,
   backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
@@ -374,13 +389,14 @@ ButtonStyle _sheetButtonStyle(
   Color? foregroundColor,
 }) => FilledButton.styleFrom(
   backgroundColor: backgroundColor,
-  foregroundColor: foregroundColor,
+  foregroundColor: foregroundColor ?? Colors.white,
   minimumSize: const Size(0, 44),
   padding: const EdgeInsets.symmetric(horizontal: AppSizes.md),
   shape: RoundedRectangleBorder(
     borderRadius: BorderRadius.circular(AppSizes.radiusMd),
   ),
-  textStyle: Theme.of(context).textTheme.labelLarge,
+  textStyle: Theme.of(context).textTheme.labelLarge
+      ?.copyWith(fontWeight: FontWeight.w600),
 );
 
 class MarketOverviewPanel extends StatelessWidget {
@@ -510,7 +526,6 @@ class MarketOverviewPanel extends StatelessWidget {
                       ),
                     ),
                   ),
-                const Divider(height: AppSizes.xl),
                 Row(
                   children: [
                     Expanded(

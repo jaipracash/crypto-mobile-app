@@ -35,7 +35,7 @@ final homeTabProvider = NotifierProvider<HomeTabController, HomeTab>(
 
 class HomeTabController extends Notifier<HomeTab> {
   @override
-  HomeTab build() => HomeTab.overview;
+  HomeTab build() => HomeTab.all;
   void select(HomeTab tab) => state = tab;
 }
 
