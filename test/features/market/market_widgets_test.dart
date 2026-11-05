@@ -9,6 +9,7 @@ import 'package:gecko_lite/features/market/domain/market_models.dart';
 import 'package:gecko_lite/features/market/presentation/controllers/market_controller.dart';
 import 'package:gecko_lite/features/market/presentation/widgets/coin_row.dart';
 import 'package:gecko_lite/features/market/presentation/widgets/market_sheets.dart';
+import 'package:gecko_lite/shared/widgets/sparkline.dart';
 
 void main() {
   testWidgets('CoinRow renders coin data without a favorite control', (
@@ -22,6 +23,7 @@ void main() {
       price: 67420,
       marketCap: 1300000000000,
       change24hPct: 2.4,
+      sparkline7d: [65000, 66500, 65800, 67420],
     );
     await tester.pumpWidget(
       MaterialApp(
@@ -36,8 +38,11 @@ void main() {
       ),
     );
     expect(find.text('Bitcoin'), findsOneWidget);
-    expect(find.text('BTC'), findsOneWidget);
+    expect(find.textContaining('BTC'), findsOneWidget);
     expect(find.textContaining('1.3T'), findsOneWidget);
+    final sparkline = tester.widget<Sparkline>(find.byType(Sparkline));
+    expect(sparkline.filled, isTrue);
+    expect(sparkline.positive, isTrue);
     expect(find.byTooltip(AppStrings.addToWatchlist), findsNothing);
     expect(find.byTooltip(AppStrings.removeFromWatchlist), findsNothing);
     expect(find.byIcon(Icons.star_border_rounded), findsNothing);
@@ -82,8 +87,20 @@ void main() {
       ),
     );
 
-    expect(find.text(AppStrings.marketCapShort), findsOneWidget);
+    expect(find.textContaining('BTC'), findsOneWidget);
+    expect(find.textContaining('1.3T'), findsOneWidget);
+    expect(find.byType(VerticalDivider), findsNothing);
     expect(tester.takeException(), isNull);
+  });
+
+  test('market tabs place Overview after Trending', () {
+    expect(HomeTab.values, [
+      HomeTab.all,
+      HomeTab.trending,
+      HomeTab.overview,
+      HomeTab.gainers,
+      HomeTab.losers,
+    ]);
   });
 
   testWidgets('provided navigation SVG assets render', (tester) async {
@@ -92,6 +109,9 @@ void main() {
       'assets/search-alt-2-svgrepo-com.svg',
       'assets/profile-svgrepo-com.svg',
       'assets/watchlist.svg',
+      'assets/filter-svgrepo-com.svg',
+      'assets/notification-6-svgrepo-com.svg',
+      'assets/sort-vertical-svgrepo-com.svg',
     ];
     await tester.pumpWidget(
       MaterialApp(
@@ -106,7 +126,7 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect(find.byType(SvgPicture), findsNWidgets(4));
+    expect(find.byType(SvgPicture), findsNWidgets(7));
     expect(tester.takeException(), isNull);
   });
 

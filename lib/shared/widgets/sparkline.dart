@@ -5,28 +5,42 @@ import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_sizes.dart';
 
 class Sparkline extends StatelessWidget {
-  const Sparkline({required this.values, this.positive = true, super.key});
+  const Sparkline({
+    required this.values,
+    this.positive = true,
+    this.width = AppSizes.sparklineWidth,
+    this.height = AppSizes.sparklineHeight,
+    this.filled = false,
+    super.key,
+  });
+
   final List<double> values;
   final bool positive;
+  final double width;
+  final double height;
+  final bool filled;
+
   @override
   Widget build(BuildContext context) {
     if (values.length < 2) {
-      return const SizedBox(
-        width: AppSizes.sparklineWidth,
-        height: AppSizes.sparklineHeight,
-      );
+      return SizedBox(width: width, height: height);
     }
     final dark = Theme.of(context).brightness == Brightness.dark;
     final color = positive
         ? (dark ? AppColors.darkGain : AppColors.lightGain)
         : (dark ? AppColors.darkLoss : AppColors.lightLoss);
+    final minimum = values.reduce((a, b) => a < b ? a : b);
+    final maximum = values.reduce((a, b) => a > b ? a : b);
+    final padding = ((maximum - minimum).abs() * 0.1)
+        .clamp(0.000000000001, double.infinity)
+        .toDouble();
     return SizedBox(
-      width: AppSizes.sparklineWidth,
-      height: AppSizes.sparklineHeight,
+      width: width,
+      height: height,
       child: LineChart(
         LineChartData(
-          minY: values.reduce((a, b) => a < b ? a : b),
-          maxY: values.reduce((a, b) => a > b ? a : b),
+          minY: minimum - padding,
+          maxY: maximum + padding,
           titlesData: const FlTitlesData(show: false),
           gridData: const FlGridData(show: false),
           borderData: FlBorderData(show: false),
@@ -40,6 +54,17 @@ class Sparkline extends StatelessWidget {
               barWidth: AppSizes.sparklineLineWidth,
               color: color,
               dotData: const FlDotData(show: false),
+              belowBarData: BarAreaData(
+                show: filled,
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    color.withValues(alpha: 0.28),
+                    color.withValues(alpha: 0.02),
+                  ],
+                ),
+              ),
             ),
           ],
         ),

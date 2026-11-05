@@ -8,6 +8,7 @@ import '../../../../core/constants/app_strings.dart';
 import '../../../../core/utils/formatters.dart';
 import '../../../../shared/widgets/change_pill.dart';
 import '../../../../shared/widgets/coin_avatar.dart';
+import '../../../../shared/widgets/sparkline.dart';
 import '../../../../shared/widgets/shimmer_box.dart';
 import '../../domain/coin.dart';
 import '../controllers/market_controller.dart';
@@ -105,7 +106,7 @@ class _CoinRowState extends State<CoinRow> {
                             ),
                           ),
                           Text(
-                            '${widget.coin.symbol.toUpperCase()} · ${AppStrings.marketCapShort} ${Formatters.compact(widget.coin.marketCap, currencyCode: widget.currency)}',
+                            '${widget.coin.symbol.toUpperCase()} · ${Formatters.compact(widget.coin.marketCap, currencyCode: widget.currency)}',
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: theme.textTheme.bodySmall,
@@ -137,10 +138,26 @@ class _CoinRowState extends State<CoinRow> {
                         textAlign: TextAlign.right,
                       ),
                     ),
-                    const SizedBox(height: AppSizes.xs),
+                  ],
+                ),
+              ),
+              Expanded(
+                flex: 3,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
                     ChangePill(
                       change: widget.period.value(widget.coin),
                       compact: true,
+                    ),
+                    const SizedBox(height: AppSizes.xs),
+                    Sparkline(
+                      values: widget.coin.sparkline7d,
+                      positive: (widget.period.value(widget.coin) ?? 0) >= 0,
+                      width: 58,
+                      height: 22,
+                      filled: true,
                     ),
                   ],
                 ),
@@ -198,17 +215,21 @@ class CoinTableHeader extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                Flexible(
+                Expanded(
                   child: InkWell(
                     onTap: onPeriodTap,
-                    child: Text('${period.label} %', style: _style(context)),
-                  ),
-                ),
-                InkWell(
-                  onTap: onPeriodTap,
-                  child: const Icon(
-                    Icons.expand_more,
-                    size: AppSizes.iconSmall,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        Flexible(
+                          child: Text(
+                            '${period.label} %',
+                            style: _style(context),
+                          ),
+                        ),
+                        const Icon(Icons.expand_more, size: AppSizes.iconSmall),
+                      ],
+                    ),
                   ),
                 ),
               ],

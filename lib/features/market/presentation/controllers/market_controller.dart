@@ -9,7 +9,7 @@ import '../../domain/coin.dart';
 import '../../domain/market_filters.dart';
 import '../../domain/market_models.dart';
 
-enum HomeTab { overview, all, trending, gainers, losers }
+enum HomeTab { all, trending, overview, gainers, losers }
 
 enum ChangePeriod { oneHour, day, week, month }
 

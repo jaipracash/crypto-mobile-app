@@ -254,7 +254,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               const SnackBar(content: Text(AppStrings.noNotifications)),
             );
           },
-          icon: const Icon(Icons.notifications_none_rounded),
+          icon: _controlIcon('assets/notification-6-svgrepo-com.svg'),
         ),
       ],
     );
@@ -267,18 +267,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         Row(
           children: [
             Expanded(
-              child: Scrollbar(
+              child: SingleChildScrollView(
                 controller: _tabsController,
-                thumbVisibility: true,
-                child: SingleChildScrollView(
-                  controller: _tabsController,
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: HomeTab.values
-                        .map((item) => _homeTab(item, tab))
-                        .toList(),
-                  ),
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: HomeTab.values
+                      .map((item) => _homeTab(item, tab))
+                      .toList(),
                 ),
               ),
             ),
@@ -290,7 +286,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   IconButton(
                     tooltip: AppStrings.sortCoins,
                     onPressed: () => _openSheet(const SortSheet()),
-                    icon: const Icon(Icons.swap_vert_rounded),
+                    icon: _controlIcon('assets/sort-vertical-svgrepo-com.svg'),
                     padding: EdgeInsets.zero,
                     visualDensity: VisualDensity.compact,
                   ),
@@ -302,7 +298,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         IconButton(
                           tooltip: AppStrings.filter,
                           onPressed: () => _openSheet(const FilterSheet()),
-                          icon: const Icon(Icons.tune_rounded),
+                          icon: _controlIcon('assets/filter-svgrepo-com.svg'),
                           padding: EdgeInsets.zero,
                           visualDensity: VisualDensity.compact,
                         ),
@@ -345,11 +341,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     onTap: () => ref.read(homeTabProvider.notifier).select(item),
     child: SizedBox(
       width: switch (item) {
-        HomeTab.overview => 88,
-        HomeTab.all => 60,
-        HomeTab.trending => 88,
-        HomeTab.gainers => 84,
-        HomeTab.losers => 76,
+        HomeTab.overview => 82,
+        HomeTab.all => 54,
+        HomeTab.trending => 78,
+        HomeTab.gainers => 108,
+        HomeTab.losers => 66,
       },
       height: AppSizes.homeTabHeight,
       child: Column(
@@ -359,11 +355,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             _tabLabel(item),
             style: Theme.of(context).textTheme.labelLarge?.copyWith(
               color: item == selectedTab
-                  ? Theme.of(context).colorScheme.onSurface
+                  ? Theme.of(context).colorScheme.primary
                   : Theme.of(context).colorScheme.onSurfaceVariant,
+              fontWeight: item == selectedTab
+                  ? FontWeight.w700
+                  : FontWeight.w500,
             ),
           ),
-          const Spacer(),
+          const SizedBox(height: AppSizes.xs),
           SizedBox(
             height: AppSizes.homeTabUnderlineHeight,
             child: Align(
@@ -377,16 +376,27 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               ),
             ),
           ),
+          const Spacer(),
         ],
       ),
     ),
   );
 
+  Widget _controlIcon(String asset) => SvgPicture.asset(
+    asset,
+    width: AppSizes.iconMedium,
+    height: AppSizes.iconMedium,
+    colorFilter: ColorFilter.mode(
+      Theme.of(context).colorScheme.onSurfaceVariant,
+      BlendMode.srcIn,
+    ),
+  );
+
   String _tabLabel(HomeTab tab) => switch (tab) {
-    HomeTab.overview => AppStrings.overview,
     HomeTab.all => AppStrings.allCoins,
     HomeTab.trending => AppStrings.trending,
-    HomeTab.gainers => AppStrings.gainers,
+    HomeTab.overview => AppStrings.overview,
+    HomeTab.gainers => AppStrings.topGainers,
     HomeTab.losers => AppStrings.losers,
   };
 
