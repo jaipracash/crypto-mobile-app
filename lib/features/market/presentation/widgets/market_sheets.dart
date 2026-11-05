@@ -7,6 +7,7 @@ import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_sizes.dart';
 import '../../../../core/constants/app_strings.dart';
 import '../../../../core/utils/formatters.dart';
+import '../../../../shared/widgets/change_pill.dart';
 import '../../domain/market_filters.dart';
 import '../../domain/market_models.dart';
 import '../controllers/market_controller.dart';
@@ -74,34 +75,6 @@ class BottomSheetScaffold extends StatelessWidget {
   );
 }
 
-class RankSheet extends ConsumerWidget {
-  const RankSheet({super.key});
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) => BottomSheetScaffold(
-    title: AppStrings.topCoins,
-    child: Padding(
-      padding: const EdgeInsets.symmetric(horizontal: AppSizes.screenPadding),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [50, 100, 200, 250]
-            .map(
-              (limit) => _SelectionTile(
-                title: '$limit',
-                selected: ref.watch(rankLimitProvider) == limit,
-                onTap: () {
-                  HapticFeedback.selectionClick();
-                  ref.read(rankLimitProvider.notifier).set(limit);
-                  Navigator.of(context).pop();
-                },
-              ),
-            )
-            .toList(),
-      ),
-    ),
-  );
-}
-
 class PeriodSheet extends ConsumerWidget {
   const PeriodSheet({super.key});
 
@@ -143,17 +116,6 @@ class FilterSheet extends ConsumerStatefulWidget {
 class _FilterSheetState extends ConsumerState<FilterSheet> {
   late MarketFilters _draft;
 
-  static const _categories = <(String, String?)>[
-    (AppStrings.all, null),
-    (AppStrings.defi, 'decentralized-finance-defi'),
-    (AppStrings.layer1, 'layer-1'),
-    (AppStrings.layer2, 'layer-2'),
-    (AppStrings.meme, 'meme-token'),
-    (AppStrings.artificialIntelligence, 'artificial-intelligence'),
-    (AppStrings.gaming, 'gaming'),
-    (AppStrings.stablecoins, 'stablecoins'),
-  ];
-
   @override
   void initState() {
     super.initState();
@@ -188,57 +150,26 @@ class _FilterSheetState extends ConsumerState<FilterSheet> {
       ),
     ),
     child: SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(horizontal: AppSizes.screenPadding),
+      padding: const EdgeInsets.fromLTRB(
+        AppSizes.screenPadding,
+        AppSizes.md,
+        AppSizes.screenPadding,
+        AppSizes.lg,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _heading(AppStrings.sortBy),
-          ...MarketSortField.values.map(
-            (field) => _SelectionTile(
-              title: _sortLabel(field),
-              selected: _draft.sortField == field,
-              onTap: () =>
-                  _edit((filters) => filters.copyWith(sortField: field)),
-            ),
-          ),
-          Row(
-            children: [
-              TextButton(
-                onPressed: () =>
-                    _edit((filters) => filters.copyWith(ascending: true)),
-                child: Text(
-                  AppStrings.ascending,
-                  style: TextStyle(
-                    fontWeight: _draft.ascending
-                        ? FontWeight.w700
-                        : FontWeight.normal,
-                  ),
-                ),
-              ),
-              TextButton(
-                onPressed: () =>
-                    _edit((filters) => filters.copyWith(ascending: false)),
-                child: Text(
-                  AppStrings.descending,
-                  style: TextStyle(
-                    fontWeight: !_draft.ascending
-                        ? FontWeight.w700
-                        : FontWeight.normal,
-                  ),
-                ),
-              ),
+          _choiceGroup(
+            AppStrings.showTop,
+            _draft.topLimit.toString(),
+            const [
+              ('50', 'Top 50'),
+              ('100', 'Top 100'),
+              ('200', 'Top 200'),
+              ('250', 'Top 250'),
             ],
-          ),
-          _heading(AppStrings.category),
-          ..._categories.map(
-            (entry) => _SelectionTile(
-              title: entry.$1,
-              selected: entry.$2 == _draft.category,
-              onTap: () => _edit(
-                (filters) => entry.$2 == null
-                    ? filters.copyWith(clearCategory: true)
-                    : filters.copyWith(category: entry.$2),
-              ),
+            (value) => _edit(
+              (filters) => filters.copyWith(topLimit: int.parse(value)),
             ),
           ),
           _choiceGroup(AppStrings.marketCap, _draft.marketCap, const [
@@ -259,36 +190,10 @@ class _FilterSheetState extends ConsumerState<FilterSheet> {
             ('1to100', AppStrings.price1To100),
             ('over100', AppStrings.priceOver100),
           ], (value) => _edit((filters) => filters.copyWith(price: value))),
-          SwitchListTile(
-            contentPadding: EdgeInsets.zero,
-            title: const Text(AppStrings.watchlistedOnly),
-            value: _draft.watchlistedOnly,
-            onChanged: (value) =>
-                _edit((filters) => filters.copyWith(watchlistedOnly: value)),
-          ),
-          SwitchListTile(
-            contentPadding: EdgeInsets.zero,
-            title: const Text(AppStrings.hideStablecoins),
-            value: _draft.hideStablecoins,
-            onChanged: (value) =>
-                _edit((filters) => filters.copyWith(hideStablecoins: value)),
-          ),
         ],
       ),
     ),
   );
-
-  Widget _heading(String label) => Padding(
-    padding: EdgeInsets.zero,
-    child: Text(label, style: Theme.of(context).textTheme.titleMedium),
-  );
-
-  String _sortLabel(MarketSortField field) => switch (field) {
-    MarketSortField.marketCap => AppStrings.marketCap,
-    MarketSortField.price => AppStrings.price,
-    MarketSortField.priceChange => AppStrings.priceChangeSort,
-    MarketSortField.volume => AppStrings.volume,
-  };
 
   Widget _choiceGroup(
     String title,
@@ -298,15 +203,346 @@ class _FilterSheetState extends ConsumerState<FilterSheet> {
   ) => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      _heading(title),
-      ...options.map(
-        (option) => _SelectionTile(
-          title: option.$2,
-          selected: option.$1 == selected,
-          onTap: () => onChanged(option.$1),
+      Padding(
+        padding: const EdgeInsets.only(bottom: AppSizes.sm),
+        child: Text(title, style: Theme.of(context).textTheme.titleSmall),
+      ),
+      Wrap(
+        spacing: AppSizes.sm,
+        runSpacing: AppSizes.xs,
+        children: options.map((option) {
+          final isSelected = option.$1 == selected;
+          return ChoiceChip(
+            label: Text(option.$2),
+            selected: isSelected,
+            onSelected: (_) => onChanged(option.$1),
+            showCheckmark: false,
+            avatar: isSelected
+                ? const Icon(Icons.check_rounded, size: AppSizes.iconSmall)
+                : null,
+          );
+        }).toList(),
+      ),
+      const SizedBox(height: AppSizes.lg),
+    ],
+  );
+}
+
+class SortSheet extends ConsumerStatefulWidget {
+  const SortSheet({super.key});
+
+  @override
+  ConsumerState<SortSheet> createState() => _SortSheetState();
+}
+
+class _SortSheetState extends ConsumerState<SortSheet> {
+  late MarketSortField _field;
+  late bool _ascending;
+
+  @override
+  void initState() {
+    super.initState();
+    final filters = ref.read(marketFiltersProvider);
+    _field = filters.sortField;
+    _ascending = filters.ascending;
+  }
+
+  @override
+  Widget build(BuildContext context) => BottomSheetScaffold(
+    title: AppStrings.sortCoins,
+    footer: Padding(
+      padding: const EdgeInsets.symmetric(horizontal: AppSizes.screenPadding),
+      child: SizedBox(
+        width: double.infinity,
+        child: FilledButton(
+          onPressed: () {
+            ref
+                .read(marketFiltersProvider.notifier)
+                .set(
+                  ref
+                      .read(marketFiltersProvider)
+                      .copyWith(sortField: _field, ascending: _ascending),
+                );
+            Navigator.of(context).pop();
+          },
+          child: const Text(AppStrings.apply),
         ),
       ),
-    ],
+    ),
+    child: Padding(
+      padding: const EdgeInsets.fromLTRB(
+        AppSizes.screenPadding,
+        AppSizes.lg,
+        AppSizes.screenPadding,
+        AppSizes.xl,
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            AppStrings.sortBy,
+            style: Theme.of(context).textTheme.titleSmall,
+          ),
+          const SizedBox(height: AppSizes.sm),
+          Wrap(
+            spacing: AppSizes.sm,
+            runSpacing: AppSizes.xs,
+            children: MarketSortField.values.map((field) {
+              final selected = field == _field;
+              return ChoiceChip(
+                label: Text(_sortLabel(field)),
+                selected: selected,
+                showCheckmark: false,
+                avatar: selected
+                    ? const Icon(Icons.check_rounded, size: AppSizes.iconSmall)
+                    : null,
+                onSelected: (_) => setState(() => _field = field),
+              );
+            }).toList(),
+          ),
+          const SizedBox(height: AppSizes.lg),
+          Text(AppStrings.order, style: Theme.of(context).textTheme.titleSmall),
+          const SizedBox(height: AppSizes.sm),
+          Wrap(
+            spacing: AppSizes.sm,
+            children: [
+              _directionChip(AppStrings.ascending, true),
+              _directionChip(AppStrings.descending, false),
+            ],
+          ),
+        ],
+      ),
+    ),
+  );
+
+  Widget _directionChip(String label, bool ascending) => ChoiceChip(
+    label: Text(label),
+    selected: _ascending == ascending,
+    showCheckmark: false,
+    onSelected: (_) => setState(() => _ascending = ascending),
+  );
+
+  String _sortLabel(MarketSortField field) => switch (field) {
+    MarketSortField.marketCap => AppStrings.marketCap,
+    MarketSortField.price => AppStrings.price,
+    MarketSortField.priceChange => AppStrings.priceChangeSort,
+    MarketSortField.volume => AppStrings.volume,
+  };
+}
+
+class MarketOverviewPanel extends StatelessWidget {
+  const MarketOverviewPanel({
+    required this.snapshot,
+    required this.currency,
+    super.key,
+  });
+
+  final MarketSnapshot snapshot;
+  final String currency;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final hasDominance = [
+      snapshot.btcDominance,
+      snapshot.ethDominance,
+      snapshot.othersDominance,
+    ].any((value) => value != null && value > 0);
+
+    return Padding(
+      padding: const EdgeInsets.all(AppSizes.screenPadding),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(AppStrings.globalMarket, style: theme.textTheme.titleLarge),
+          const SizedBox(height: AppSizes.md),
+          Row(
+            children: [
+              Expanded(
+                child: _overviewMetric(
+                  context,
+                  label: AppStrings.totalMarketCap,
+                  value: Formatters.compact(
+                    snapshot.totalMarketCap,
+                    currencyCode: currency,
+                  ),
+                  change: snapshot.marketCapChange24hPct,
+                ),
+              ),
+              const SizedBox(width: AppSizes.sm),
+              Expanded(
+                child: _overviewMetric(
+                  context,
+                  label: AppStrings.volume24h,
+                  value: Formatters.compact(
+                    snapshot.totalVolume24h,
+                    currencyCode: currency,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppSizes.md),
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(AppSizes.lg),
+            decoration: BoxDecoration(
+              color: theme.colorScheme.surface,
+              borderRadius: BorderRadius.circular(AppSizes.radiusMd),
+              border: Border.all(color: theme.dividerColor),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  AppStrings.marketDominance,
+                  style: theme.textTheme.titleMedium,
+                ),
+                const SizedBox(height: AppSizes.md),
+                if (hasDominance)
+                  Row(
+                    children: [
+                      SizedBox(
+                        width: 148,
+                        height: 148,
+                        child: PieChart(
+                          PieChartData(
+                            centerSpaceRadius: AppSizes.donutCenter,
+                            sectionsSpace: AppSizes.donutSectionGap,
+                            sections: [
+                              _section(snapshot.btcDominance, AppColors.btc),
+                              _section(snapshot.ethDominance, AppColors.eth),
+                              _section(
+                                snapshot.othersDominance,
+                                AppColors.other,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: AppSizes.md),
+                      Expanded(
+                        child: Column(
+                          children: [
+                            _dominanceRow(
+                              context,
+                              AppStrings.btc,
+                              snapshot.btcDominance,
+                              AppColors.btc,
+                            ),
+                            _dominanceRow(
+                              context,
+                              AppStrings.eth,
+                              snapshot.ethDominance,
+                              AppColors.eth,
+                            ),
+                            _dominanceRow(
+                              context,
+                              AppStrings.others,
+                              snapshot.othersDominance,
+                              AppColors.other,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  )
+                else
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: AppSizes.xl),
+                    child: Center(
+                      child: Text(
+                        AppStrings.notAvailable,
+                        style: theme.textTheme.bodyMedium,
+                      ),
+                    ),
+                  ),
+                const Divider(height: AppSizes.xl),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        AppStrings.activeCoins,
+                        style: theme.textTheme.bodyMedium,
+                      ),
+                    ),
+                    Text(
+                      snapshot.activeCoins?.toString() ??
+                          AppStrings.notAvailable,
+                      style: theme.textTheme.titleMedium,
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _overviewMetric(
+    BuildContext context, {
+    required String label,
+    required String value,
+    double? change,
+  }) => Container(
+    height: 112,
+    padding: const EdgeInsets.all(AppSizes.md),
+    decoration: BoxDecoration(
+      color: Theme.of(context).colorScheme.surface,
+      borderRadius: BorderRadius.circular(AppSizes.radiusMd),
+      border: Border.all(color: Theme.of(context).dividerColor),
+    ),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Text(label, style: Theme.of(context).textTheme.bodySmall),
+        const SizedBox(height: AppSizes.sm),
+        Text(
+          value,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: Theme.of(context).textTheme.titleMedium,
+        ),
+        if (change != null) ...[
+          const SizedBox(height: AppSizes.xs),
+          ChangePill(change: change, compact: true),
+        ],
+      ],
+    ),
+  );
+
+  PieChartSectionData _section(double? value, Color color) =>
+      PieChartSectionData(
+        value: value ?? 0,
+        color: color,
+        radius: AppSizes.donutRadius,
+        showTitle: false,
+      );
+
+  Widget _dominanceRow(
+    BuildContext context,
+    String label,
+    double? value,
+    Color color,
+  ) => Padding(
+    padding: const EdgeInsets.symmetric(vertical: AppSizes.xs),
+    child: Row(
+      children: [
+        Icon(Icons.circle, size: AppSizes.legendDot, color: color),
+        const SizedBox(width: AppSizes.sm),
+        Expanded(child: Text(label)),
+        Text(
+          value == null
+              ? AppStrings.notAvailable
+              : '${value.toStringAsFixed(2)}%',
+          style: Theme.of(context).textTheme.labelLarge,
+        ),
+      ],
+    ),
   );
 }
 

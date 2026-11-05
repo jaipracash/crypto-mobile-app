@@ -26,6 +26,10 @@ class MainShell extends StatelessWidget {
           label: AppStrings.home,
         ),
         NavigationDestination(
+          icon: Icon(Icons.search_rounded),
+          label: AppStrings.search,
+        ),
+        NavigationDestination(
           icon: Icon(Icons.star_outline_rounded),
           label: AppStrings.watchlist,
         ),

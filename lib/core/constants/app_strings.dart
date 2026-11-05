@@ -2,11 +2,13 @@ abstract final class AppStrings {
   static const appName = 'GeckoLite';
   static const market = 'Market';
   static const home = 'Home';
+  static const search = 'Search';
   static const allCoins = 'All';
+  static const overview = 'Overview';
   static const category = 'Category';
   static const top = 'Top';
-  static const period = 'Period';
   static const sortBy = 'Sort by';
+  static const order = 'Order';
   static const marketCapSort = 'Market cap';
   static const priceChangeSort = 'Price change';
   static const marketCapLarge = r'Large >$10B';
@@ -26,7 +28,7 @@ abstract final class AppStrings {
   static const reset = 'Reset';
   static const apply = 'Apply';
   static const filter = 'Filter';
-  static const topCoins = 'Top coins';
+  static const showTop = 'Show top';
   static const changePeriod = 'Change period';
   static const marketCapShort = 'MCap';
   static const marketCapChange = 'Market cap change';
@@ -39,6 +41,7 @@ abstract final class AppStrings {
   static const noMatchingCoins = 'No coins match your filters';
   static const resetFilters = 'Reset filters';
   static const marketOverview = 'Market overview';
+  static const marketDominance = 'Market dominance';
   static const coin = 'Coin';
   static const symbolMarketCap = 'SYMBOL · MCap';
   static const layer1 = 'Layer 1';
@@ -103,8 +106,6 @@ abstract final class AppStrings {
   static const version = 'Version 1.0.0';
   static const tryAgain = 'Try again';
   static const offline = 'You are offline';
-  static const sampleData =
-      'Showing sample data while the market feed reconnects.';
   static const cachedData = 'Showing recently cached market data.';
   static const addToWatchlist = 'Add to watchlist';
   static const removeFromWatchlist = 'Remove from watchlist';

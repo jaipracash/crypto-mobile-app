@@ -6,11 +6,11 @@ import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_sizes.dart';
 import '../../../../core/constants/app_strings.dart';
 import '../../../../core/utils/formatters.dart';
+import '../../../../core/router/routes.dart';
 import '../../../../shared/widgets/async_value_view.dart';
 import '../../../../shared/widgets/change_pill.dart';
 import '../../../../shared/widgets/data_source_banner.dart';
 import '../../../../shared/widgets/empty_view.dart';
-import '../../../../shared/widgets/error_view.dart';
 import '../../../../shared/widgets/shimmer_box.dart';
 import '../../../settings/presentation/controllers/settings_controller.dart';
 import '../../../watchlist/presentation/controllers/watchlist_controller.dart';
@@ -29,14 +29,6 @@ class HomeScreen extends ConsumerStatefulWidget {
 }
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
-  final _searchController = TextEditingController();
-
-  @override
-  void dispose() {
-    _searchController.dispose();
-    super.dispose();
-  }
-
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -102,67 +94,26 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   ),
                 ),
                 SliverToBoxAdapter(
-                  child: AsyncValueView<List<Coin>>(
-                    value: selectedState,
-                    onRetry: tab == HomeTab.trending
-                        ? () => ref
-                              .read(trendingControllerProvider.notifier)
-                              .refresh()
-                        : () => ref
-                              .read(coinListControllerProvider.notifier)
-                              .refresh(),
-                    loading: const _CoinRowsLoading(),
-                    builder: (_) => Column(
-                      children: [
-                        DataSourceBanner(source: source),
-                        if (visibleCoins.isEmpty)
-                          Padding(
-                            padding: const EdgeInsets.all(AppSizes.xl),
-                            child: EmptyView(
-                              title: tab == HomeTab.trending
-                                  ? AppStrings.noTrending
-                                  : AppStrings.noMatchingCoins,
-                              actionLabel: tab == HomeTab.trending
-                                  ? null
-                                  : AppStrings.resetFilters,
-                              onAction: tab == HomeTab.trending
-                                  ? null
-                                  : () => ref
-                                        .read(marketFiltersProvider.notifier)
-                                        .reset(),
-                            ),
-                          )
-                        else
-                          ListView.builder(
-                            shrinkWrap: true,
-                            physics: const NeverScrollableScrollPhysics(),
-                            itemCount: visibleCoins.length,
-                            itemBuilder: (context, index) {
-                              final coin = visibleCoins[index];
-                              return Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  CoinRow(
-                                    coin: coin,
-                                    currency: currency,
-                                    period: period,
-                                    onTap: () =>
-                                        context.push('/coin/${coin.id}'),
-                                  ),
-                                  Divider(
-                                    height: AppSizes.hairline,
-                                    thickness: AppSizes.hairline,
-                                    indent: AppSizes.screenPadding,
-                                    endIndent: AppSizes.screenPadding,
-                                    color: Theme.of(context).dividerColor,
-                                  ),
-                                ],
-                              );
-                            },
+                  child: tab == HomeTab.overview
+                      ? _overviewSection(currency)
+                      : AsyncValueView<List<Coin>>(
+                          value: selectedState,
+                          onRetry: tab == HomeTab.trending
+                              ? () => ref
+                                    .read(trendingControllerProvider.notifier)
+                                    .refresh()
+                              : () => ref
+                                    .read(coinListControllerProvider.notifier)
+                                    .refresh(),
+                          loading: const _CoinRowsLoading(),
+                          builder: (_) => _coinListSection(
+                            tab: tab,
+                            source: source,
+                            coins: visibleCoins,
+                            currency: currency,
+                            period: period,
                           ),
-                      ],
-                    ),
-                  ),
+                        ),
                 ),
               ],
             ),
@@ -172,95 +123,101 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
+  Widget _overviewSection(String currency) {
+    final overview = ref.watch(globalStatsControllerProvider);
+    return AsyncValueView<MarketSnapshot>(
+      value: overview,
+      onRetry: () => ref.read(globalStatsControllerProvider.notifier).refresh(),
+      builder: (snapshot) => Column(
+        children: [
+          DataSourceBanner(source: snapshot.dataSource),
+          MarketOverviewPanel(snapshot: snapshot, currency: currency),
+        ],
+      ),
+    );
+  }
+
+  Widget _coinListSection({
+    required HomeTab tab,
+    required String source,
+    required List<Coin> coins,
+    required String currency,
+    required ChangePeriod period,
+  }) => Column(
+    children: [
+      DataSourceBanner(source: source),
+      if (coins.isEmpty)
+        Padding(
+          padding: const EdgeInsets.all(AppSizes.xl),
+          child: EmptyView(
+            title: tab == HomeTab.trending
+                ? AppStrings.noTrending
+                : AppStrings.noMatchingCoins,
+            actionLabel: tab == HomeTab.trending
+                ? null
+                : AppStrings.resetFilters,
+            onAction: tab == HomeTab.trending
+                ? null
+                : () => ref.read(marketFiltersProvider.notifier).reset(),
+          ),
+        )
+      else
+        ListView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: coins.length,
+          itemBuilder: (context, index) {
+            final coin = coins[index];
+            return Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                CoinRow(
+                  coin: coin,
+                  currency: currency,
+                  period: period,
+                  onTap: () => context.push('/coin/${coin.id}'),
+                ),
+                Divider(
+                  height: AppSizes.hairline,
+                  thickness: AppSizes.hairline,
+                  indent: AppSizes.screenPadding,
+                  endIndent: AppSizes.screenPadding,
+                  color: Theme.of(context).dividerColor,
+                ),
+              ],
+            );
+          },
+        ),
+    ],
+  );
+
   Widget _searchSection() {
-    final query = ref.watch(searchQueryProvider);
-    final results = ref.watch(searchResultsProvider);
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Expanded(
-          child: Column(
-            children: [
-              TextField(
-                controller: _searchController,
-                onChanged: ref.read(searchQueryProvider.notifier).set,
-                decoration: InputDecoration(
-                  hintText: AppStrings.searchCoins,
-                  prefixIcon: const Icon(Icons.search),
-                  suffixIcon: query.isEmpty
-                      ? null
-                      : IconButton(
-                          tooltip: AppStrings.clearSearch,
-                          onPressed: () {
-                            _searchController.clear();
-                            ref.read(searchQueryProvider.notifier).set('');
-                          },
-                          icon: const Icon(Icons.close),
-                        ),
-                  filled: true,
-                  fillColor: Theme.of(context)
-                      .colorScheme
-                      .surfaceContainerHighest,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(AppSizes.radiusMd),
-                    borderSide: BorderSide.none,
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(AppSizes.radiusMd),
-                    borderSide: BorderSide.none,
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(AppSizes.radiusMd),
-                    borderSide: BorderSide.none,
-                  ),
-                  isDense: true,
-                ),
+          child: TextField(
+            readOnly: true,
+            onTap: () => context.go(Routes.search),
+            decoration: InputDecoration(
+              hintText: AppStrings.searchCoins,
+              prefixIcon: const Icon(Icons.search),
+              filled: true,
+              fillColor: Theme.of(context).colorScheme.surfaceContainerHighest,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(AppSizes.radiusMd),
+                borderSide: BorderSide.none,
               ),
-              if (query.trim().length >= 2)
-                Padding(
-                  padding: const EdgeInsets.only(top: AppSizes.xs),
-                  child: Material(
-                    color: Theme.of(context).colorScheme.surface,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(AppSizes.radiusMd),
-                      side: BorderSide(color: Theme.of(context).dividerColor),
-                    ),
-                    clipBehavior: Clip.antiAlias,
-                    child: SizedBox(
-                      height: AppSizes.searchResultsHeight,
-                      child: results.when(
-                        loading: () =>
-                            const Center(child: CircularProgressIndicator()),
-                        error: (error, _) => ErrorView(
-                          message: error.toString(),
-                          onRetry: () =>
-                              ref.read(searchQueryProvider.notifier).set(query),
-                        ),
-                        data: (items) => items.isEmpty
-                            ? const Center(child: Text(AppStrings.noCoinsFound))
-                            : ListView.builder(
-                                itemCount: items.length,
-                                itemBuilder: (context, index) {
-                                  final coin = items[index];
-                                  return ListTile(
-                                    dense: true,
-                                    title: Text(coin.name),
-                                    subtitle: Text(coin.symbol.toUpperCase()),
-                                    onTap: () {
-                                      _searchController.clear();
-                                      ref
-                                          .read(searchQueryProvider.notifier)
-                                          .set('');
-                                      context.push('/coin/${coin.id}');
-                                    },
-                                  );
-                                },
-                              ),
-                      ),
-                    ),
-                  ),
-                ),
-            ],
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(AppSizes.radiusMd),
+                borderSide: BorderSide.none,
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(AppSizes.radiusMd),
+                borderSide: BorderSide.none,
+              ),
+              isDense: true,
+            ),
           ),
         ),
         IconButton(
@@ -286,51 +243,67 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     child: Column(
       children: [
         Row(
-          children: HomeTab.values
-              .map(
-                (item) => Expanded(
-                  child: InkWell(
-                    onTap: () =>
-                        ref.read(homeTabProvider.notifier).select(item),
-                    child: SizedBox(
-                      height: AppSizes.homeTabHeight,
-                      child: Column(
-                        children: [
-                          const Spacer(),
-                          Text(
-                            _tabLabel(item),
-                            style: Theme.of(context).textTheme.labelLarge
-                                ?.copyWith(
-                                  color: item == tab
-                                      ? Theme.of(context).colorScheme.onSurface
-                                      : Theme.of(context)
-                                            .colorScheme
-                                            .onSurfaceVariant,
-                                ),
-                          ),
-                          const Spacer(),
-                          SizedBox(
-                            height: AppSizes.homeTabUnderlineHeight,
-                            child: Align(
-                              alignment: Alignment.bottomCenter,
-                              child: Container(
-                                width: item == tab
-                                    ? AppSizes.tabIndicatorWidth
-                                    : 0,
-                                height: AppSizes.homeTabUnderlineHeight,
-                                color: item == tab
-                                    ? AppColors.brand
-                                    : Colors.transparent,
+          children: [
+            Expanded(
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: HomeTab.values
+                      .map((item) => _homeTab(item, tab))
+                      .toList(),
+                ),
+              ),
+            ),
+            SizedBox(
+              height: AppSizes.homeTabHeight,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  IconButton(
+                    tooltip: AppStrings.sortCoins,
+                    onPressed: () => _openSheet(const SortSheet()),
+                    icon: const Icon(Icons.swap_vert_rounded),
+                    padding: EdgeInsets.zero,
+                    visualDensity: VisualDensity.compact,
+                  ),
+                  SizedBox(
+                    width: AppSizes.filterButtonExtent,
+                    child: Stack(
+                      clipBehavior: Clip.none,
+                      children: [
+                        IconButton(
+                          tooltip: AppStrings.filter,
+                          onPressed: () => _openSheet(const FilterSheet()),
+                          icon: const Icon(Icons.tune_rounded),
+                          padding: EdgeInsets.zero,
+                          visualDensity: VisualDensity.compact,
+                        ),
+                        if (filters.activeCount > 0)
+                          Positioned(
+                            top: 2,
+                            right: 2,
+                            child: CircleAvatar(
+                              radius: AppSizes.filterBadgeRadius,
+                              backgroundColor: Theme.of(context)
+                                  .colorScheme
+                                  .surfaceContainerHighest,
+                              child: Text(
+                                '${filters.activeCount}',
+                                style: Theme.of(context).textTheme.labelSmall
+                                    ?.copyWith(
+                                      fontSize: AppSizes.filterBadgeTextSize,
+                                    ),
                               ),
                             ),
                           ),
-                        ],
-                      ),
+                      ],
                     ),
                   ),
-                ),
-              )
-              .toList(),
+                ],
+              ),
+            ),
+          ],
         ),
         Divider(
           height: AppSizes.hairline,
@@ -338,98 +311,66 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           color: Theme.of(context).dividerColor,
         ),
         SizedBox(
-          height: AppSizes.homeControlsHeight,
+          height: AppSizes.homeColumnHeaderHeight,
           child: Padding(
-            padding: EdgeInsets.zero,
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSizes.screenPadding,
+            ),
             child: Row(
               children: [
-                if (tab != HomeTab.trending)
-                  Expanded(
-                    flex: 3,
-                    child: _MarketControlChip(
-                      label:
-                          '${AppStrings.top} ${ref.watch(rankLimitProvider)}',
-                      onTap: () => _openSheet(const RankSheet()),
-                    ),
-                  ),
-                if (tab != HomeTab.trending) const SizedBox(width: AppSizes.xs),
                 Expanded(
-                  flex: tab == HomeTab.trending ? 1 : 2,
-                  child: _MarketControlChip(
-                    label: period.label,
-                    onTap: () => _openSheet(const PeriodSheet()),
+                  flex: 5,
+                  child: Row(
+                    children: [
+                      SizedBox(
+                        width: AppSizes.rankColumn,
+                        child: Text(
+                          '#',
+                          textAlign: TextAlign.center,
+                          style: Theme.of(context).textTheme.labelMedium
+                              ?.copyWith(
+                                fontSize: AppSizes.homeColumnTitleFontSize,
+                                fontWeight: FontWeight.w600,
+                              ),
+                        ),
+                      ),
+                      const SizedBox(width: AppSizes.sm),
+                      const SizedBox(width: AppSizes.coinLogo),
+                      const SizedBox(width: AppSizes.md),
+                      Expanded(
+                        child: _SortHeader(
+                          label: AppStrings.coin,
+                          alignStart: true,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                const SizedBox(width: AppSizes.xs),
-                Stack(
-                  clipBehavior: Clip.none,
-                  children: [
-                    SizedBox(
-                      width: AppSizes.filterButtonExtent,
-                      child: IconButton(
-                        tooltip: AppStrings.filter,
-                        onPressed: () => _openSheet(const FilterSheet()),
-                        icon: const Icon(Icons.tune_rounded),
-                        padding: EdgeInsets.zero,
-                        visualDensity: VisualDensity.compact,
-                      ),
-                    ),
-                    if (filters.activeCount > 0)
-                      Positioned(
-                        top: 2,
-                        right: 2,
-                        child: CircleAvatar(
-                          radius: AppSizes.filterBadgeRadius,
-                          backgroundColor: Theme.of(context)
-                              .colorScheme
-                              .surfaceContainerHighest,
-                          child: Text(
-                            '${filters.activeCount}',
-                            style: Theme.of(context).textTheme.labelSmall
-                                ?.copyWith(
-                                  fontSize: AppSizes.filterBadgeTextSize,
-                                ),
+                Expanded(flex: 4, child: _SortHeader(label: AppStrings.price)),
+                Expanded(
+                  flex: 3,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Flexible(child: _SortHeader(label: '${period.label} %')),
+                      Tooltip(
+                        message: AppStrings.changePeriod,
+                        child: InkWell(
+                          onTap: () => _openSheet(const PeriodSheet()),
+                          child: const Padding(
+                            padding: EdgeInsets.only(left: AppSizes.xs),
+                            child: Icon(
+                              Icons.expand_more,
+                              size: AppSizes.iconMedium,
+                            ),
                           ),
                         ),
                       ),
-                  ],
+                    ],
+                  ),
                 ),
               ],
             ),
-          ),
-        ),
-        SizedBox(
-          height: AppSizes.homeColumnHeaderHeight,
-          child: Row(
-            children: [
-              Expanded(
-                flex: 5,
-                child: _SortHeader(
-                  label: '#  ${AppStrings.coin}',
-                  selected: filters.sortField == MarketSortField.marketCap,
-                  ascending: filters.ascending,
-                  onTap: () => _sortBy(MarketSortField.marketCap, filters),
-                ),
-              ),
-              Expanded(
-                flex: 4,
-                child: _SortHeader(
-                  label: AppStrings.price,
-                  selected: filters.sortField == MarketSortField.price,
-                  ascending: filters.ascending,
-                  onTap: () => _sortBy(MarketSortField.price, filters),
-                ),
-              ),
-              Expanded(
-                flex: 3,
-                child: _SortHeader(
-                  label: '${period.label} %',
-                  selected: filters.sortField == MarketSortField.priceChange,
-                  ascending: filters.ascending,
-                  onTap: () => _sortBy(MarketSortField.priceChange, filters),
-                ),
-              ),
-            ],
           ),
         ),
         Divider(
@@ -441,21 +382,48 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     ),
   );
 
+  Widget _homeTab(HomeTab item, HomeTab selectedTab) => InkWell(
+    onTap: () => ref.read(homeTabProvider.notifier).select(item),
+    child: SizedBox(
+      width: item == HomeTab.overview ? 76 : 64,
+      height: AppSizes.homeTabHeight,
+      child: Column(
+        children: [
+          const Spacer(),
+          Text(
+            _tabLabel(item),
+            style: Theme.of(context).textTheme.labelLarge?.copyWith(
+              color: item == selectedTab
+                  ? Theme.of(context).colorScheme.onSurface
+                  : Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
+          ),
+          const Spacer(),
+          SizedBox(
+            height: AppSizes.homeTabUnderlineHeight,
+            child: Align(
+              alignment: Alignment.bottomCenter,
+              child: Container(
+                width: item == selectedTab ? AppSizes.tabIndicatorWidth : 0,
+                height: AppSizes.homeTabUnderlineHeight,
+                color: item == selectedTab
+                    ? AppColors.brand
+                    : Colors.transparent,
+              ),
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
+
   String _tabLabel(HomeTab tab) => switch (tab) {
+    HomeTab.overview => AppStrings.overview,
     HomeTab.all => AppStrings.allCoins,
     HomeTab.trending => AppStrings.trending,
     HomeTab.gainers => AppStrings.gainers,
     HomeTab.losers => AppStrings.losers,
   };
-
-  void _sortBy(MarketSortField field, MarketFilters current) {
-    final ascending = current.sortField == field
-        ? !current.ascending
-        : field == MarketSortField.priceChange;
-    ref
-        .read(marketFiltersProvider.notifier)
-        .set(current.copyWith(sortField: field, ascending: ascending));
-  }
 
   void _openSheet(Widget sheet) {
     FocusManager.instance.primaryFocus?.unfocus();
@@ -473,81 +441,29 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 }
 
 class _SortHeader extends StatelessWidget {
-  const _SortHeader({
-    required this.label,
-    required this.selected,
-    required this.ascending,
-    required this.onTap,
-  });
+  const _SortHeader({required this.label, this.alignStart = false});
 
   final String label;
-  final bool selected;
-  final bool ascending;
-  final VoidCallback onTap;
+  final bool alignStart;
 
   @override
-  Widget build(BuildContext context) => InkWell(
-    onTap: onTap,
-    child: Padding(
-      padding: const EdgeInsets.symmetric(horizontal: AppSizes.xs),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          Flexible(
-            child: Text(
-              label,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                fontSize: AppSizes.homeColumnTitleFontSize,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
+  Widget build(BuildContext context) => Row(
+    mainAxisAlignment: alignStart
+        ? MainAxisAlignment.start
+        : MainAxisAlignment.end,
+    children: [
+      Flexible(
+        child: Text(
+          label,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: Theme.of(context).textTheme.labelMedium?.copyWith(
+            fontSize: AppSizes.homeColumnTitleFontSize,
+            fontWeight: FontWeight.w600,
           ),
-          if (selected)
-            Icon(
-              ascending ? Icons.arrow_upward : Icons.arrow_downward,
-              size: AppSizes.iconSmall,
-            ),
-        ],
-      ),
-    ),
-  );
-}
-
-class _MarketControlChip extends StatelessWidget {
-  const _MarketControlChip({required this.label, required this.onTap});
-
-  final String label;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) => InkWell(
-    onTap: onTap,
-    borderRadius: BorderRadius.circular(AppSizes.radiusMd),
-    child: SizedBox(
-      height: AppSizes.marketControlChipHeight,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(
-          horizontal: AppSizes.marketControlChipHorizontalPadding,
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Flexible(
-              child: Text(
-                label,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: Theme.of(context).textTheme.labelMedium,
-              ),
-            ),
-            const SizedBox(width: AppSizes.xs),
-            const Icon(Icons.expand_more, size: AppSizes.iconMedium),
-          ],
         ),
       ),
-    ),
+    ],
   );
 }
 

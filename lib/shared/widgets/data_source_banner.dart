@@ -9,8 +9,7 @@ class DataSourceBanner extends StatelessWidget {
   final String source;
   @override
   Widget build(BuildContext context) {
-    if (source == 'live') return const SizedBox.shrink();
-    final isMock = source == 'mock';
+    if (source == 'live' || source == 'mock') return const SizedBox.shrink();
     return Container(
       margin: const EdgeInsets.fromLTRB(
         AppSizes.screenPadding,
@@ -32,7 +31,7 @@ class DataSourceBanner extends StatelessWidget {
           const SizedBox(width: AppSizes.sm),
           Expanded(
             child: Text(
-              isMock ? AppStrings.sampleData : AppStrings.cachedData,
+              AppStrings.cachedData,
               style: Theme.of(context).textTheme.bodySmall,
             ),
           ),

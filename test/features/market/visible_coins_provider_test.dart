@@ -110,25 +110,20 @@ void main() {
     },
   );
 
-  test(
-    'visible coins applies client-side buckets and watchlist filter',
-    () async {
-      await container.read(coinListControllerProvider.future);
-      await container.read(watchlistControllerProvider.future);
-      container
-          .read(marketFiltersProvider.notifier)
-          .set(const MarketFilters(marketCap: 'large', watchlistedOnly: true));
+  test('visible coins applies client-side market cap filters', () async {
+    await container.read(coinListControllerProvider.future);
+    await container.read(watchlistControllerProvider.future);
+    container
+        .read(marketFiltersProvider.notifier)
+        .set(const MarketFilters(marketCap: 'large'));
 
-      expect(
-        container
-            .read(visibleCoinsProvider(HomeTab.all))
-            .map((coin) => coin.id),
-        ['bitcoin'],
-      );
-      expect(
-        container.read(visibleCoinsProvider(HomeTab.all)).single.isWatchlisted,
-        isTrue,
-      );
-    },
-  );
+    expect(
+      container.read(visibleCoinsProvider(HomeTab.all)).map((coin) => coin.id),
+      ['bitcoin'],
+    );
+    expect(
+      container.read(visibleCoinsProvider(HomeTab.all)).single.isWatchlisted,
+      isFalse,
+    );
+  });
 }

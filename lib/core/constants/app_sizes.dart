@@ -39,12 +39,11 @@ abstract final class AppSizes {
   static const sheetHandleHeight = 4.0;
   static const sheetMaxHeightFraction = 0.88;
   static const homeExpandedHeight = 198.0;
-  static const homePinnedHeaderHeight = 136.0;
+  static const homePinnedHeaderHeight = 88.0;
   static const searchResultsHeight = 210.0;
   static const marketCardHeight = 84.0;
   static const coinRowHeight = 76.0;
   static const homeTabHeight = 44.0;
-  static const homeControlsHeight = 48.0;
   static const homeColumnHeaderHeight = 42.0;
   static const homeTabUnderlineHeight = 2.0;
   static const filterBadgeRadius = 9.0;
@@ -54,6 +53,4 @@ abstract final class AppSizes {
   static const loadingChangeWidth = 60.0;
   static const tabIndicatorWidth = 32.0;
   static const homeColumnTitleFontSize = 13.0;
-  static const marketControlChipHeight = 32.0;
-  static const marketControlChipHorizontalPadding = 10.0;
 }

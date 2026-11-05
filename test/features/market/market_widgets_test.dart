@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gecko_lite/core/constants/app_strings.dart';
 import 'package:gecko_lite/features/market/domain/coin.dart';
+import 'package:gecko_lite/features/market/domain/market_filters.dart';
+import 'package:gecko_lite/features/market/domain/market_models.dart';
 import 'package:gecko_lite/features/market/presentation/controllers/market_controller.dart';
 import 'package:gecko_lite/features/market/presentation/widgets/coin_row.dart';
 import 'package:gecko_lite/features/market/presentation/widgets/market_sheets.dart';
@@ -95,7 +97,41 @@ void main() {
     expect(container.read(marketFiltersProvider).marketCap, 'any');
   });
 
-  testWidgets('RankSheet sizes to its options instead of filling the screen', (
+  testWidgets('FilterSheet applies top count from its draft', (tester) async {
+    final container = ProviderContainer();
+    addTearDown(container.dispose);
+    await tester.pumpWidget(
+      UncontrolledProviderScope(
+        container: container,
+        child: MaterialApp(
+          home: Scaffold(
+            body: Builder(
+              builder: (context) => TextButton(
+                onPressed: () => showMarketSheet(context, const FilterSheet()),
+                child: const Text(AppStrings.filter),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    await tester.tap(find.text(AppStrings.filter));
+    await tester.pumpAndSettle();
+    expect(
+      tester.getTopLeft(find.text('${AppStrings.top} 50')).dx,
+      greaterThanOrEqualTo(16),
+    );
+    await tester.tap(find.text('${AppStrings.top} 200'));
+    await tester.pumpAndSettle();
+    expect(container.read(marketFiltersProvider).topLimit, 100);
+    expect(find.text('${AppStrings.apply} (1)'), findsOneWidget);
+    await tester.tap(find.text('${AppStrings.apply} (1)'));
+    await tester.pumpAndSettle();
+    expect(container.read(marketFiltersProvider).topLimit, 200);
+  });
+
+  testWidgets('SortSheet applies sort field and direction separately', (
     tester,
   ) async {
     final container = ProviderContainer();
@@ -107,8 +143,8 @@ void main() {
           home: Scaffold(
             body: Builder(
               builder: (context) => TextButton(
-                onPressed: () => showMarketSheet(context, const RankSheet()),
-                child: const Text(AppStrings.topCoins),
+                onPressed: () => showMarketSheet(context, const SortSheet()),
+                child: const Text(AppStrings.sortCoins),
               ),
             ),
           ),
@@ -116,13 +152,48 @@ void main() {
       ),
     );
 
-    await tester.tap(find.text(AppStrings.topCoins));
+    await tester.tap(find.text(AppStrings.sortCoins));
     await tester.pumpAndSettle();
-    expect(tester.getTopLeft(find.text('50')).dx, greaterThanOrEqualTo(16));
+    await tester.tap(find.text(AppStrings.volume));
+    await tester.tap(find.text(AppStrings.ascending));
+    await tester.tap(find.text(AppStrings.apply));
+    await tester.pumpAndSettle();
+
     expect(
-      tester.getSize(find.byType(BottomSheetScaffold)).height,
-      lessThan(400),
+      container.read(marketFiltersProvider).sortField,
+      MarketSortField.volume,
     );
+    expect(container.read(marketFiltersProvider).ascending, isTrue);
+    expect(container.read(marketFiltersProvider).activeCount, 0);
+  });
+
+  testWidgets('Market overview shows global metrics and dominance', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: Scaffold(
+          body: MarketOverviewPanel(
+            snapshot: MarketSnapshot(
+              totalMarketCap: 2500000000000,
+              totalVolume24h: 95000000000,
+              marketCapChange24hPct: 2.5,
+              btcDominance: 54,
+              ethDominance: 17,
+              othersDominance: 29,
+              activeCoins: 12000,
+            ),
+            currency: 'usd',
+          ),
+        ),
+      ),
+    );
+
+    expect(find.text(AppStrings.totalMarketCap), findsOneWidget);
+    expect(find.text(AppStrings.volume24h), findsOneWidget);
+    expect(find.text(AppStrings.marketDominance), findsOneWidget);
+    expect(find.text(AppStrings.activeCoins), findsOneWidget);
+    expect(find.text('12000'), findsOneWidget);
   });
 
   testWidgets('PeriodSheet selection rows have horizontal inset', (

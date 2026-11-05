@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../features/coin_details/presentation/screens/coin_details_screen.dart';
 import '../../features/market/presentation/screens/home_screen.dart';
+import '../../features/market/presentation/screens/search_screen.dart';
 import '../../features/settings/presentation/screens/settings_screen.dart';
 import '../../features/watchlist/presentation/screens/watchlist_screen.dart';
 import '../../shared/widgets/main_shell.dart';
@@ -25,6 +26,14 @@ final appRouterProvider = Provider<GoRouter>((ref) {
               GoRoute(
                 path: Routes.market,
                 builder: (_, _) => const HomeScreen(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: Routes.search,
+                builder: (_, _) => const SearchScreen(),
               ),
             ],
           ),

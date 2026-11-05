@@ -5,12 +5,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/constants/app_strings.dart';
 import '../../../../core/providers/repository_providers.dart';
 import '../../../settings/presentation/controllers/settings_controller.dart';
-import '../../../watchlist/presentation/controllers/watchlist_controller.dart';
 import '../../domain/coin.dart';
 import '../../domain/market_filters.dart';
 import '../../domain/market_models.dart';
 
-enum HomeTab { all, trending, gainers, losers }
+enum HomeTab { overview, all, trending, gainers, losers }
 
 enum ChangePeriod { oneHour, day, week, month }
 
@@ -36,18 +35,8 @@ final homeTabProvider = NotifierProvider<HomeTabController, HomeTab>(
 
 class HomeTabController extends Notifier<HomeTab> {
   @override
-  HomeTab build() => HomeTab.all;
+  HomeTab build() => HomeTab.overview;
   void select(HomeTab tab) => state = tab;
-}
-
-final rankLimitProvider = NotifierProvider<RankLimitController, int>(
-  RankLimitController.new,
-);
-
-class RankLimitController extends Notifier<int> {
-  @override
-  int build() => 100;
-  void set(int value) => state = value;
 }
 
 final changePeriodProvider =
@@ -90,11 +79,10 @@ class CoinListController extends AsyncNotifier<CoinListState> {
 
   @override
   Future<CoinListState> build() async {
-    ref.listen(rankLimitProvider, (previous, next) {
-      if (previous != null && previous != next) unawaited(refresh());
-    });
     ref.listen(marketFiltersProvider, (previous, next) {
-      if (previous?.category != next.category) unawaited(refresh());
+      if (previous != null && previous.topLimit != next.topLimit) {
+        unawaited(refresh());
+      }
     });
     ref.listen(settingsControllerProvider, (previous, next) {
       final oldSettings = previous?.asData?.value;
@@ -117,10 +105,9 @@ class CoinListController extends AsyncNotifier<CoinListState> {
         .read(marketRepositoryProvider)
         .getCoins(
           page: 1,
-          perPage: ref.read(rankLimitProvider),
+          perPage: ref.read(marketFiltersProvider).topLimit,
           order: 'market_cap_desc',
           currency: currency,
-          category: ref.read(marketFiltersProvider).category,
         );
     if (generation != _generation) {
       return state.asData?.value ?? const CoinListState();
@@ -227,6 +214,8 @@ class SearchResultsController extends AsyncNotifier<List<SearchCoin>> {
     return const [];
   }
 
+  void retry() => _schedule(ref.read(searchQueryProvider));
+
   void _schedule(String query) {
     _timer?.cancel();
     final id = ++_requestId;
@@ -257,16 +246,6 @@ final visibleCoinsProvider = Provider.family<List<Coin>, HomeTab>((ref, tab) {
   final filters = ref.watch(marketFiltersProvider);
   final period = ref.watch(changePeriodProvider);
   final query = ref.watch(searchQueryProvider).trim().toLowerCase();
-  final watchlistedIds =
-      ref
-          .watch(watchlistControllerProvider)
-          .asData
-          ?.value
-          .items
-          .map((coin) => coin.id)
-          .toSet() ??
-      const <String>{};
-
   var coins = sourceCoins.where((coin) {
     final marketCap = coin.marketCap;
     final volume = coin.volume24h;
@@ -302,12 +281,6 @@ final visibleCoinsProvider = Provider.family<List<Coin>, HomeTab>((ref, tab) {
       return false;
     }
     if (filters.price == 'over100' && (price == null || price <= 100)) {
-      return false;
-    }
-    if (filters.hideStablecoins && _stablecoinSymbols.contains(coin.symbol)) {
-      return false;
-    }
-    if (filters.watchlistedOnly && !watchlistedIds.contains(coin.id)) {
       return false;
     }
     if (query.isNotEmpty &&
@@ -347,23 +320,5 @@ final visibleCoinsProvider = Provider.family<List<Coin>, HomeTab>((ref, tab) {
 
     coins.sort(compare);
   }
-  return coins
-      .map(
-        (coin) =>
-            coin.copyWith(isWatchlisted: watchlistedIds.contains(coin.id)),
-      )
-      .toList(growable: false);
+  return coins;
 });
-
-const _stablecoinSymbols = {
-  'usdt',
-  'usdc',
-  'busd',
-  'dai',
-  'tusd',
-  'usde',
-  'usds',
-  'fdusd',
-  'usdp',
-  'frax',
-};
