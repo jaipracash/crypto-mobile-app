@@ -134,12 +134,15 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     textInputAction: TextInputAction.search,
     decoration: InputDecoration(
       hintText: AppStrings.searchCoins,
+      hintStyle: TextStyle(
+        color: Theme.of(context).colorScheme.onSurfaceVariant,
+      ),
       prefixIcon: Padding(
         padding: const EdgeInsets.all(AppSizes.md),
         child: SvgPicture.asset(
           'assets/search2.svg',
-          width: AppSizes.iconMedium,
-          height: AppSizes.iconMedium,
+          width: AppSizes.iconSmall,
+          height: AppSizes.iconSmall,
           colorFilter: ColorFilter.mode(
             Theme.of(context).colorScheme.onSurfaceVariant,
             BlendMode.srcIn,

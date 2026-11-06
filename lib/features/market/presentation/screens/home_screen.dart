@@ -209,12 +209,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 onTap: () => context.push(Routes.search, extra: true),
                 decoration: InputDecoration(
                   hintText: AppStrings.searchCoins,
+                  hintStyle: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
                   prefixIcon: Padding(
                     padding: const EdgeInsets.all(AppSizes.md),
                     child: SvgPicture.asset(
                       'assets/search2.svg',
-                      width: AppSizes.iconMedium,
-                      height: AppSizes.iconMedium,
+                      width: AppSizes.iconSmall,
+                      height: AppSizes.iconSmall,
                       colorFilter: ColorFilter.mode(
                         Theme.of(context).colorScheme.onSurfaceVariant,
                         BlendMode.srcIn,
