@@ -17,61 +17,71 @@ class MainShell extends StatelessWidget {
         Expanded(child: navigationShell),
       ],
     ),
-    bottomNavigationBar: NavigationBar(
-      selectedIndex: navigationShell.currentIndex,
-      onDestinationSelected: navigationShell.goBranch,
-      destinations: [
-        NavigationDestination(
-          icon: _navigationIcon(
-            context,
-            'assets/dart-svgrepo-com.svg',
-            selected: false,
-          ),
-          selectedIcon: _navigationIcon(
-            context,
-            'assets/dart-svgrepo-com.svg',
-            selected: true,
-          ),
-          label: AppStrings.home,
+    bottomNavigationBar: Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Divider(
+          height: 1,
+          thickness: 0.5,
+          color: Theme.of(context).dividerColor,
         ),
-        NavigationDestination(
-          icon: _navigationIcon(
-            context,
-            'assets/search-alt-2-svgrepo-com.svg',
-            selected: false,
-          ),
-          selectedIcon: _navigationIcon(
-            context,
-            'assets/search-alt-2-svgrepo-com.svg',
-            selected: true,
-          ),
-          label: AppStrings.search,
-        ),
-        NavigationDestination(
-          icon: _navigationIcon(
-            context,
-            'assets/watchlist.svg',
-            selected: false,
-          ),
-          selectedIcon: _navigationIcon(
-            context,
-            'assets/watchlist.svg',
-            selected: true,
-          ),
-          label: AppStrings.watchlist,
-        ),
-        NavigationDestination(
-          icon: _navigationIcon(
-            context,
-            'assets/profile-svgrepo-com.svg',
-            selected: false,
-          ),
-          selectedIcon: _navigationIcon(
-            context,
-            'assets/profile-svgrepo-com.svg',
-            selected: true,
-          ),
-          label: AppStrings.settings,
+        NavigationBar(
+          selectedIndex: navigationShell.currentIndex,
+          onDestinationSelected: navigationShell.goBranch,
+          destinations: [
+            NavigationDestination(
+              icon: _navigationIcon(
+                context,
+                'assets/dart-svgrepo-com.svg',
+                selected: false,
+              ),
+              selectedIcon: _navigationIcon(
+                context,
+                'assets/dart-svgrepo-com.svg',
+                selected: true,
+              ),
+              label: AppStrings.home,
+            ),
+            NavigationDestination(
+              icon: _navigationIcon(
+                context,
+                'assets/search-alt-2-svgrepo-com.svg',
+                selected: false,
+              ),
+              selectedIcon: _navigationIcon(
+                context,
+                'assets/search-alt-2-svgrepo-com.svg',
+                selected: true,
+              ),
+              label: AppStrings.search,
+            ),
+            NavigationDestination(
+              icon: _navigationIcon(
+                context,
+                'assets/watchlist.svg',
+                selected: false,
+              ),
+              selectedIcon: _navigationIcon(
+                context,
+                'assets/watchlist.svg',
+                selected: true,
+              ),
+              label: AppStrings.watchlist,
+            ),
+            NavigationDestination(
+              icon: _navigationIcon(
+                context,
+                'assets/profile-svgrepo-com.svg',
+                selected: false,
+              ),
+              selectedIcon: _navigationIcon(
+                context,
+                'assets/profile-svgrepo-com.svg',
+                selected: true,
+              ),
+              label: AppStrings.settings,
+            ),
+          ],
         ),
       ],
     ),

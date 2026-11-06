@@ -5,13 +5,15 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/constants/app_sizes.dart';
 import '../../../../core/constants/app_strings.dart';
+import '../../../../core/utils/formatters.dart';
+import '../../../../shared/widgets/change_pill.dart';
 import '../../../../shared/widgets/coin_avatar.dart';
+import '../../../../shared/widgets/cupertino_loader.dart';
 import '../../../../shared/widgets/error_view.dart';
 import '../../../settings/presentation/controllers/settings_controller.dart';
 import '../../domain/coin.dart';
 import '../../domain/market_models.dart';
 import '../controllers/market_controller.dart';
-import '../widgets/coin_row.dart';
 
 class SearchScreen extends ConsumerStatefulWidget {
   const SearchScreen({this.animateFromHome = false, super.key});
@@ -26,14 +28,14 @@ class SearchScreen extends ConsumerStatefulWidget {
 
 class _SearchScreenState extends ConsumerState<SearchScreen> {
   static const _tabs = [
-    HomeTab.all,
     HomeTab.trending,
+    HomeTab.all,
     HomeTab.gainers,
     HomeTab.losers,
   ];
 
   late final TextEditingController _controller;
-  HomeTab _selectedTab = HomeTab.all;
+  HomeTab _selectedTab = HomeTab.trending;
 
   @override
   void initState() {
@@ -60,32 +62,58 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
         ? trendingState.whenData((data) => data.items)
         : listState.whenData((data) => data.items);
     final searchField = _searchField(query);
+    final theme = Theme.of(context);
+    final searchTheme = theme.brightness == Brightness.light
+        ? theme.copyWith(
+            scaffoldBackgroundColor: Colors.white,
+            colorScheme: theme.colorScheme.copyWith(surface: Colors.white),
+          )
+        : theme;
 
-    return Scaffold(
-      appBar: AppBar(title: const Text(AppStrings.search)),
-      body: SafeArea(
-        top: false,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: AppSizes.md),
-          child: Column(
-            children: [
-              widget.animateFromHome
-                  ? Hero(
-                      tag: SearchScreen.homeSearchHeroTag,
-                      child: Material(
-                        color: Colors.transparent,
-                        child: searchField,
+    return Theme(
+      data: searchTheme,
+      child: Scaffold(
+        backgroundColor: searchTheme.scaffoldBackgroundColor,
+        body: SafeArea(
+          child: CustomScrollView(
+            slivers: [
+              SliverPadding(
+                padding: const EdgeInsets.fromLTRB(
+                  AppSizes.screenPadding,
+                  AppSizes.md,
+                  AppSizes.screenPadding,
+                  0,
+                ),
+                sliver: SliverList(
+                  delegate: SliverChildListDelegate([
+                    widget.animateFromHome
+                        ? Hero(
+                            tag: SearchScreen.homeSearchHeroTag,
+                            child: Material(
+                              color: Colors.transparent,
+                              child: searchField,
+                            ),
+                          )
+                        : searchField,
+                    const SizedBox(height: AppSizes.lg),
+                    if (query.trim().isEmpty) ...[
+                      Text(
+                        'Popular Coins',
+                        style: Theme.of(context).textTheme.titleMedium
+                            ?.copyWith(fontWeight: FontWeight.w700),
                       ),
-                    )
-                  : searchField,
-              const SizedBox(height: AppSizes.md),
-              _tabStrip(),
-              const SizedBox(height: AppSizes.sm),
-              Expanded(
-                child: query.trim().isNotEmpty
-                    ? _searchResults(query, results)
-                    : _marketResults(marketState, marketCoins, currency),
+                      const SizedBox(height: AppSizes.sm),
+                      _tabStrip(),
+                      const Divider(height: 1, thickness: 0.5),
+                    ],
+                    const SizedBox(height: AppSizes.sm),
+                  ]),
+                ),
               ),
+              if (query.trim().isNotEmpty)
+                _searchResults(query, results)
+              else
+                _marketResults(marketState, marketCoins, currency),
             ],
           ),
         ),
@@ -95,7 +123,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
 
   Widget _searchField(String query) => TextField(
     controller: _controller,
-    autofocus: !widget.animateFromHome,
+    autofocus: false,
     onChanged: ref.read(searchQueryProvider.notifier).set,
     textInputAction: TextInputAction.search,
     decoration: InputDecoration(
@@ -141,50 +169,41 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
   );
 
   Widget _tabStrip() => SizedBox(
-    height: AppSizes.homeTabHeight,
-    child: ListView(
+    height: AppSizes.chipHeight + AppSizes.xs,
+    child: ListView.separated(
       scrollDirection: Axis.horizontal,
-      children: _tabs.map((tab) {
+      itemCount: _tabs.length,
+      separatorBuilder: (_, _) => const SizedBox(width: AppSizes.sm),
+      itemBuilder: (context, index) {
+        final tab = _tabs[index];
         final selected = tab == _selectedTab;
-        return InkWell(
-          onTap: () => setState(() => _selectedTab = tab),
-          child: SizedBox(
-            width: switch (tab) {
-              HomeTab.all => 64,
-              HomeTab.trending => 88,
-              HomeTab.gainers => 116,
-              HomeTab.losers => 74,
-              HomeTab.overview => 0,
-            },
-            height: AppSizes.homeTabHeight,
-            child: Stack(
-              alignment: Alignment.bottomCenter,
-              children: [
-                Center(
-                  child: Text(
-                    _tabLabel(tab),
-                    style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                      color: selected
-                          ? Theme.of(context).colorScheme.primary
-                          : Theme.of(context).colorScheme.onSurfaceVariant,
-                      fontWeight: selected ? FontWeight.w700 : FontWeight.w600,
-                    ),
-                  ),
+        final scheme = Theme.of(context).colorScheme;
+        return Material(
+          color: Colors.transparent,
+          child: InkWell(
+            borderRadius: BorderRadius.circular(AppSizes.radiusSm),
+            onTap: () => setState(() => _selectedTab = tab),
+            child: Container(
+              height: AppSizes.chipHeight,
+              padding: const EdgeInsets.symmetric(horizontal: AppSizes.md),
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: selected
+                    ? scheme.primary
+                    : scheme.surfaceContainerHighest.withValues(alpha: 0.62),
+                borderRadius: BorderRadius.circular(AppSizes.radiusSm),
+              ),
+              child: Text(
+                _tabLabel(tab),
+                style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                  color: selected ? Colors.white : scheme.onSurfaceVariant,
+                  fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
                 ),
-                if (selected)
-                  Container(
-                    width: AppSizes.tabIndicatorWidth,
-                    height: AppSizes.homeTabUnderlineHeight,
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.primary,
-                      borderRadius: BorderRadius.circular(AppSizes.radiusPill),
-                    ),
-                  ),
-              ],
+              ),
             ),
           ),
         );
-      }).toList(),
+      },
     ),
   );
 
@@ -193,70 +212,168 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     List<Coin> coins,
     String currency,
   ) => state.when(
-    loading: () => const Center(child: CircularProgressIndicator()),
-    error: (error, _) => ErrorView(
-      message: error.toString(),
-      onRetry: _selectedTab == HomeTab.trending
-          ? () => ref.read(trendingControllerProvider.notifier).refresh()
-          : () => ref.read(coinListControllerProvider.notifier).refresh(),
+    loading: () => const SliverFillRemaining(
+      hasScrollBody: false,
+      child: Center(child: CupertinoLoader()),
+    ),
+    error: (error, _) => SliverFillRemaining(
+      hasScrollBody: false,
+      child: ErrorView(
+        message: error.toString(),
+        onRetry: _selectedTab == HomeTab.trending
+            ? () => ref.read(trendingControllerProvider.notifier).refresh()
+            : () => ref.read(coinListControllerProvider.notifier).refresh(),
+      ),
     ),
     data: (_) => coins.isEmpty
-        ? const Center(child: Text(AppStrings.noCoinsFound))
-        : ListView.separated(
-            padding: const EdgeInsets.only(bottom: AppSizes.lg),
-            itemCount: coins.length,
-            separatorBuilder: (_, _) => const SizedBox(height: AppSizes.sm),
-            itemBuilder: (context, index) =>
-                _MarketSearchCard(coin: coins[index], currency: currency),
+        ? const SliverFillRemaining(
+            hasScrollBody: false,
+            child: Center(child: Text(AppStrings.noCoinsFound)),
+          )
+        : SliverPadding(
+            padding: const EdgeInsets.fromLTRB(
+              AppSizes.screenPadding,
+              0,
+              AppSizes.screenPadding,
+              AppSizes.lg,
+            ),
+            sliver: SliverToBoxAdapter(
+              child: _MarketCoinTable(coins: coins, currency: currency),
+            ),
           ),
   );
 
   Widget _searchResults(String query, AsyncValue<List<SearchCoin>> results) {
     if (query.trim().length < 2) {
-      return const Center(child: Text(AppStrings.searchCoins));
+      return const SliverFillRemaining(
+        hasScrollBody: false,
+        child: Center(child: Text(AppStrings.searchCoins)),
+      );
     }
     return results.when(
-      loading: () => const Center(child: CircularProgressIndicator()),
-      error: (error, _) => ErrorView(
-        message: error.toString(),
-        onRetry: () => ref.read(searchResultsProvider.notifier).retry(),
+      loading: () => const SliverFillRemaining(
+        hasScrollBody: false,
+        child: Center(child: CupertinoLoader()),
+      ),
+      error: (error, _) => SliverFillRemaining(
+        hasScrollBody: false,
+        child: ErrorView(
+          message: error.toString(),
+          onRetry: () => ref.read(searchResultsProvider.notifier).retry(),
+        ),
       ),
       data: (items) => items.isEmpty
-          ? const Center(child: Text(AppStrings.noCoinsFound))
-          : ListView.separated(
-              padding: const EdgeInsets.only(bottom: AppSizes.lg),
-              itemCount: items.length,
-              separatorBuilder: (_, _) => const SizedBox(height: AppSizes.sm),
-              itemBuilder: (context, index) =>
-                  _SearchResultCard(coin: items[index]),
+          ? const SliverFillRemaining(
+              hasScrollBody: false,
+              child: Center(child: Text(AppStrings.noCoinsFound)),
+            )
+          : SliverPadding(
+              padding: const EdgeInsets.fromLTRB(
+                AppSizes.screenPadding,
+                0,
+                AppSizes.screenPadding,
+                AppSizes.lg,
+              ),
+              sliver: SliverList.separated(
+                itemCount: items.length,
+                separatorBuilder: (_, _) => const SizedBox(height: AppSizes.sm),
+                itemBuilder: (context, index) =>
+                    _SearchResultCard(coin: items[index]),
+              ),
             ),
     );
   }
 
   String _tabLabel(HomeTab tab) => switch (tab) {
-    HomeTab.all => AppStrings.allCoins,
+    HomeTab.all => AppStrings.all,
     HomeTab.trending => AppStrings.trending,
-    HomeTab.gainers => AppStrings.topGainers,
-    HomeTab.losers => AppStrings.topLosers,
+    HomeTab.gainers => AppStrings.gainers,
+    HomeTab.losers => AppStrings.losers,
     HomeTab.overview => AppStrings.overview,
   };
 }
 
-class _MarketSearchCard extends StatelessWidget {
-  const _MarketSearchCard({required this.coin, required this.currency});
+class _MarketCoinTable extends StatelessWidget {
+  const _MarketCoinTable({required this.coins, required this.currency});
+
+  final List<Coin> coins;
+  final String currency;
+
+  @override
+  Widget build(BuildContext context) => Column(
+    children: [
+      for (final coin in coins)
+        _MarketSearchRow(coin: coin, currency: currency),
+    ],
+  );
+}
+
+class _MarketSearchRow extends StatelessWidget {
+  const _MarketSearchRow({required this.coin, required this.currency});
 
   final Coin coin;
   final String currency;
 
   @override
-  Widget build(BuildContext context) => Card(
-    margin: EdgeInsets.zero,
-    clipBehavior: Clip.antiAlias,
-    child: CoinRow(
-      coin: coin,
-      currency: currency,
-      period: ChangePeriod.day,
-      onTap: () => context.push('/coin/${coin.id}'),
+  Widget build(BuildContext context) => InkWell(
+    onTap: () => context.push('/coin/${coin.id}'),
+    child: SizedBox(
+      height: 76,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: AppSizes.md),
+        child: Row(
+          children: [
+            CoinAvatar(symbol: coin.symbol, imageUrl: coin.image),
+            const SizedBox(width: AppSizes.sm),
+            Expanded(
+              flex: 4,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    coin.name,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      fontWeight: FontWeight.w600,
+                      color: Theme.of(context).colorScheme.onSurface,
+                    ),
+                  ),
+                  Text(
+                    coin.symbol.toUpperCase(),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Expanded(
+              flex: 4,
+              child: Text(
+                Formatters.currency(coin.price, currency),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.right,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  fontFeatures: const [FontFeature.tabularFigures()],
+                ),
+              ),
+            ),
+            const SizedBox(width: AppSizes.sm),
+            SizedBox(
+              width: 76,
+              child: Align(
+                alignment: Alignment.centerRight,
+                child: ChangePill(change: coin.change24hPct, compact: true),
+              ),
+            ),
+          ],
+        ),
+      ),
     ),
   );
 }
@@ -271,9 +388,16 @@ class _SearchResultCard extends StatelessWidget {
     margin: EdgeInsets.zero,
     child: ListTile(
       leading: CoinAvatar(symbol: coin.symbol, imageUrl: coin.image),
-      title: Text(coin.name, maxLines: 1, overflow: TextOverflow.ellipsis),
+      title: Text(
+        coin.name,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+          fontWeight: FontWeight.w600,
+          color: Theme.of(context).colorScheme.onSurface,
+        ),
+      ),
       subtitle: Text(coin.symbol.toUpperCase()),
-      trailing: coin.rank == null ? null : Text('#${coin.rank}'),
       onTap: () => context.push('/coin/${coin.id}'),
     ),
   );

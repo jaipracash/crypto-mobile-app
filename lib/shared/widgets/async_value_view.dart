@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../core/constants/app_sizes.dart';
 import '../../core/constants/app_strings.dart';
+import 'cupertino_loader.dart';
 import 'empty_view.dart';
 import 'error_view.dart';
-import 'shimmer_box.dart';
 
 class AsyncValueView<T> extends StatelessWidget {
   const AsyncValueView({
@@ -28,31 +27,10 @@ class AsyncValueView<T> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => value.when(
-    loading: () => loading ?? const _DefaultLoading(),
+    loading: () => loading ?? const Center(child: CupertinoLoader()),
     error: (error, _) => ErrorView(message: error.toString(), onRetry: onRetry),
     data: (data) => isEmpty?.call(data) == true
         ? EmptyView(title: emptyTitle, message: emptyMessage)
         : builder(data),
-  );
-}
-
-class _DefaultLoading extends StatelessWidget {
-  const _DefaultLoading();
-  @override
-  Widget build(BuildContext context) => ListView.separated(
-    padding: const EdgeInsets.all(AppSizes.screenPadding),
-    itemCount: AppSizes.loadingItemCount,
-    separatorBuilder: (_, _) => const SizedBox(height: AppSizes.loadingRowGap),
-    itemBuilder: (_, _) => const Row(
-      children: [
-        ShimmerBox(
-          width: AppSizes.coinLogo,
-          height: AppSizes.coinLogo,
-          radius: AppSizes.radiusPill,
-        ),
-        SizedBox(width: AppSizes.loadingRowGap),
-        Expanded(child: ShimmerBox(height: AppSizes.loadingBoxHeight)),
-      ],
-    ),
   );
 }

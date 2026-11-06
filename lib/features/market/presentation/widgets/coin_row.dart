@@ -60,7 +60,7 @@ class _CoinRowState extends State<CoinRow> {
     final theme = Theme.of(context);
     final dark = theme.brightness == Brightness.dark;
     final flashColor = _priceRose == null
-        ? theme.colorScheme.onSurface
+      ? theme.colorScheme.onSurfaceVariant
         : _priceRose!
         ? (dark ? AppColors.darkGain : AppColors.lightGain)
         : (dark ? AppColors.darkLoss : AppColors.lightLoss);
@@ -122,23 +122,29 @@ class _CoinRowState extends State<CoinRow> {
               ),
               const SizedBox(width: AppSizes.xs),
               Expanded(
-                flex: 5,
+                flex: 4,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    AnimatedDefaultTextStyle(
-                      duration: const Duration(milliseconds: 180),
-                      style: theme.textTheme.bodyMedium!.copyWith(
-                        color: flashColor,
-                        fontWeight: FontWeight.w600,
-                        fontFeatures: const [FontFeature.tabularFigures()],
-                      ),
-                      child: Text(
-                        Formatters.currency(widget.coin.price, widget.currency),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        textAlign: TextAlign.right,
+                    Padding(
+                      padding: const EdgeInsets.only(right: AppSizes.sm),
+                      child: AnimatedDefaultTextStyle(
+                        duration: const Duration(milliseconds: 180),
+                        style: theme.textTheme.bodyMedium!.copyWith(
+                          color: flashColor,
+                          fontWeight: FontWeight.w500,
+                          fontFeatures: const [FontFeature.tabularFigures()],
+                        ),
+                        child: Text(
+                          Formatters.currency(
+                            widget.coin.price,
+                            widget.currency,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          textAlign: TextAlign.right,
+                        ),
                       ),
                     ),
                   ],
@@ -209,11 +215,14 @@ class CoinTableHeader extends StatelessWidget {
           ),
           const SizedBox(width: AppSizes.xs),
           Expanded(
-            flex: 5,
-            child: Text(
-              AppStrings.price,
-              textAlign: TextAlign.right,
-              style: _style(context),
+            flex: 4,
+            child: Padding(
+              padding: const EdgeInsets.only(right: AppSizes.sm),
+              child: Text(
+                AppStrings.price,
+                textAlign: TextAlign.right,
+                style: _style(context),
+              ),
             ),
           ),
           const SizedBox(width: AppSizes.sm),

@@ -9,9 +9,9 @@ import '../../../../core/utils/formatters.dart';
 import '../../../../core/router/routes.dart';
 import '../../../../shared/widgets/async_value_view.dart';
 import '../../../../shared/widgets/change_pill.dart';
+import '../../../../shared/widgets/cupertino_loader.dart';
 import '../../../../shared/widgets/data_source_banner.dart';
 import '../../../../shared/widgets/empty_view.dart';
-import '../../../../shared/widgets/shimmer_box.dart';
 import '../../../settings/presentation/controllers/settings_controller.dart';
 import '../../../watchlist/presentation/controllers/watchlist_controller.dart';
 import '../../domain/coin.dart';
@@ -114,7 +114,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                               : () => ref
                                     .read(coinListControllerProvider.notifier)
                                     .refresh(),
-                          loading: _CoinRowsLoading(period: period),
+                          loading: SizedBox(
+                            height:
+                                AppSizes.coinRowHeight *
+                                AppSizes.loadingItemCount,
+                            child: const Center(child: CupertinoLoader()),
+                          ),
                           builder: (_) => _coinListSection(
                             tab: tab,
                             source: source,
@@ -139,7 +144,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       onRetry: () => ref.read(globalStatsControllerProvider.notifier).refresh(),
       loading: const SizedBox(
         height: AppSizes.marketCardHeight * 2,
-        child: Center(child: CircularProgressIndicator()),
+        child: Center(child: CupertinoLoader()),
       ),
       builder: (snapshot) => Column(
         children: [
@@ -442,21 +447,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 }
 
-class _CoinRowsLoading extends StatelessWidget {
-  const _CoinRowsLoading({required this.period});
-
-  final ChangePeriod period;
-
-  @override
-  Widget build(BuildContext context) => Column(
-    children: [
-      CoinTableHeader(period: period, onPeriodTap: () {}),
-      for (var index = 0; index < AppSizes.loadingItemCount; index++)
-        const CoinRowSkeleton(),
-    ],
-  );
-}
-
 class GlobalStatsStrip extends ConsumerWidget {
   const GlobalStatsStrip({super.key});
 
@@ -467,7 +457,7 @@ class GlobalStatsStrip extends ConsumerWidget {
         ref.watch(settingsControllerProvider).asData?.value.currency ?? 'usd';
     final snapshot = stats.asData?.value;
     final cap = stats.isLoading
-        ? const _MetricSkeleton()
+        ? const _MetricLoading()
         : _MetricCard(
             label: AppStrings.totalMarketCap,
             value: snapshot == null
@@ -479,7 +469,7 @@ class GlobalStatsStrip extends ConsumerWidget {
             change: snapshot?.marketCapChange24hPct,
           );
     final volume = stats.isLoading
-        ? const _MetricSkeleton()
+        ? const _MetricLoading()
         : _MetricCard(
             label: AppStrings.volume24h,
             value: snapshot == null
@@ -558,26 +548,18 @@ class _MetricCard extends StatelessWidget {
   );
 }
 
-class _MetricSkeleton extends StatelessWidget {
-  const _MetricSkeleton();
+class _MetricLoading extends StatelessWidget {
+  const _MetricLoading();
 
   @override
   Widget build(BuildContext context) => Container(
     height: AppSizes.marketCardHeight,
-    padding: const EdgeInsets.all(AppSizes.md),
     decoration: BoxDecoration(
       color: Theme.of(context).colorScheme.surface,
       borderRadius: BorderRadius.circular(AppSizes.radiusMd),
+      border: Border.all(color: Theme.of(context).dividerColor),
     ),
-    child: const Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        ShimmerBox(width: 84, height: 12),
-        SizedBox(height: AppSizes.sm),
-        ShimmerBox(width: 120, height: 18),
-      ],
-    ),
+    child: const Center(child: CupertinoLoader()),
   );
 }
 

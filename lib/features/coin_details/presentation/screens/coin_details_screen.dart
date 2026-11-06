@@ -9,6 +9,7 @@ import '../../../../core/utils/formatters.dart';
 import '../../../../shared/widgets/async_value_view.dart';
 import '../../../../shared/widgets/change_pill.dart';
 import '../../../../shared/widgets/coin_avatar.dart';
+import '../../../../shared/widgets/cupertino_loader.dart';
 import '../../../../shared/widgets/data_source_banner.dart';
 import '../../../market/domain/coin.dart';
 import '../../../settings/presentation/controllers/settings_controller.dart';
@@ -178,7 +179,7 @@ class _CoinDetailsScreenState extends ConsumerState<CoinDetailsScreen> {
           onRetry: () => ref.invalidate(chartControllerProvider(widget.coinId)),
           loading: const SizedBox(
             height: AppSizes.chartHeight,
-            child: Center(child: CircularProgressIndicator()),
+            child: Center(child: CupertinoLoader()),
           ),
           isEmpty: (value) => value.prices.isEmpty,
           emptyTitle: AppStrings.noChartData,

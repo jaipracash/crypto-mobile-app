@@ -204,11 +204,16 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect(find.text(AppStrings.allCoins), findsOneWidget);
+    expect(find.text(AppStrings.all), findsOneWidget);
     expect(find.text(AppStrings.trending), findsOneWidget);
-    expect(find.text(AppStrings.topGainers), findsOneWidget);
-    expect(find.text(AppStrings.topLosers), findsOneWidget);
-    expect(find.text('Bitcoin'), findsOneWidget);
+    expect(find.text(AppStrings.gainers), findsOneWidget);
+    expect(find.text(AppStrings.losers), findsOneWidget);
+    expect(find.text('Ethereum'), findsOneWidget);
+    expect(find.text('Bitcoin'), findsNothing);
+    expect(find.text('Market pulse'), findsNothing);
+    expect(find.byType(Sparkline), findsNothing);
+    expect(find.byType(Divider), findsOneWidget);
+    expect(find.byType(ChoiceChip), findsNothing);
     expect(
       find.byWidgetPredicate(
         (widget) =>
@@ -217,10 +222,10 @@ void main() {
       findsOneWidget,
     );
 
-    await tester.tap(find.text(AppStrings.trending));
+    await tester.tap(find.text(AppStrings.all));
     await tester.pumpAndSettle();
-    expect(find.text('Ethereum'), findsOneWidget);
-    expect(find.text('Bitcoin'), findsNothing);
+    expect(find.text('Bitcoin'), findsOneWidget);
+    expect(find.text('Ethereum'), findsNothing);
     expect(tester.takeException(), isNull);
   });
 

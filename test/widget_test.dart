@@ -4,7 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:gecko_lite/features/market/domain/coin.dart';
 import 'package:gecko_lite/shared/widgets/async_value_view.dart';
 import 'package:gecko_lite/shared/widgets/coin_tile.dart';
-import 'package:gecko_lite/shared/widgets/shimmer_box.dart';
+import 'package:gecko_lite/shared/widgets/cupertino_loader.dart';
 
 void main() {
   testWidgets('CoinTile shows coin identity and market price', (tester) async {
@@ -47,7 +47,7 @@ void main() {
     );
 
     await tester.pumpWidget(view(const AsyncLoading<List<int>>()));
-    expect(find.byType(ShimmerBox), findsWidgets);
+    expect(find.byType(CupertinoLoader), findsOneWidget);
 
     await tester.pumpWidget(
       view(AsyncError<List<int>>(Exception('offline'), StackTrace.current)),
