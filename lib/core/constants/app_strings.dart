@@ -110,8 +110,11 @@ abstract final class AppStrings {
   static const addToWatchlist = 'Add to watchlist';
   static const removeFromWatchlist = 'Remove from watchlist';
   static const emptyWatchlist = 'Your watchlist is empty';
-  static const saveCoinsMessage = 'Save coins to keep their prices close by.';
-  static const exploreMarket = 'Explore market';
+  static const saveCoinsMessage =
+      'Add coins to follow their prices and daily changes here.';
+  static const addCoins = 'Add coins';
+  static const searchAllCoins = 'Search all coins';
+  static const noAvailableCoins = 'No coins match your search.';
   static const undo = 'Undo';
   static const sort = 'Sort coins';
   static const clear = 'Clear search';

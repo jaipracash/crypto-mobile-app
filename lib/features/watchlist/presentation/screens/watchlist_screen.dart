@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/constants/app_sizes.dart';
 import '../../../../core/constants/app_strings.dart';
+import '../../../../core/router/routes.dart';
 import '../../../../shared/widgets/async_value_view.dart';
 import '../../../../shared/widgets/coin_tile.dart';
 import '../../../../shared/widgets/data_source_banner.dart';
-import '../../../../shared/widgets/empty_view.dart';
 import '../../../market/domain/coin.dart';
 import '../../../settings/presentation/controllers/settings_controller.dart';
 import '../controllers/watchlist_controller.dart';
@@ -47,11 +48,35 @@ class WatchlistScreen extends ConsumerWidget {
                     height:
                         MediaQuery.sizeOf(context).height *
                         AppSizes.emptyStateHeightFraction,
-                    child: EmptyView(
-                      title: AppStrings.emptyWatchlist,
-                      message: AppStrings.saveCoinsMessage,
-                      actionLabel: AppStrings.exploreMarket,
-                      onAction: () => context.go('/'),
+                    child: Padding(
+                      padding: const EdgeInsets.all(AppSizes.xl),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          SvgPicture.asset(
+                            'assets/not_added.svg',
+                            width: 156,
+                            height: 156,
+                          ),
+                          const SizedBox(height: AppSizes.lg),
+                          Text(
+                            AppStrings.emptyWatchlist,
+                            style: Theme.of(context).textTheme.titleMedium,
+                          ),
+                          const SizedBox(height: AppSizes.xs),
+                          Text(
+                            AppStrings.saveCoinsMessage,
+                            textAlign: TextAlign.center,
+                            style: Theme.of(context).textTheme.bodySmall,
+                          ),
+                          const SizedBox(height: AppSizes.lg),
+                          FilledButton(
+                            onPressed: () =>
+                                context.push(Routes.addWatchlistCoins),
+                            child: const Text(AppStrings.addCoins),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ],

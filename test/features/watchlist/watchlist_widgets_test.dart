@@ -1,0 +1,99 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
+import 'package:gecko_lite/core/constants/app_strings.dart';
+import 'package:gecko_lite/core/router/routes.dart';
+import 'package:gecko_lite/features/market/domain/coin.dart';
+import 'package:gecko_lite/features/settings/domain/app_settings.dart';
+import 'package:gecko_lite/features/settings/presentation/controllers/settings_controller.dart';
+import 'package:gecko_lite/features/watchlist/domain/watchlist_repository.dart';
+import 'package:gecko_lite/features/watchlist/presentation/controllers/add_watchlist_coins_controller.dart';
+import 'package:gecko_lite/features/watchlist/presentation/controllers/watchlist_controller.dart';
+import 'package:gecko_lite/features/watchlist/presentation/screens/add_watchlist_coins_screen.dart';
+import 'package:gecko_lite/features/watchlist/presentation/screens/watchlist_screen.dart';
+
+const _coins = [
+  Coin(id: 'bitcoin', symbol: 'btc', name: 'Bitcoin', change24hPct: 2.4),
+  Coin(id: 'ethereum', symbol: 'eth', name: 'Ethereum', change24hPct: -1.2),
+];
+
+class _TestAddCoinsController extends AddWatchlistCoinsController {
+  @override
+  Future<AddWatchlistCoinsState> build() async => const AddWatchlistCoinsState(
+    items: _coins,
+    page: 1,
+    hasMore: false,
+    dataSource: 'mock',
+  );
+}
+
+class _EmptyTestWatchlistController extends WatchlistController {
+  @override
+  Future<WatchlistData> build() async =>
+      const WatchlistData(items: [], dataSource: 'mock');
+}
+
+class _TestSettingsController extends SettingsController {
+  @override
+  Future<AppSettings> build() async => const AppSettings();
+}
+
+void main() {
+  testWidgets('empty watchlist opens searchable add-coins selector', (
+    tester,
+  ) async {
+    final router = GoRouter(
+      initialLocation: Routes.watchlist,
+      routes: [
+        GoRoute(
+          path: Routes.watchlist,
+          builder: (_, _) => const WatchlistScreen(),
+          routes: [
+            GoRoute(
+              path: 'add',
+              builder: (_, _) => const AddWatchlistCoinsScreen(),
+            ),
+          ],
+        ),
+      ],
+    );
+    addTearDown(router.dispose);
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          addWatchlistCoinsControllerProvider.overrideWith(
+            _TestAddCoinsController.new,
+          ),
+          watchlistControllerProvider.overrideWith(
+            _EmptyTestWatchlistController.new,
+          ),
+          settingsControllerProvider.overrideWith(_TestSettingsController.new),
+        ],
+        child: MaterialApp.router(routerConfig: router),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text(AppStrings.emptyWatchlist), findsOneWidget);
+    expect(find.text('Explore market'), findsNothing);
+    expect(find.text(AppStrings.addCoins), findsOneWidget);
+
+    await tester.tap(find.text(AppStrings.addCoins));
+    await tester.pumpAndSettle();
+    expect(find.text(AppStrings.searchAllCoins), findsOneWidget);
+    expect(find.text('Bitcoin'), findsOneWidget);
+    expect(find.text('Ethereum'), findsOneWidget);
+
+    await tester.enterText(find.byType(TextField), 'eth');
+    await tester.pumpAndSettle();
+    expect(find.text('Ethereum'), findsOneWidget);
+    expect(find.text('Bitcoin'), findsNothing);
+
+    await tester.tap(find.text('Ethereum'));
+    await tester.pumpAndSettle();
+    expect(find.text('${AppStrings.addCoins} (1)'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+}
