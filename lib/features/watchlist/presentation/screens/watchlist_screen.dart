@@ -13,24 +13,30 @@ import '../../../market/domain/coin.dart';
 import '../../../settings/presentation/controllers/settings_controller.dart';
 import '../controllers/watchlist_controller.dart';
 
-class WatchlistScreen extends ConsumerWidget {
+enum _WatchlistSort { name, price, change24h }
+
+enum _WatchlistFilter { all, gainers, losers }
+
+class WatchlistScreen extends ConsumerStatefulWidget {
   const WatchlistScreen({super.key});
+
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<WatchlistScreen> createState() => _WatchlistScreenState();
+}
+
+class _WatchlistScreenState extends ConsumerState<WatchlistScreen> {
+  _WatchlistSort _sort = _WatchlistSort.change24h;
+  _WatchlistFilter _filter = _WatchlistFilter.all;
+  bool _ascending = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final ref = this.ref;
     final coins = ref.watch(watchlistControllerProvider);
     final currency =
         ref.watch(settingsControllerProvider).asData?.value.currency ?? 'usd';
     return Scaffold(
-      appBar: AppBar(
-        title: const Text(AppStrings.watchlist),
-        actions: [
-          TextButton(
-            onPressed: () =>
-                ref.read(watchlistControllerProvider.notifier).refresh(),
-            child: Text('${coins.asData?.value.items.length ?? 0}'),
-          ),
-        ],
-      ),
+      appBar: AppBar(title: const Text(AppStrings.watchlist)),
       body: RefreshIndicator(
         onRefresh: () =>
             ref.read(watchlistControllerProvider.notifier).refresh(),
@@ -55,8 +61,8 @@ class WatchlistScreen extends ConsumerWidget {
                         children: [
                           SvgPicture.asset(
                             'assets/not_added.svg',
-                            width: 156,
-                            height: 156,
+                            width: 176,
+                            height: 176,
                           ),
                           const SizedBox(height: AppSizes.lg),
                           Text(
@@ -82,31 +88,62 @@ class WatchlistScreen extends ConsumerWidget {
                 ],
               );
             }
+            final visibleItems = _sortAndFilter(items);
             return ListView(
               physics: const AlwaysScrollableScrollPhysics(),
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppSizes.screenPadding,
-              ),
               children: [
                 DataSourceBanner(source: data.dataSource),
-                ...items.map(
-                  (coin) => Dismissible(
-                    key: ValueKey(coin.id),
-                    direction: DismissDirection.endToStart,
-                    background: Container(
-                      alignment: Alignment.centerRight,
-                      padding: const EdgeInsets.only(right: AppSizes.xl),
-                      color: Theme.of(context).colorScheme.error,
-                      child: Icon(
-                        Icons.delete_outline,
-                        color: Theme.of(context).colorScheme.onError,
+                _watchlistControls(context, visibleItems.length),
+                if (visibleItems.isEmpty)
+                  Padding(
+                    padding: const EdgeInsets.all(AppSizes.xl),
+                    child: Center(
+                      child: Text(
+                        _filter == _WatchlistFilter.gainers
+                            ? AppStrings.noGainers
+                            : AppStrings.noLosers,
+                        style: Theme.of(context).textTheme.bodyMedium,
                       ),
                     ),
-                    onDismissed: (_) => _remove(context, ref, coin),
-                    child: CoinTile(
-                      coin: coin.copyWith(isWatchlisted: true),
-                      currency: currency,
-                      onTap: () => context.push('/coin/${coin.id}'),
+                  ),
+                ...visibleItems.map(
+                  (coin) => Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSizes.screenPadding,
+                    ),
+                    child: Dismissible(
+                      key: ValueKey(coin.id),
+                      direction: DismissDirection.endToStart,
+                      background: Container(
+                        alignment: Alignment.centerRight,
+                        padding: const EdgeInsets.only(right: AppSizes.xl),
+                        color: Theme.of(context).colorScheme.error,
+                        child: Icon(
+                          Icons.delete_outline,
+                          color: Theme.of(context).colorScheme.onError,
+                        ),
+                      ),
+                      onDismissed: (_) => _remove(context, ref, coin),
+                      child: CoinTile(
+                        coin: coin.copyWith(isWatchlisted: true),
+                        currency: currency,
+                        onTap: () => context.push('/coin/${coin.id}'),
+                      ),
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(
+                    AppSizes.screenPadding,
+                    AppSizes.md,
+                    AppSizes.screenPadding,
+                    AppSizes.xl,
+                  ),
+                  child: Center(
+                    child: FilledButton.icon(
+                      onPressed: () => context.push(Routes.addWatchlistCoins),
+                      icon: const Icon(Icons.add_rounded),
+                      label: const Text(AppStrings.addCoins),
                     ),
                   ),
                 ),
@@ -117,6 +154,173 @@ class WatchlistScreen extends ConsumerWidget {
       ),
     );
   }
+
+  List<Coin> _sortAndFilter(List<Coin> coins) {
+    final filtered = coins.where((coin) {
+      final change = coin.change24hPct;
+      return switch (_filter) {
+        _WatchlistFilter.all => true,
+        _WatchlistFilter.gainers => change != null && change > 0,
+        _WatchlistFilter.losers => change != null && change < 0,
+      };
+    }).toList();
+
+    int compare(Coin a, Coin b) {
+      if (_sort == _WatchlistSort.name) {
+        final result = a.name.toLowerCase().compareTo(b.name.toLowerCase());
+        return _ascending ? result : -result;
+      }
+
+      final aValue = _sort == _WatchlistSort.price ? a.price : a.change24hPct;
+      final bValue = _sort == _WatchlistSort.price ? b.price : b.change24hPct;
+      if (aValue == null || bValue == null) {
+        if (aValue == null && bValue == null) return 0;
+        return aValue == null ? 1 : -1;
+      }
+      final result = aValue.compareTo(bValue);
+      return _ascending ? result : -result;
+    }
+
+    filtered.sort(compare);
+    return filtered;
+  }
+
+  Widget _watchlistControls(BuildContext context, int count) => Padding(
+    padding: const EdgeInsets.fromLTRB(
+      AppSizes.screenPadding,
+      AppSizes.sm,
+      AppSizes.screenPadding,
+      AppSizes.sm,
+    ),
+    child: Row(
+      children: [
+        Expanded(
+          child: Text(
+            '$count ${AppStrings.watchlist.toLowerCase()}',
+            style: Theme.of(context).textTheme.bodySmall
+                ?.copyWith(fontWeight: FontWeight.w700),
+          ),
+        ),
+        IconButton(
+          tooltip: AppStrings.sortWatchlist,
+          onPressed: () => _showSortOptions(context),
+          icon: SvgPicture.asset(
+            'assets/sort-vertical-svgrepo-com.svg',
+            width: AppSizes.iconLarge,
+            height: AppSizes.iconLarge,
+            colorFilter: ColorFilter.mode(
+              Theme.of(context).colorScheme.onSurfaceVariant,
+              BlendMode.srcIn,
+            ),
+          ),
+        ),
+        IconButton(
+          tooltip: AppStrings.filterWatchlist,
+          onPressed: () => _showFilterOptions(context),
+          icon: SvgPicture.asset(
+            'assets/filter-svgrepo-com.svg',
+            width: AppSizes.iconLarge,
+            height: AppSizes.iconLarge,
+            colorFilter: ColorFilter.mode(
+              Theme.of(context).colorScheme.onSurfaceVariant,
+              BlendMode.srcIn,
+            ),
+          ),
+        ),
+      ],
+    ),
+  );
+
+  Future<void> _showSortOptions(BuildContext context) async {
+    await showModalBottomSheet<void>(
+      context: context,
+      showDragHandle: true,
+      builder: (context) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(AppSizes.md),
+              child: Text(
+                AppStrings.sortWatchlist,
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+            ),
+            for (final option in _WatchlistSort.values)
+              ListTile(
+                title: Text(_sortLabel(option)),
+                trailing: _sort == option
+                    ? Icon(
+                        _ascending
+                            ? Icons.arrow_upward_rounded
+                            : Icons.arrow_downward_rounded,
+                        color: Theme.of(context).colorScheme.primary,
+                      )
+                    : null,
+                onTap: () {
+                  setState(() {
+                    if (_sort == option) {
+                      _ascending = !_ascending;
+                    } else {
+                      _sort = option;
+                      _ascending = option == _WatchlistSort.name;
+                    }
+                  });
+                  Navigator.of(context).pop();
+                },
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _showFilterOptions(BuildContext context) async {
+    await showModalBottomSheet<void>(
+      context: context,
+      showDragHandle: true,
+      builder: (context) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(AppSizes.md),
+              child: Text(
+                AppStrings.filterWatchlist,
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+            ),
+            for (final option in _WatchlistFilter.values)
+              ListTile(
+                title: Text(_filterLabel(option)),
+                trailing: _filter == option
+                    ? Icon(
+                        Icons.check_rounded,
+                        color: Theme.of(context).colorScheme.primary,
+                      )
+                    : null,
+                onTap: () {
+                  setState(() => _filter = option);
+                  Navigator.of(context).pop();
+                },
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  String _sortLabel(_WatchlistSort sort) => switch (sort) {
+    _WatchlistSort.name => AppStrings.name,
+    _WatchlistSort.price => AppStrings.price,
+    _WatchlistSort.change24h => AppStrings.change24h,
+  };
+
+  String _filterLabel(_WatchlistFilter filter) => switch (filter) {
+    _WatchlistFilter.all => AppStrings.allCoinsFilter,
+    _WatchlistFilter.gainers => AppStrings.gainers,
+    _WatchlistFilter.losers => AppStrings.losers,
+  };
 
   Future<void> _remove(BuildContext context, WidgetRef ref, Coin coin) async {
     try {

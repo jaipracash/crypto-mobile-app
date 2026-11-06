@@ -212,7 +212,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   prefixIcon: Padding(
                     padding: const EdgeInsets.all(AppSizes.md),
                     child: SvgPicture.asset(
-                      'assets/search-alt-2-svgrepo-com.svg',
+                      'assets/search2.svg',
                       width: AppSizes.iconMedium,
                       height: AppSizes.iconMedium,
                       colorFilter: ColorFilter.mode(
@@ -251,10 +251,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               const SnackBar(content: Text(AppStrings.noNotifications)),
             );
           },
-          icon: _controlIcon(
-            'assets/notification-6-svgrepo-com.svg',
-            size: AppSizes.xxl,
-          ),
+          icon: _controlIcon('assets/notification-6-svgrepo-com.svg', size: 36),
         ),
       ],
     );
@@ -262,108 +259,118 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   Widget _homeControls(HomeTab tab, MarketFilters filters) => Material(
     color: Theme.of(context).colorScheme.surface,
-    child: Column(
-      children: [
-        Row(
-          children: [
-            Expanded(
-              child: SizedBox(
-                height: AppSizes.homeTabHeight,
-                child: Stack(
-                  fit: StackFit.expand,
-                  children: [
-                    SingleChildScrollView(
-                      controller: _tabsController,
-                      scrollDirection: Axis.horizontal,
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: HomeTab.values
-                            .map((item) => _homeTab(item, tab))
-                            .toList(),
+    child: Container(
+      decoration: BoxDecoration(
+        border: Border(
+          bottom: BorderSide(color: Theme.of(context).dividerColor, width: 0.5),
+        ),
+      ),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: SizedBox(
+                  height: AppSizes.homeTabHeight,
+                  child: Stack(
+                    fit: StackFit.expand,
+                    children: [
+                      SingleChildScrollView(
+                        controller: _tabsController,
+                        scrollDirection: Axis.horizontal,
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: HomeTab.values
+                              .map((item) => _homeTab(item, tab))
+                              .toList(),
+                        ),
                       ),
-                    ),
-                    Positioned(
-                      top: 0,
-                      bottom: 0,
-                      right: 0,
-                      child: IgnorePointer(
-                        child: Container(
-                          width: AppSizes.xxl,
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              begin: Alignment.centerLeft,
-                              end: Alignment.centerRight,
-                              colors: [
-                                Theme.of(context).colorScheme.surface
-                                    .withValues(alpha: 0),
-                                Theme.of(context).colorScheme.surface,
-                              ],
+                      Positioned(
+                        top: 0,
+                        bottom: 0,
+                        right: 0,
+                        child: IgnorePointer(
+                          child: Container(
+                            width: AppSizes.xxl,
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                begin: Alignment.centerLeft,
+                                end: Alignment.centerRight,
+                                colors: [
+                                  Theme.of(context).colorScheme.surface
+                                      .withValues(alpha: 0),
+                                  Theme.of(context).colorScheme.surface,
+                                ],
+                              ),
                             ),
                           ),
                         ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              SizedBox(
+                height: AppSizes.homeTabHeight,
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    SizedBox(
+                      width: AppSizes.filterButtonExtent,
+                      height: AppSizes.homeTabHeight,
+                      child: IconButton(
+                        tooltip: AppStrings.sortCoins,
+                        onPressed: () => _openSheet(const SortSheet()),
+                        icon: _controlIcon(
+                          'assets/sort-vertical-svgrepo-com.svg',
+                        ),
+                        padding: EdgeInsets.zero,
+                        visualDensity: VisualDensity.compact,
+                      ),
+                    ),
+                    SizedBox(
+                      width: AppSizes.filterButtonExtent,
+                      child: Stack(
+                        clipBehavior: Clip.none,
+                        children: [
+                          IconButton(
+                            tooltip: AppStrings.filter,
+                            onPressed: () => _openSheet(const FilterSheet()),
+                            icon: _controlIcon(
+                              'assets/filter-svgrepo-com.svg',
+                              size: AppSizes.iconMedium,
+                            ),
+                            padding: EdgeInsets.zero,
+                            visualDensity: VisualDensity.compact,
+                          ),
+                          if (filters.activeCount > 0)
+                            Positioned(
+                              top: 2,
+                              right: 2,
+                              child: CircleAvatar(
+                                radius: AppSizes.filterBadgeRadius,
+                                backgroundColor: Theme.of(context)
+                                    .colorScheme
+                                    .surfaceContainerHighest,
+                                child: Text(
+                                  '${filters.activeCount}',
+                                  style: Theme.of(context).textTheme.labelSmall
+                                      ?.copyWith(
+                                        fontSize: AppSizes.filterBadgeTextSize,
+                                      ),
+                                ),
+                              ),
+                            ),
+                        ],
                       ),
                     ),
                   ],
                 ),
               ),
-            ),
-            SizedBox(
-              height: AppSizes.homeTabHeight,
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  SizedBox(
-                    width: AppSizes.filterButtonExtent,
-                    height: AppSizes.homeTabHeight,
-                    child: IconButton(
-                      tooltip: AppStrings.sortCoins,
-                      onPressed: () => _openSheet(const SortSheet()),
-                      icon: _controlIcon(
-                        'assets/sort-vertical-svgrepo-com.svg',
-                      ),
-                      padding: EdgeInsets.zero,
-                      visualDensity: VisualDensity.compact,
-                    ),
-                  ),
-                  SizedBox(
-                    width: AppSizes.filterButtonExtent,
-                    child: Stack(
-                      clipBehavior: Clip.none,
-                      children: [
-                        IconButton(
-                          tooltip: AppStrings.filter,
-                          onPressed: () => _openSheet(const FilterSheet()),
-                          icon: _controlIcon('assets/filter-svgrepo-com.svg'),
-                          padding: EdgeInsets.zero,
-                          visualDensity: VisualDensity.compact,
-                        ),
-                        if (filters.activeCount > 0)
-                          Positioned(
-                            top: 2,
-                            right: 2,
-                            child: CircleAvatar(
-                              radius: AppSizes.filterBadgeRadius,
-                              backgroundColor: Theme.of(context)
-                                  .colorScheme
-                                  .surfaceContainerHighest,
-                              child: Text(
-                                '${filters.activeCount}',
-                                style: Theme.of(context).textTheme.labelSmall
-                                    ?.copyWith(
-                                      fontSize: AppSizes.filterBadgeTextSize,
-                                    ),
-                              ),
-                            ),
-                          ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ],
+            ],
+          ),
+        ],
+      ),
     ),
   );
 

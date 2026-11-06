@@ -75,7 +75,11 @@ class BottomSheetScaffold extends StatelessWidget {
           ),
           const SizedBox(height: AppSizes.sm),
           Flexible(fit: FlexFit.loose, child: child),
-          footer ?? const SizedBox.shrink(),
+          if (footer != null)
+            Padding(
+              padding: const EdgeInsets.only(bottom: AppSizes.lg),
+              child: footer!,
+            ),
         ],
       ),
     ),
@@ -183,12 +187,7 @@ class _FilterSheetState extends ConsumerState<FilterSheet> {
           _choiceGroup(
             AppStrings.showTop,
             _draft.topLimit.toString(),
-            const [
-              ('50', 'Top 50'),
-              ('100', 'Top 100'),
-              ('200', 'Top 200'),
-              ('250', 'Top 250'),
-            ],
+            const [('50', 'Top 50'), ('100', 'Top 100')],
             (value) => _edit(
               (filters) => filters.copyWith(topLimit: int.parse(value)),
             ),

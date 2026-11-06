@@ -55,6 +55,10 @@ abstract final class AppStrings {
   static const settings = 'Settings';
   static const dataByCoinGecko = 'Data by CoinGecko';
   static const sortCoins = 'Sort coins';
+  static const sortWatchlist = 'Sort watchlist';
+  static const filterWatchlist = 'Filter watchlist';
+  static const name = 'Name';
+  static const allCoinsFilter = 'All coins';
   static const high = 'High';
   static const low = 'Low';
   static const searchCoins = 'Search coins';

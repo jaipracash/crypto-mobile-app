@@ -60,7 +60,7 @@ class _CoinRowState extends State<CoinRow> {
     final theme = Theme.of(context);
     final dark = theme.brightness == Brightness.dark;
     final flashColor = _priceRose == null
-      ? theme.colorScheme.onSurfaceVariant
+        ? theme.colorScheme.onSurfaceVariant
         : _priceRose!
         ? (dark ? AppColors.darkGain : AppColors.lightGain)
         : (dark ? AppColors.darkLoss : AppColors.lightLoss);
@@ -79,7 +79,10 @@ class _CoinRowState extends State<CoinRow> {
                 child: Text(
                   widget.coin.rank?.toString() ?? AppStrings.notAvailable,
                   textAlign: TextAlign.center,
-                  style: theme.textTheme.bodySmall,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ),
               const SizedBox(width: AppSizes.sm),
@@ -106,6 +109,7 @@ class _CoinRowState extends State<CoinRow> {
                               height: 1.0,
                             ),
                           ),
+                          const SizedBox(height: AppSizes.xs),
                           Text(
                             '${widget.coin.symbol.toUpperCase()} · ${Formatters.compact(widget.coin.marketCap, currencyCode: widget.currency)}',
                             maxLines: 1,

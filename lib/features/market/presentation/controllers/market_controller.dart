@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/constants/api_constants.dart';
 import '../../../../core/constants/app_strings.dart';
 import '../../../../core/providers/repository_providers.dart';
 import '../../../settings/presentation/controllers/settings_controller.dart';
@@ -105,7 +106,11 @@ class CoinListController extends AsyncNotifier<CoinListState> {
         .read(marketRepositoryProvider)
         .getCoins(
           page: 1,
-          perPage: ref.read(marketFiltersProvider).topLimit,
+          perPage: ref
+              .read(marketFiltersProvider)
+              .topLimit
+              .clamp(1, ApiConstants.maxPageSize)
+              .toInt(),
           order: 'market_cap_desc',
           currency: currency,
         );

@@ -33,8 +33,10 @@ flutter:
   uses-material-design: true
   assets:
     - assets/dart-svgrepo-com.svg
+    - assets/flutter.svg
     - assets/profile-svgrepo-com.svg
     - assets/search-alt-2-svgrepo-com.svg
+    - assets/search2.svg
     - assets/watchlist.svg
     - assets/not_added.svg
     - assets/filter-svgrepo-com.svg

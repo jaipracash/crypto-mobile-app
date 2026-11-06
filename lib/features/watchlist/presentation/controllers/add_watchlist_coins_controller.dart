@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/constants/api_constants.dart';
 import '../../../../core/providers/repository_providers.dart';
 import '../../../market/domain/coin.dart';
 import '../../../settings/presentation/controllers/settings_controller.dart';
@@ -29,7 +30,7 @@ class AddWatchlistCoinsState {
 
 class AddWatchlistCoinsController
     extends AsyncNotifier<AddWatchlistCoinsState> {
-  static const _pageSize = 250;
+  static const _pageSize = ApiConstants.maxPageSize;
 
   @override
   Future<AddWatchlistCoinsState> build() async {

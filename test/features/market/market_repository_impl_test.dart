@@ -106,7 +106,7 @@ void main() {
     expect(page.items.single.change24hPct, 2.4);
     expect(page.items.single.change7dPct, 4.8);
     expect(page.items.single.change30dPct, 12.0);
-    expect(remote.coinQuery?['per_page'], 250);
+    expect(remote.coinQuery?['per_page'], 100);
     expect(remote.coinQuery?['category'], 'layer-1');
   });
 

@@ -34,6 +34,12 @@ class _EmptyTestWatchlistController extends WatchlistController {
       const WatchlistData(items: [], dataSource: 'mock');
 }
 
+class _PopulatedTestWatchlistController extends WatchlistController {
+  @override
+  Future<WatchlistData> build() async =>
+      const WatchlistData(items: _coins, dataSource: 'mock');
+}
+
 class _TestSettingsController extends SettingsController {
   @override
   Future<AppSettings> build() async => const AppSettings();
@@ -94,6 +100,37 @@ void main() {
     await tester.tap(find.text('Ethereum'));
     await tester.pumpAndSettle();
     expect(find.text('${AppStrings.addCoins} (1)'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('watchlist filter only shows coins with matching daily change', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          watchlistControllerProvider.overrideWith(
+            _PopulatedTestWatchlistController.new,
+          ),
+          settingsControllerProvider.overrideWith(_TestSettingsController.new),
+        ],
+        child: const MaterialApp(home: WatchlistScreen()),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('2'), findsNothing);
+    expect(find.text('2 watchlist'), findsOneWidget);
+    expect(find.text(AppStrings.addCoins), findsOneWidget);
+    expect(find.text('Bitcoin'), findsOneWidget);
+    expect(find.text('Ethereum'), findsOneWidget);
+    await tester.tap(find.byTooltip(AppStrings.filterWatchlist));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text(AppStrings.losers));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Bitcoin'), findsNothing);
+    expect(find.text('Ethereum'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 }

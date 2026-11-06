@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 
+import '../../../core/constants/api_constants.dart';
 import '../../../core/error/app_exception.dart';
 import '../../../core/error/failure.dart';
 import '../domain/market_models.dart';
@@ -23,7 +24,7 @@ class MarketRepositoryImpl implements MarketRepository {
     try {
       final query = <String, dynamic>{
         'page': page,
-        'per_page': perPage,
+        'per_page': perPage.clamp(1, ApiConstants.maxPageSize).toInt(),
         'order': order,
         'currency': currency,
       };

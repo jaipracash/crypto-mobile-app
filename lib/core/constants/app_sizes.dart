@@ -45,12 +45,12 @@ abstract final class AppSizes {
   static const searchResultsHeight = 210.0;
   static const marketCardHeight = 84.0;
   static const coinRowHeight = 76.0;
-  static const homeTabHeight = 44.0;
+  static const homeTabHeight = 45.5;
   static const homeColumnHeaderHeight = 42.0;
   static const homeTabUnderlineHeight = 2.0;
   static const filterBadgeRadius = 9.0;
   static const filterBadgeTextSize = 10.0;
-  static const filterButtonExtent = 44.0;
+  static const filterButtonExtent = 40.0;
   static const loadingPriceWidth = 92.0;
   static const loadingChangeWidth = 60.0;
   static const tabIndicatorWidth = 32.0;

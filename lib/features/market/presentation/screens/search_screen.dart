@@ -58,6 +58,13 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     final currency =
         ref.watch(settingsControllerProvider).asData?.value.currency ?? 'usd';
     final marketCoins = ref.watch(visibleCoinsProvider(_selectedTab));
+    final marketCoinsById = {
+      for (final coin in [
+        ...?listState.asData?.value.items,
+        ...?trendingState.asData?.value.items,
+      ])
+        coin.id: coin,
+    };
     final AsyncValue<List<Coin>> marketState = _selectedTab == HomeTab.trending
         ? trendingState.whenData((data) => data.items)
         : listState.whenData((data) => data.items);
@@ -104,14 +111,13 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                       ),
                       const SizedBox(height: AppSizes.sm),
                       _tabStrip(),
-                      const Divider(height: 1, thickness: 0.5),
                     ],
                     const SizedBox(height: AppSizes.sm),
                   ]),
                 ),
               ),
               if (query.trim().isNotEmpty)
-                _searchResults(query, results)
+                _searchResults(query, results, marketCoinsById, currency)
               else
                 _marketResults(marketState, marketCoins, currency),
             ],
@@ -131,7 +137,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
       prefixIcon: Padding(
         padding: const EdgeInsets.all(AppSizes.md),
         child: SvgPicture.asset(
-          'assets/search-alt-2-svgrepo-com.svg',
+          'assets/search2.svg',
           width: AppSizes.iconMedium,
           height: AppSizes.iconMedium,
           colorFilter: ColorFilter.mode(
@@ -196,8 +202,10 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
               child: Text(
                 _tabLabel(tab),
                 style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                  color: selected ? Colors.white : scheme.onSurfaceVariant,
-                  fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
+                  color: selected
+                      ? Colors.white
+                      : scheme.onSurfaceVariant.withValues(alpha: 0.85),
+                  fontWeight: selected ? FontWeight.w700 : FontWeight.w600,
                 ),
               ),
             ),
@@ -243,7 +251,12 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
           ),
   );
 
-  Widget _searchResults(String query, AsyncValue<List<SearchCoin>> results) {
+  Widget _searchResults(
+    String query,
+    AsyncValue<List<SearchCoin>> results,
+    Map<String, Coin> marketCoinsById,
+    String currency,
+  ) {
     if (query.trim().length < 2) {
       return const SliverFillRemaining(
         hasScrollBody: false,
@@ -277,8 +290,14 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
               sliver: SliverList.separated(
                 itemCount: items.length,
                 separatorBuilder: (_, _) => const SizedBox(height: AppSizes.sm),
-                itemBuilder: (context, index) =>
-                    _SearchResultCard(coin: items[index]),
+                itemBuilder: (context, index) {
+                  final coin = items[index];
+                  return _SearchResultCard(
+                    coin: coin,
+                    marketData: marketCoinsById[coin.id],
+                    currency: currency,
+                  );
+                },
               ),
             ),
     );
@@ -353,22 +372,27 @@ class _MarketSearchRow extends StatelessWidget {
             ),
             Expanded(
               flex: 4,
-              child: Text(
-                Formatters.currency(coin.price, currency),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                textAlign: TextAlign.right,
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  fontFeatures: const [FontFeature.tabularFigures()],
-                ),
-              ),
-            ),
-            const SizedBox(width: AppSizes.sm),
-            SizedBox(
-              width: 76,
-              child: Align(
-                alignment: Alignment.centerRight,
-                child: ChangePill(change: coin.change24hPct, compact: true),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text(
+                    Formatters.currency(coin.price, currency),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    textAlign: TextAlign.right,
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      fontWeight: FontWeight.w400,
+                      fontFeatures: const [FontFeature.tabularFigures()],
+                    ),
+                  ),
+                  const SizedBox(height: AppSizes.xs),
+                  ChangePill(
+                    change: coin.change24hPct,
+                    compact: true,
+                    showBackground: false,
+                  ),
+                ],
               ),
             ),
           ],
@@ -379,26 +403,81 @@ class _MarketSearchRow extends StatelessWidget {
 }
 
 class _SearchResultCard extends StatelessWidget {
-  const _SearchResultCard({required this.coin});
+  const _SearchResultCard({
+    required this.coin,
+    required this.marketData,
+    required this.currency,
+  });
 
   final SearchCoin coin;
+  final Coin? marketData;
+  final String currency;
 
   @override
-  Widget build(BuildContext context) => Card(
-    margin: EdgeInsets.zero,
-    child: ListTile(
-      leading: CoinAvatar(symbol: coin.symbol, imageUrl: coin.image),
-      title: Text(
-        coin.name,
-        maxLines: 1,
-        overflow: TextOverflow.ellipsis,
-        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-          fontWeight: FontWeight.w600,
-          color: Theme.of(context).colorScheme.onSurface,
+  Widget build(BuildContext context) => InkWell(
+    onTap: () => context.push('/coin/${coin.id}'),
+    child: SizedBox(
+      height: 76,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: AppSizes.md),
+        child: Row(
+          children: [
+            CoinAvatar(symbol: coin.symbol, imageUrl: coin.image),
+            const SizedBox(width: AppSizes.sm),
+            Expanded(
+              flex: 5,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    coin.name,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      fontWeight: FontWeight.w600,
+                      color: Theme.of(context).colorScheme.onSurface,
+                    ),
+                  ),
+                  Text(
+                    coin.symbol.toUpperCase(),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Expanded(
+              flex: 4,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text(
+                    Formatters.currency(marketData?.price, currency),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    textAlign: TextAlign.right,
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      fontWeight: FontWeight.w400,
+                      fontFeatures: const [FontFeature.tabularFigures()],
+                    ),
+                  ),
+                  const SizedBox(height: AppSizes.xs),
+                  ChangePill(
+                    change: marketData?.change24hPct,
+                    compact: true,
+                    showBackground: false,
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
-      subtitle: Text(coin.symbol.toUpperCase()),
-      onTap: () => context.push('/coin/${coin.id}'),
     ),
   );
 }

@@ -158,7 +158,7 @@ void main() {
 
   testWidgets('provided navigation SVG assets render', (tester) async {
     const assets = [
-      'assets/dart-svgrepo-com.svg',
+      'assets/flutter.svg',
       'assets/search-alt-2-svgrepo-com.svg',
       'assets/profile-svgrepo-com.svg',
       'assets/watchlist.svg',
@@ -212,7 +212,7 @@ void main() {
     expect(find.text('Bitcoin'), findsNothing);
     expect(find.text('Market pulse'), findsNothing);
     expect(find.byType(Sparkline), findsNothing);
-    expect(find.byType(Divider), findsOneWidget);
+    expect(find.byType(Divider), findsNothing);
     expect(find.byType(ChoiceChip), findsNothing);
     expect(
       find.byWidgetPredicate(
@@ -316,17 +316,19 @@ void main() {
 
     await tester.tap(find.text(AppStrings.filter));
     await tester.pumpAndSettle();
+    expect(find.text('${AppStrings.top} 200'), findsNothing);
+    expect(find.text('${AppStrings.top} 250'), findsNothing);
     expect(
       tester.getTopLeft(find.text('${AppStrings.top} 50')).dx,
       greaterThanOrEqualTo(6),
     );
-    await tester.tap(find.text('${AppStrings.top} 200'));
+    await tester.tap(find.text('${AppStrings.top} 50'));
     await tester.pumpAndSettle();
     expect(container.read(marketFiltersProvider).topLimit, 100);
     expect(find.text('${AppStrings.apply} (1)'), findsOneWidget);
     await tester.tap(find.text('${AppStrings.apply} (1)'));
     await tester.pumpAndSettle();
-    expect(container.read(marketFiltersProvider).topLimit, 200);
+    expect(container.read(marketFiltersProvider).topLimit, 50);
   });
 
   testWidgets('SortSheet applies sort field and direction separately', (
