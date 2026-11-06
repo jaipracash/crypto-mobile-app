@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:gecko_lite/core/constants/app_strings.dart';
 import 'package:gecko_lite/core/router/routes.dart';
 import 'package:gecko_lite/features/market/domain/coin.dart';
+import 'package:gecko_lite/features/market/presentation/widgets/coin_row.dart';
 import 'package:gecko_lite/features/settings/domain/app_settings.dart';
 import 'package:gecko_lite/features/settings/presentation/controllers/settings_controller.dart';
 import 'package:gecko_lite/features/watchlist/domain/watchlist_repository.dart';
@@ -100,6 +101,10 @@ void main() {
     await tester.tap(find.text('Ethereum'));
     await tester.pumpAndSettle();
     expect(find.text('${AppStrings.addCoins} (1)'), findsOneWidget);
+    final addButton = tester.widget<FilledButton>(
+      find.widgetWithText(FilledButton, '${AppStrings.addCoins} (1)'),
+    );
+    expect(addButton.style?.foregroundColor?.resolve({}), Colors.white);
     expect(tester.takeException(), isNull);
   });
 
@@ -119,9 +124,27 @@ void main() {
     );
     await tester.pumpAndSettle();
 
+    final appBar = tester.widget<AppBar>(find.byType(AppBar));
+    expect(appBar.scrolledUnderElevation, 0);
+    expect(appBar.surfaceTintColor, Colors.transparent);
     expect(find.text('2'), findsNothing);
     expect(find.text('2 watchlist'), findsOneWidget);
     expect(find.text(AppStrings.addCoins), findsOneWidget);
+    final addCoinsButton = find.widgetWithText(
+      FilledButton,
+      AppStrings.addCoins,
+    );
+    expect(tester.getSize(addCoinsButton).width, 768);
+    final addCoinsLabel = tester.widget<Text>(
+      find.descendant(
+        of: addCoinsButton,
+        matching: find.text(AppStrings.addCoins),
+      ),
+    );
+    expect(addCoinsLabel.style?.color, Colors.white);
+    expect(addCoinsLabel.style?.fontWeight, FontWeight.w700);
+    expect(addCoinsLabel.style?.fontSize, 16);
+    expect(find.byType(CoinRow), findsNWidgets(2));
     expect(find.text('Bitcoin'), findsOneWidget);
     expect(find.text('Ethereum'), findsOneWidget);
     await tester.tap(find.byTooltip(AppStrings.filterWatchlist));

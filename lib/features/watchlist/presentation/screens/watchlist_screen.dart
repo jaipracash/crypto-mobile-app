@@ -6,8 +6,9 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/constants/app_sizes.dart';
 import '../../../../core/constants/app_strings.dart';
 import '../../../../core/router/routes.dart';
+import '../../../../features/market/presentation/controllers/market_controller.dart';
+import '../../../../features/market/presentation/widgets/coin_row.dart';
 import '../../../../shared/widgets/async_value_view.dart';
-import '../../../../shared/widgets/coin_tile.dart';
 import '../../../../shared/widgets/data_source_banner.dart';
 import '../../../market/domain/coin.dart';
 import '../../../settings/presentation/controllers/settings_controller.dart';
@@ -36,7 +37,11 @@ class _WatchlistScreenState extends ConsumerState<WatchlistScreen> {
     final currency =
         ref.watch(settingsControllerProvider).asData?.value.currency ?? 'usd';
     return Scaffold(
-      appBar: AppBar(title: const Text(AppStrings.watchlist)),
+      appBar: AppBar(
+        title: const Text(AppStrings.watchlist),
+        scrolledUnderElevation: 0,
+        surfaceTintColor: Colors.transparent,
+      ),
       body: RefreshIndicator(
         onRefresh: () =>
             ref.read(watchlistControllerProvider.notifier).refresh(),
@@ -55,7 +60,9 @@ class _WatchlistScreenState extends ConsumerState<WatchlistScreen> {
                         MediaQuery.sizeOf(context).height *
                         AppSizes.emptyStateHeightFraction,
                     child: Padding(
-                      padding: const EdgeInsets.all(AppSizes.xl),
+                      padding: const EdgeInsets.symmetric(
+                        vertical: AppSizes.xl,
+                      ),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -76,11 +83,7 @@ class _WatchlistScreenState extends ConsumerState<WatchlistScreen> {
                             style: Theme.of(context).textTheme.bodySmall,
                           ),
                           const SizedBox(height: AppSizes.lg),
-                          FilledButton(
-                            onPressed: () =>
-                                context.push(Routes.addWatchlistCoins),
-                            child: const Text(AppStrings.addCoins),
-                          ),
+                          _addCoinsButton(context),
                         ],
                       ),
                     ),
@@ -107,50 +110,71 @@ class _WatchlistScreenState extends ConsumerState<WatchlistScreen> {
                     ),
                   ),
                 ...visibleItems.map(
-                  (coin) => Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: AppSizes.screenPadding,
+                  (coin) => Dismissible(
+                    key: ValueKey(coin.id),
+                    direction: DismissDirection.endToStart,
+                    background: Container(
+                      alignment: Alignment.centerRight,
+                      padding: const EdgeInsets.only(right: AppSizes.xl),
+                      color: Theme.of(context).colorScheme.error,
+                      child: Icon(
+                        Icons.delete_outline,
+                        color: Theme.of(context).colorScheme.onError,
+                      ),
                     ),
-                    child: Dismissible(
-                      key: ValueKey(coin.id),
-                      direction: DismissDirection.endToStart,
-                      background: Container(
-                        alignment: Alignment.centerRight,
-                        padding: const EdgeInsets.only(right: AppSizes.xl),
-                        color: Theme.of(context).colorScheme.error,
-                        child: Icon(
-                          Icons.delete_outline,
-                          color: Theme.of(context).colorScheme.onError,
-                        ),
-                      ),
-                      onDismissed: (_) => _remove(context, ref, coin),
-                      child: CoinTile(
-                        coin: coin.copyWith(isWatchlisted: true),
-                        currency: currency,
-                        onTap: () => context.push('/coin/${coin.id}'),
-                      ),
+                    onDismissed: (_) => _remove(context, ref, coin),
+                    child: CoinRow(
+                      coin: coin.copyWith(isWatchlisted: true),
+                      currency: currency,
+                      period: ChangePeriod.day,
+                      onTap: () => context.push('/coin/${coin.id}'),
                     ),
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(
-                    AppSizes.screenPadding,
-                    AppSizes.md,
-                    AppSizes.screenPadding,
-                    AppSizes.xl,
+                  padding: const EdgeInsets.only(
+                    top: AppSizes.md,
+                    bottom: AppSizes.xl,
                   ),
-                  child: Center(
-                    child: FilledButton.icon(
-                      onPressed: () => context.push(Routes.addWatchlistCoins),
-                      icon: const Icon(Icons.add_rounded),
-                      label: const Text(AppStrings.addCoins),
-                    ),
-                  ),
+                  child: _addCoinsButton(context, withIcon: true),
                 ),
               ],
             );
           },
         ),
+      ),
+    );
+  }
+
+  Widget _addCoinsButton(BuildContext context, {bool withIcon = false}) {
+    final style = FilledButton.styleFrom(
+      backgroundColor: Theme.of(context).colorScheme.primary,
+      foregroundColor: Colors.white,
+    );
+    final label = Text(
+      AppStrings.addCoins,
+      style: Theme.of(context).textTheme.labelLarge?.copyWith(
+        color: Colors.white,
+        fontSize: 16,
+        fontWeight: FontWeight.w700,
+      ),
+    );
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: AppSizes.screenPadding),
+      child: SizedBox(
+        width: double.infinity,
+        child: withIcon
+            ? FilledButton.icon(
+                style: style,
+                onPressed: () => context.push(Routes.addWatchlistCoins),
+                icon: const Icon(Icons.add_rounded),
+                label: label,
+              )
+            : FilledButton(
+                style: style,
+                onPressed: () => context.push(Routes.addWatchlistCoins),
+                child: label,
+              ),
       ),
     );
   }

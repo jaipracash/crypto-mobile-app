@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_sizes.dart';
 import '../../../../core/constants/app_strings.dart';
+import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/formatters.dart';
 import '../../../../shared/widgets/async_value_view.dart';
 import '../../../../shared/widgets/change_pill.dart';
@@ -46,29 +48,69 @@ class _CoinDetailsScreenState extends ConsumerState<CoinDetailsScreen> {
             .items
             .any((coin) => coin.id == widget.coinId) ??
         false;
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text(AppStrings.coinDetails),
-        actions: [
-          IconButton(
-            tooltip: watched
-                ? AppStrings.removeFromWatchlist
-                : AppStrings.addToWatchlist,
-            onPressed: detailsData == null
-                ? null
-                : () => _toggle(detailsData.coin),
-            icon: Icon(
-              watched ? Icons.star_rounded : Icons.star_border_rounded,
-            ),
-            color: watched ? AppColors.watchlistStar : null,
+    return Theme(
+      data: AppTheme.light(),
+      child: Builder(
+        builder: (context) => Scaffold(
+          backgroundColor: Colors.white,
+          appBar: AppBar(
+            titleSpacing: AppSizes.sm,
+            title: detailsData == null
+                ? const Text(AppStrings.coinDetails)
+                : Row(
+                    children: [
+                      CoinAvatar(
+                        symbol: detailsData.coin.symbol,
+                        imageUrl: detailsData.coin.image,
+                        size: AppSizes.coinLogo,
+                      ),
+                      const SizedBox(width: AppSizes.sm),
+                      Flexible(
+                        child: Text(
+                          detailsData.coin.name,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: Theme.of(context).textTheme.titleMedium,
+                        ),
+                      ),
+                      if (detailsData.coin.rank != null) ...[
+                        const SizedBox(width: AppSizes.sm),
+                        _RankBadge(rank: detailsData.coin.rank!),
+                      ],
+                    ],
+                  ),
+            backgroundColor: Colors.white,
+            surfaceTintColor: Colors.transparent,
+            scrolledUnderElevation: 0,
+            actions: [
+              IconButton(
+                tooltip: watched
+                    ? AppStrings.removeFromWatchlist
+                    : AppStrings.addToWatchlist,
+                onPressed: detailsData == null
+                    ? null
+                    : () => _toggle(detailsData.coin),
+                icon: SvgPicture.asset(
+                  watched ? 'assets/star-filled.svg' : 'assets/star.svg',
+                  width: AppSizes.iconLarge,
+                  height: AppSizes.iconLarge,
+                  colorFilter: ColorFilter.mode(
+                    watched
+                        ? AppColors.watchlistStar
+                        : AppColors.lightTextSecondary,
+                    BlendMode.srcIn,
+                  ),
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
-      body: AsyncValueView(
-        value: details,
-        onRetry: () =>
-            ref.invalidate(coinDetailsControllerProvider(widget.coinId)),
-        builder: (data) => _buildDetails(context, data, chart, currency),
+          body: AsyncValueView(
+            value: details,
+            onRetry: () =>
+                ref.invalidate(coinDetailsControllerProvider(widget.coinId)),
+            builder: (data) => _buildDetails(context, data, chart, currency),
+          ),
+        ),
       ),
     );
   }
@@ -93,10 +135,7 @@ class _CoinDetailsScreenState extends ConsumerState<CoinDetailsScreen> {
     final displayedPrice = _hoveredPoint?.price ?? coin.price;
     final displayedDate = _hoveredPoint?.timestamp;
     final gain = (coin.change24hPct ?? 0) >= 0;
-    final dark = Theme.of(context).brightness == Brightness.dark;
-    final color = gain
-        ? (dark ? AppColors.darkGain : AppColors.lightGain)
-        : (dark ? AppColors.darkLoss : AppColors.lightLoss);
+    final color = gain ? AppColors.lightGain : AppColors.lightLoss;
     return ListView(
       padding: const EdgeInsets.fromLTRB(
         AppSizes.screenPadding,
@@ -105,40 +144,27 @@ class _CoinDetailsScreenState extends ConsumerState<CoinDetailsScreen> {
         AppSizes.xxl,
       ),
       children: [
-        Row(
+        const SizedBox(height: AppSizes.md),
+        Wrap(
+          crossAxisAlignment: WrapCrossAlignment.center,
+          spacing: AppSizes.sm,
+          runSpacing: AppSizes.xs,
           children: [
-            CoinAvatar(
-              symbol: coin.symbol,
-              imageUrl: coin.image,
-              size: AppSizes.detailCoinLogo,
-            ),
-            const SizedBox(width: AppSizes.md),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    coin.name,
-                    style: Theme.of(context).textTheme.titleLarge,
-                  ),
-                  Text(
-                    coin.symbol.toUpperCase(),
-                    style: Theme.of(context).textTheme.bodySmall,
-                  ),
-                ],
+            Text(
+              Formatters.currency(displayedPrice, currency),
+              style: Theme.of(context).textTheme.displayLarge?.copyWith(
+                color: color,
+                fontSize: 32,
+                fontWeight: FontWeight.w700,
+                letterSpacing: -0.8,
               ),
             ),
-            if (coin.rank != null)
-              Chip(
-                label: Text('#${coin.rank}'),
-                visualDensity: VisualDensity.compact,
-              ),
+            ChangePill(change: coin.change24hPct, showBackground: false),
+            Text(
+              '(${AppStrings.period24h})',
+              style: Theme.of(context).textTheme.bodySmall,
+            ),
           ],
-        ),
-        const SizedBox(height: AppSizes.xl),
-        Text(
-          Formatters.currency(displayedPrice, currency),
-          style: Theme.of(context).textTheme.displayLarge,
         ),
         if (displayedDate != null) ...[
           const SizedBox(height: AppSizes.xs),
@@ -146,29 +172,10 @@ class _CoinDetailsScreenState extends ConsumerState<CoinDetailsScreen> {
             Formatters.dateTime(displayedDate),
             style: Theme.of(context).textTheme.bodySmall,
           ),
-        ] else ...[
-          const SizedBox(height: AppSizes.sm),
-          Row(
-            children: [
-              Icon(
-                gain
-                    ? Icons.arrow_upward_rounded
-                    : Icons.arrow_downward_rounded,
-                size: 18,
-                color: color,
-              ),
-              ChangePill(change: coin.change24hPct),
-              const SizedBox(width: AppSizes.sm),
-              Text(
-                AppStrings.period24h,
-                style: Theme.of(context).textTheme.bodySmall,
-              ),
-            ],
-          ),
         ],
-        const SizedBox(height: AppSizes.md),
+        const SizedBox(height: AppSizes.lg),
         _timeframes(context, ref),
-        const SizedBox(height: AppSizes.sm),
+        const SizedBox(height: AppSizes.md),
         DataSourceBanner(
           source: chartData != null && chartData.dataSource != 'live'
               ? chartData.dataSource
@@ -189,34 +196,46 @@ class _CoinDetailsScreenState extends ConsumerState<CoinDetailsScreen> {
             onTouch: (point) => setState(() => _hoveredPoint = point),
           ),
         ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            _ChartMarker(
-              label: AppStrings.low,
-              value: Formatters.currency(chartData?.min, currency),
-            ),
-            _ChartMarker(
-              label: AppStrings.change,
-              value: Formatters.percent(chartData?.changePct),
-            ),
-            _ChartMarker(
-              label: AppStrings.high,
-              value: Formatters.currency(chartData?.max, currency),
-            ),
-          ],
+        Container(
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSizes.md,
+            vertical: AppSizes.sm,
+          ),
+          decoration: BoxDecoration(
+            color: const Color(0xFFF4F6F8),
+            borderRadius: BorderRadius.circular(AppSizes.radiusSm),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              _ChartMarker(
+                label: AppStrings.low,
+                value: Formatters.currency(chartData?.min, currency),
+              ),
+              _ChartMarker(
+                label: AppStrings.change,
+                value: Formatters.percent(chartData?.changePct),
+              ),
+              _ChartMarker(
+                label: AppStrings.high,
+                value: Formatters.currency(chartData?.max, currency),
+              ),
+            ],
+          ),
         ),
         const SizedBox(height: AppSizes.xl),
         Text(
-          AppStrings.marketStatistics,
-          style: Theme.of(context).textTheme.titleLarge,
+          AppStrings.info,
+          style: Theme.of(context).textTheme.titleLarge
+              ?.copyWith(fontWeight: FontWeight.w700),
         ),
         const SizedBox(height: AppSizes.md),
         StatsGrid(details: data, currency: currency),
         const SizedBox(height: AppSizes.xl),
         Text(
           '${AppStrings.about} ${coin.name}',
-          style: Theme.of(context).textTheme.titleLarge,
+          style: Theme.of(context).textTheme.titleLarge
+              ?.copyWith(fontWeight: FontWeight.w700),
         ),
         const SizedBox(height: AppSizes.sm),
         Text(
@@ -263,31 +282,52 @@ class _CoinDetailsScreenState extends ConsumerState<CoinDetailsScreen> {
       (90, '90D'),
       (365, '1Y'),
     ];
-    return SizedBox(
-      height: AppSizes.chipHeight + 4,
+    return Container(
+      height: 44,
+      padding: const EdgeInsets.all(AppSizes.xs),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF0F3F6),
+        borderRadius: BorderRadius.circular(AppSizes.radiusMd),
+      ),
       child: Row(
-        children: timeframes
-            .map(
-              (entry) => Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.only(right: AppSizes.xs),
-                  child: ChoiceChip(
-                    label: Center(child: Text(entry.$2)),
-                    selected: _days == entry.$1,
-                    onSelected: (_) {
-                      setState(() {
-                        _days = entry.$1;
-                        _hoveredPoint = null;
-                      });
-                      ref
-                          .read(chartControllerProvider(widget.coinId).notifier)
-                          .setDays(entry.$1);
-                    },
+        children: timeframes.map((entry) {
+          final selected = _days == entry.$1;
+          return Expanded(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 2),
+              child: Material(
+                color: selected ? Colors.white : Colors.transparent,
+                borderRadius: BorderRadius.circular(AppSizes.radiusSm),
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(AppSizes.radiusSm),
+                  onTap: () {
+                    if (selected) return;
+                    setState(() {
+                      _days = entry.$1;
+                      _hoveredPoint = null;
+                    });
+                    ref
+                        .read(chartControllerProvider(widget.coinId).notifier)
+                        .setDays(entry.$1);
+                  },
+                  child: Center(
+                    child: Text(
+                      entry.$2,
+                      style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                        color: selected
+                            ? AppColors.lightTextPrimary
+                            : AppColors.lightTextSecondary,
+                        fontWeight: selected
+                            ? FontWeight.w700
+                            : FontWeight.w500,
+                      ),
+                    ),
                   ),
                 ),
               ),
-            )
-            .toList(),
+            ),
+          );
+        }).toList(),
       ),
     );
   }
@@ -312,9 +352,44 @@ class _ChartMarker extends StatelessWidget {
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      Text(label, style: Theme.of(context).textTheme.bodySmall),
-      Text(value, style: Theme.of(context).textTheme.bodyMedium),
+      Text(
+        label,
+        style: Theme.of(context).textTheme.labelSmall
+            ?.copyWith(color: AppColors.lightTextSecondary),
+      ),
+      Text(
+        value,
+        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+          color: AppColors.lightTextPrimary,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
     ],
+  );
+}
+
+class _RankBadge extends StatelessWidget {
+  const _RankBadge({required this.rank});
+
+  final int rank;
+
+  @override
+  Widget build(BuildContext context) => Container(
+    padding: const EdgeInsets.symmetric(
+      horizontal: AppSizes.sm,
+      vertical: AppSizes.xs,
+    ),
+    decoration: BoxDecoration(
+      color: const Color(0xFFF0F3F6),
+      borderRadius: BorderRadius.circular(AppSizes.radiusSm),
+    ),
+    child: Text(
+      '#$rank',
+      style: Theme.of(context).textTheme.labelMedium?.copyWith(
+        color: AppColors.lightTextSecondary,
+        fontWeight: FontWeight.w600,
+      ),
+    ),
   );
 }
 

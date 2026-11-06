@@ -37,6 +37,8 @@ flutter:
     - assets/profile-svgrepo-com.svg
     - assets/search-alt-2-svgrepo-com.svg
     - assets/search2.svg
+    - assets/star.svg
+    - assets/star-filled.svg
     - assets/watchlist.svg
     - assets/not_added.svg
     - assets/filter-svgrepo-com.svg

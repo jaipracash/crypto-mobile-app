@@ -74,6 +74,7 @@ abstract final class AppStrings {
   static const noChartData = 'No chart data available';
   static const coinDetails = 'Coin details';
   static const marketStatistics = 'Market statistics';
+  static const info = 'Info';
   static const about = 'About';
   static const website = 'Website';
   static const whitepaper = 'Whitepaper';
@@ -129,11 +130,14 @@ abstract final class AppStrings {
   static const watchlisted = 'Watchlisted';
   static const nothingHereYet = 'Nothing here yet';
   static const marketCap = 'Market cap';
+  static const fullyDilutedValuation = 'Fully diluted valuation';
+  static const marketCapFdvRatio = 'Market cap / FDV ratio';
   static const circulatingSupply = 'Circulating supply';
   static const totalSupply = 'Total supply';
   static const maxSupply = 'Max supply';
   static const high24h = '24h high';
   static const low24h = '24h low';
+  static const range24h = '24h range';
   static const allTimeHigh = 'All-time high';
   static const allTimeLow = 'All-time low';
   static const period24h = '24h';

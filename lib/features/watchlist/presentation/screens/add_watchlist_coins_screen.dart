@@ -66,7 +66,11 @@ class _AddWatchlistCoinsScreenState
         .length;
 
     return Scaffold(
-      appBar: AppBar(title: const Text(AppStrings.addCoins)),
+      appBar: AppBar(
+        title: const Text(AppStrings.addCoins),
+        scrolledUnderElevation: 0,
+        surfaceTintColor: Colors.transparent,
+      ),
       body: Column(
         children: [
           Padding(
@@ -120,6 +124,17 @@ class _AddWatchlistCoinsScreenState
               child: SizedBox(
                 width: double.infinity,
                 child: FilledButton(
+                  style: FilledButton.styleFrom(
+                    backgroundColor: Theme.of(context).colorScheme.primary,
+                    foregroundColor: Colors.white,
+                    disabledBackgroundColor: Theme.of(context)
+                        .colorScheme
+                        .primary
+                        .withValues(alpha: 0.45),
+                    disabledForegroundColor: Colors.white.withValues(
+                      alpha: 0.75,
+                    ),
+                  ),
                   onPressed:
                       selectionCount == 0 || _saving || watchlistIds == null
                       ? null
@@ -130,6 +145,8 @@ class _AddWatchlistCoinsScreenState
                           selectionCount == 0
                               ? AppStrings.addCoins
                               : '${AppStrings.addCoins} ($selectionCount)',
+                          style: Theme.of(context).textTheme.labelLarge
+                              ?.copyWith(color: Colors.white),
                         ),
                 ),
               ),
@@ -179,9 +196,6 @@ class _AddWatchlistCoinsScreenState
           );
         }
         return ListView.separated(
-          padding: const EdgeInsets.symmetric(
-            horizontal: AppSizes.screenPadding,
-          ),
           controller: _listController,
           itemCount:
               available.length +
@@ -279,36 +293,45 @@ class _SelectableCoinRow extends StatelessWidget {
       onTap: enabled ? onTap : null,
       child: SizedBox(
         height: 72,
-        child: Row(
-          children: [
-            CoinAvatar(symbol: coin.symbol, imageUrl: coin.image),
-            const SizedBox(width: AppSizes.md),
-            Expanded(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    coin.name,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: Theme.of(context).textTheme.bodyMedium
-                        ?.copyWith(fontWeight: FontWeight.w600),
-                  ),
-                  const SizedBox(height: AppSizes.xs),
-                  ChangePill(change: coin.change24hPct, showBackground: false),
-                ],
+        child: Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSizes.screenPadding,
+          ),
+          child: Row(
+            children: [
+              CoinAvatar(symbol: coin.symbol, imageUrl: coin.image),
+              const SizedBox(width: AppSizes.md),
+              Expanded(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      coin.name,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: Theme.of(context).textTheme.bodyMedium
+                          ?.copyWith(fontWeight: FontWeight.w600),
+                    ),
+                    const SizedBox(height: AppSizes.xs),
+                    ChangePill(
+                      change: coin.change24hPct,
+                      showBackground: false,
+                    ),
+                  ],
+                ),
               ),
-            ),
-            Icon(
-              selected
-                  ? Icons.radio_button_checked_rounded
-                  : Icons.radio_button_unchecked_rounded,
-              color: selected
-                  ? Theme.of(context).colorScheme.primary
-                  : Theme.of(context).colorScheme.onSurfaceVariant,
-            ),
-          ],
+              Icon(
+                selected
+                    ? Icons.radio_button_checked_rounded
+                    : Icons.radio_button_unchecked_rounded,
+                size: 20,
+                color: selected
+                    ? Theme.of(context).colorScheme.primary
+                    : Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
+            ],
+          ),
         ),
       ),
     ),

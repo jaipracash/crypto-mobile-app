@@ -212,12 +212,19 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   hintStyle: TextStyle(
                     color: Theme.of(context).colorScheme.onSurfaceVariant,
                   ),
+                  prefixIconConstraints: const BoxConstraints(
+                    minWidth: 36,
+                    minHeight: 48,
+                  ),
                   prefixIcon: Padding(
-                    padding: const EdgeInsets.all(AppSizes.md),
+                    padding: const EdgeInsets.only(
+                      left: AppSizes.md,
+                      right: AppSizes.xs,
+                    ),
                     child: SvgPicture.asset(
                       'assets/search2.svg',
-                      width: AppSizes.iconSmall,
-                      height: AppSizes.iconSmall,
+                      width: 14,
+                      height: 14,
                       colorFilter: ColorFilter.mode(
                         Theme.of(context).colorScheme.onSurfaceVariant,
                         BlendMode.srcIn,
