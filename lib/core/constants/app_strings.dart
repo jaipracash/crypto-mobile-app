@@ -111,6 +111,7 @@ abstract final class AppStrings {
   static const trending = 'Trending';
   static const noTrending = 'No trending coins';
   static const appearance = 'Appearance';
+  static const preferences = 'Preferences';
   static const theme = 'Theme';
   static const system = 'System';
   static const light = 'Light';
@@ -124,6 +125,11 @@ abstract final class AppStrings {
       'Market information provided by CoinGecko.';
   static const version = 'Version 1.0.0';
   static const tryAgain = 'Try again';
+  static const noInternetConnection = 'No internet connection';
+  static const checkInternetConnection = 'Check your connection and try again.';
+  static const somethingWentWrong = 'Something went wrong';
+  static const unexpectedErrorMessage =
+      'We could not load this right now. Please try again.';
   static const offline = 'You are offline';
   static const cachedData = 'Showing recently cached market data.';
   static const addToWatchlist = 'Add to watchlist';

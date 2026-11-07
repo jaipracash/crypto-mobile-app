@@ -10,8 +10,6 @@ import '../../../../features/market/presentation/controllers/market_controller.d
 import '../../../../features/market/presentation/controllers/live_price_controller.dart';
 import '../../../../features/market/presentation/widgets/coin_row.dart';
 import '../../../../shared/widgets/async_value_view.dart';
-import '../../../../shared/widgets/data_source_banner.dart';
-import '../../../../shared/widgets/simulated_price_banner.dart';
 import '../../../market/domain/coin.dart';
 import '../../../settings/presentation/controllers/settings_controller.dart';
 import '../controllers/watchlist_controller.dart';
@@ -57,8 +55,6 @@ class _WatchlistScreenState extends ConsumerState<WatchlistScreen> {
               return ListView(
                 physics: const AlwaysScrollableScrollPhysics(),
                 children: [
-                  DataSourceBanner(source: data.dataSource),
-                  if (livePrices.isNotEmpty) const SimulatedPriceBanner(),
                   SizedBox(
                     height:
                         MediaQuery.sizeOf(context).height *
@@ -106,8 +102,6 @@ class _WatchlistScreenState extends ConsumerState<WatchlistScreen> {
             return ListView(
               physics: const AlwaysScrollableScrollPhysics(),
               children: [
-                DataSourceBanner(source: data.dataSource),
-                if (livePrices.isNotEmpty) const SimulatedPriceBanner(),
                 _watchlistControls(context, visibleItems.length),
                 if (visibleItems.isEmpty)
                   Padding(

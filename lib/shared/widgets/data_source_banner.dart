@@ -5,19 +5,26 @@ import '../../core/constants/app_sizes.dart';
 import '../../core/constants/app_strings.dart';
 
 class DataSourceBanner extends StatelessWidget {
-  const DataSourceBanner({required this.source, super.key});
+  const DataSourceBanner({
+    required this.source,
+    this.horizontalInset = true,
+    super.key,
+  });
+
   final String source;
+  final bool horizontalInset;
+
   @override
   Widget build(BuildContext context) {
     if (source == 'live' || source == 'mock') return const SizedBox.shrink();
     return Container(
-      margin: const EdgeInsets.fromLTRB(
-        AppSizes.screenPadding,
+      margin: EdgeInsets.fromLTRB(
+        horizontalInset ? AppSizes.screenPadding : 0,
         AppSizes.sm,
-        AppSizes.screenPadding,
+        horizontalInset ? AppSizes.screenPadding : 0,
         0,
       ),
-      padding: const EdgeInsets.symmetric(
+      padding: EdgeInsets.symmetric(
         horizontal: AppSizes.md,
         vertical: AppSizes.sm,
       ),

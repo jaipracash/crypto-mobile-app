@@ -3,134 +3,195 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/constants/app_sizes.dart';
 import '../../../../core/constants/app_strings.dart';
-import '../../../../shared/widgets/app_card.dart';
 import '../../domain/app_settings.dart';
 import '../controllers/settings_controller.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final settings = ref.watch(settingsControllerProvider).asData?.value;
+    const background = Colors.white;
+    const foreground = Color(0xFF172033);
+    final theme =
+        ref.watch(settingsControllerProvider).asData?.value.themeMode ??
+        AppThemeMode.light;
     final controller = ref.read(settingsControllerProvider.notifier);
-    final theme = settings?.themeMode ?? AppThemeMode.system;
-    final currency = settings?.currency ?? 'usd';
-    final refresh = settings?.autoRefreshSeconds ?? 0;
-    return Scaffold(
-      appBar: AppBar(title: const Text(AppStrings.settings)),
-      body: ListView(
-        padding: const EdgeInsets.all(AppSizes.screenPadding),
-        children: [
-          Text(
-            AppStrings.appearance,
-            style: Theme.of(context).textTheme.titleLarge,
-          ),
-          const SizedBox(height: AppSizes.md),
-          AppCard(
+    final baseTheme = Theme.of(context);
+    final colors = baseTheme.colorScheme.copyWith(
+      brightness: Brightness.light,
+      surface: background,
+      onSurface: foreground,
+      surfaceContainerHighest: const Color(0xFFF0F3F7),
+      onSurfaceVariant: const Color(0xFF68778C),
+      outlineVariant: const Color(0xFFE1E5EA),
+    );
+
+    return Theme(
+      data: baseTheme.copyWith(
+        brightness: Brightness.light,
+        colorScheme: colors,
+        scaffoldBackgroundColor: background,
+        appBarTheme: baseTheme.appBarTheme.copyWith(
+          backgroundColor: background,
+          foregroundColor: foreground,
+          surfaceTintColor: Colors.transparent,
+        ),
+      ),
+      child: Builder(
+        builder: (context) => Scaffold(
+          backgroundColor: background,
+          appBar: AppBar(title: const Text(AppStrings.settings)),
+          body: Padding(
+            padding: const EdgeInsets.all(AppSizes.screenPadding),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  AppStrings.theme,
-                  style: Theme.of(context).textTheme.titleMedium,
+                  AppStrings.preferences,
+                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                    color: colors.onSurfaceVariant,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
-                const SizedBox(height: AppSizes.md),
-                SegmentedButton<AppThemeMode>(
-                  segments: const [
-                    ButtonSegment(
-                      value: AppThemeMode.system,
-                      label: Text(AppStrings.system),
-                      icon: Icon(Icons.settings_suggest_outlined),
+                const SizedBox(height: AppSizes.lg),
+                Row(
+                  children: [
+                    Text(
+                      AppStrings.theme,
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        color: foreground,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
-                    ButtonSegment(
-                      value: AppThemeMode.light,
-                      label: Text(AppStrings.light),
-                      icon: Icon(Icons.light_mode_outlined),
-                    ),
-                    ButtonSegment(
-                      value: AppThemeMode.dark,
-                      label: Text(AppStrings.dark),
-                      icon: Icon(Icons.dark_mode_outlined),
+                    const SizedBox(width: AppSizes.md),
+                    Expanded(
+                      child: Align(
+                        alignment: Alignment.centerRight,
+                        child: ConstrainedBox(
+                          constraints: const BoxConstraints(maxWidth: 248),
+                          child: _ThemeSelector(
+                            selected: theme,
+                            background: colors.surfaceContainerHighest,
+                            selectedForeground: foreground,
+                            unselectedForeground: colors.onSurfaceVariant,
+                            onSelected: controller.setTheme,
+                            labels: const {
+                              AppThemeMode.light: AppStrings.light,
+                              AppThemeMode.dark: AppStrings.dark,
+                              AppThemeMode.system: AppStrings.system,
+                            },
+                          ),
+                        ),
+                      ),
                     ),
                   ],
-                  selected: {theme},
-                  onSelectionChanged: (value) =>
-                      controller.setTheme(value.first),
                 ),
               ],
             ),
           ),
-          const SizedBox(height: AppSizes.xl),
-          Text(
-            AppStrings.marketPreferences,
-            style: Theme.of(context).textTheme.titleLarge,
-          ),
-          const SizedBox(height: AppSizes.md),
-          AppCard(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  AppStrings.currency,
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
-                const SizedBox(height: AppSizes.md),
-                SegmentedButton<String>(
-                  segments: const [
-                    ButtonSegment(value: 'usd', label: Text(AppStrings.usd)),
-                    ButtonSegment(value: 'inr', label: Text(AppStrings.inr)),
-                  ],
-                  selected: {currency},
-                  onSelectionChanged: (value) async {
-                    await controller.setCurrency(value.first);
-                  },
-                ),
-                const SizedBox(height: AppSizes.xl),
-                Text(
-                  AppStrings.autoRefreshMarket,
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
-                const SizedBox(height: AppSizes.md),
-                SegmentedButton<int>(
-                  segments: const [
-                    ButtonSegment(value: 0, label: Text(AppStrings.off)),
-                    ButtonSegment(value: 30, label: Text(AppStrings.seconds30)),
-                    ButtonSegment(value: 60, label: Text(AppStrings.seconds60)),
-                  ],
-                  selected: {refresh},
-                  onSelectionChanged: (value) =>
-                      controller.setAutoRefresh(value.first),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: AppSizes.xl),
-          Text(
-            AppStrings.aboutSection,
-            style: Theme.of(context).textTheme.titleLarge,
-          ),
-          const SizedBox(height: AppSizes.md),
-          AppCard(
-            padding: EdgeInsets.zero,
-            child: const Column(
-              children: [
-                ListTile(
-                  leading: Icon(Icons.eco_outlined),
-                  title: Text(AppStrings.dataByCoinGecko),
-                  subtitle: Text(AppStrings.coinGeckoAttribution),
-                ),
-                Divider(height: 1),
-                ListTile(
-                  leading: Icon(Icons.info_outline),
-                  title: Text(AppStrings.appName),
-                  trailing: Text(AppStrings.version),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: AppSizes.xxl),
-        ],
+        ),
       ),
     );
   }
+}
+
+class _ThemeSelector extends StatelessWidget {
+  const _ThemeSelector({
+    required this.selected,
+    required this.background,
+    required this.selectedForeground,
+    required this.unselectedForeground,
+    required this.onSelected,
+    required this.labels,
+  });
+
+  final AppThemeMode selected;
+  final Color background;
+  final Color selectedForeground;
+  final Color unselectedForeground;
+  final ValueChanged<AppThemeMode> onSelected;
+  final Map<AppThemeMode, String> labels;
+
+  static const _options = AppThemeMode.values;
+
+  @override
+  Widget build(BuildContext context) => LayoutBuilder(
+    builder: (context, constraints) {
+      final selectedIndex = _options.indexOf(selected);
+      return Container(
+        height: 40,
+        padding: const EdgeInsets.all(3),
+        decoration: BoxDecoration(
+          color: background,
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Stack(
+          children: [
+            AnimatedAlign(
+              alignment: Alignment(-1.0 + selectedIndex.toDouble(), 0),
+              duration: const Duration(milliseconds: 220),
+              curve: Curves.easeInOutCubic,
+              child: SizedBox(
+                width: constraints.maxWidth / _options.length,
+                height: double.infinity,
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(14),
+                    boxShadow: const [
+                      BoxShadow(
+                        color: Color(0x120E1B2A),
+                        blurRadius: 5,
+                        offset: Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            Row(
+              children: [
+                for (final option in _options)
+                  Expanded(
+                    child: Semantics(
+                      button: true,
+                      selected: option == selected,
+                      label: labels[option],
+                      child: InkWell(
+                        key: ValueKey('theme-option-${option.name}'),
+                        borderRadius: BorderRadius.circular(14),
+                        onTap: () => onSelected(option),
+                        child: Center(
+                          child: AnimatedDefaultTextStyle(
+                            duration: const Duration(milliseconds: 160),
+                            curve: Curves.easeOut,
+                            style:
+                                Theme.of(context).textTheme.bodyMedium
+                                    ?.copyWith(
+                                      color: option == selected
+                                          ? selectedForeground
+                                          : unselectedForeground,
+                                      fontWeight: option == selected
+                                          ? FontWeight.w600
+                                          : FontWeight.w500,
+                                    ) ??
+                                TextStyle(
+                                  color: option == selected
+                                      ? selectedForeground
+                                      : unselectedForeground,
+                                ),
+                            child: Text(labels[option]!),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+          ],
+        ),
+      );
+    },
+  );
 }

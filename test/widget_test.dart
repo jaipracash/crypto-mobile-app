@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:gecko_lite/core/error/failure.dart';
 import 'package:gecko_lite/features/market/domain/coin.dart';
 import 'package:gecko_lite/shared/widgets/async_value_view.dart';
 import 'package:gecko_lite/shared/widgets/coin_tile.dart';
 import 'package:gecko_lite/shared/widgets/cupertino_loader.dart';
+import 'package:gecko_lite/shared/widgets/error_view.dart';
 
 void main() {
   testWidgets('CoinTile shows coin identity and market price', (tester) async {
@@ -58,5 +61,49 @@ void main() {
     await tester.pumpWidget(view(const AsyncData<List<int>>([])));
     await tester.pumpAndSettle();
     expect(find.text('No data'), findsOneWidget);
+  });
+
+  testWidgets('ErrorView displays the offline illustration for no internet', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: ErrorView(
+            error: const Failure(FailureType.noInternet, 'offline'),
+            onRetry: () {},
+          ),
+        ),
+      ),
+    );
+
+    expect(find.text('No internet connection'), findsOneWidget);
+    expect(find.text('Check your connection and try again.'), findsOneWidget);
+    expect(find.byType(SvgPicture), findsOneWidget);
+    expect(find.text('Try again'), findsOneWidget);
+  });
+
+  testWidgets('ErrorView displays a friendly generic error state', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: ErrorView(
+            error: Exception('internal technical detail'),
+            onRetry: () {},
+          ),
+        ),
+      ),
+    );
+
+    expect(find.text('Something went wrong'), findsOneWidget);
+    expect(
+      find.text('We could not load this right now. Please try again.'),
+      findsOneWidget,
+    );
+    expect(find.text('internal technical detail'), findsNothing);
+    expect(find.byType(SvgPicture), findsOneWidget);
+    expect(find.text('Try again'), findsOneWidget);
   });
 }

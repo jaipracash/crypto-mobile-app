@@ -39,15 +39,11 @@ class _MainShellState extends State<MainShell>
 
   @override
   Widget build(BuildContext context) => Scaffold(
-    body: Column(
-      children: [
-        const OfflineBanner(),
-        Expanded(child: widget.navigationShell),
-      ],
-    ),
+    body: Column(children: [Expanded(child: widget.navigationShell)]),
     bottomNavigationBar: Column(
       mainAxisSize: MainAxisSize.min,
       children: [
+        const OfflineBanner(),
         Divider(
           height: 1,
           thickness: 0.5,

@@ -10,7 +10,6 @@ import '../../../../core/router/routes.dart';
 import '../../../../shared/widgets/async_value_view.dart';
 import '../../../../shared/widgets/change_pill.dart';
 import '../../../../shared/widgets/cupertino_loader.dart';
-import '../../../../shared/widgets/data_source_banner.dart';
 import '../../../../shared/widgets/empty_view.dart';
 import '../../../../shared/widgets/shimmer_box.dart';
 import '../../../../shared/widgets/simulated_price_banner.dart';
@@ -34,6 +33,8 @@ class HomeScreen extends ConsumerStatefulWidget {
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
   final ScrollController _tabsController = ScrollController();
+  Offset? _tabSwipeStart;
+  int _tabSlideDirection = 1;
 
   @override
   void dispose() {
@@ -55,10 +56,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final AsyncValue<List<Coin>> selectedState = tab == HomeTab.trending
         ? trendingState.whenData((data) => data.items)
         : listState.whenData((data) => data.items);
-    final source = tab == HomeTab.trending
-        ? trendingState.asData?.value.dataSource ?? 'live'
-        : listState.asData?.value.dataSource ?? 'live';
-
     final homeTheme = theme.brightness == Brightness.light
         ? theme.copyWith(
             scaffoldBackgroundColor: Colors.white,
@@ -106,26 +103,59 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   ),
                 ),
                 SliverToBoxAdapter(
-                  child: tab == HomeTab.overview
-                      ? _overviewSection(currency)
-                      : AsyncValueView<List<Coin>>(
-                          value: selectedState,
-                          onRetry: tab == HomeTab.trending
-                              ? () => ref
-                                    .read(trendingControllerProvider.notifier)
-                                    .refresh()
-                              : () => ref
-                                    .read(coinListControllerProvider.notifier)
-                                    .refresh(),
-                          loading: _CoinRowsLoading(period: period),
-                          builder: (_) => _coinListSection(
-                            tab: tab,
-                            source: source,
-                            coins: visibleCoins,
-                            currency: currency,
-                            period: period,
-                          ),
+                  child: Listener(
+                    onPointerDown: (event) => _tabSwipeStart = event.position,
+                    onPointerUp: (event) =>
+                        _handleTabSwipe(event.position, tab),
+                    onPointerCancel: (_) => _tabSwipeStart = null,
+                    child: ClipRect(
+                      child: AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 280),
+                        reverseDuration: const Duration(milliseconds: 240),
+                        switchInCurve: Curves.easeOutCubic,
+                        switchOutCurve: Curves.easeInCubic,
+                        transitionBuilder: (child, animation) =>
+                            SlideTransition(
+                              position: Tween<Offset>(
+                                begin: Offset(_tabSlideDirection.toDouble(), 0),
+                                end: Offset.zero,
+                              ).animate(animation),
+                              child: FadeTransition(
+                                opacity: animation,
+                                child: child,
+                              ),
+                            ),
+                        child: KeyedSubtree(
+                          key: ValueKey(tab),
+                          child: tab == HomeTab.overview
+                              ? _overviewSection(currency)
+                              : AsyncValueView<List<Coin>>(
+                                  value: selectedState,
+                                  onRetry: tab == HomeTab.trending
+                                      ? () => ref
+                                            .read(
+                                              trendingControllerProvider
+                                                  .notifier,
+                                            )
+                                            .refresh()
+                                      : () => ref
+                                            .read(
+                                              coinListControllerProvider
+                                                  .notifier,
+                                            )
+                                            .refresh(),
+                                  loading: _CoinRowsLoading(period: period),
+                                  builder: (_) => _coinListSection(
+                                    tab: tab,
+                                    coins: visibleCoins,
+                                    currency: currency,
+                                    period: period,
+                                  ),
+                                ),
                         ),
+                      ),
+                    ),
+                  ),
                 ),
               ],
             ),
@@ -133,6 +163,33 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         ),
       ),
     );
+  }
+
+  void _handleTabSwipe(Offset end, HomeTab currentTab) {
+    final start = _tabSwipeStart;
+    _tabSwipeStart = null;
+    if (start == null) return;
+
+    final delta = end - start;
+    if (delta.dx.abs() < 64 || delta.dx.abs() < delta.dy.abs() * 1.3) return;
+
+    final currentIndex = HomeTab.values.indexOf(currentTab);
+    final nextIndex = (currentIndex + (delta.dx < 0 ? 1 : -1)).clamp(
+      0,
+      HomeTab.values.length - 1,
+    );
+    if (nextIndex != currentIndex) {
+      _selectTab(HomeTab.values[nextIndex], direction: delta.dx < 0 ? 1 : -1);
+    }
+  }
+
+  void _selectTab(HomeTab tab, {int? direction}) {
+    final currentTab = ref.read(homeTabProvider);
+    if (currentTab == tab) return;
+    final currentIndex = HomeTab.values.indexOf(currentTab);
+    final nextIndex = HomeTab.values.indexOf(tab);
+    _tabSlideDirection = direction ?? (nextIndex > currentIndex ? 1 : -1);
+    ref.read(homeTabProvider.notifier).select(tab);
   }
 
   Widget _overviewSection(String currency) {
@@ -145,23 +202,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         child: Center(child: CupertinoLoader()),
       ),
       builder: (snapshot) => Column(
-        children: [
-          DataSourceBanner(source: snapshot.dataSource),
-          MarketOverviewPanel(snapshot: snapshot, currency: currency),
-        ],
+        children: [MarketOverviewPanel(snapshot: snapshot, currency: currency)],
       ),
     );
   }
 
   Widget _coinListSection({
     required HomeTab tab,
-    required String source,
     required List<Coin> coins,
     required String currency,
     required ChangePeriod period,
   }) => Column(
     children: [
-      DataSourceBanner(source: source),
       if (ref.watch(liveCoinPricesProvider).isNotEmpty)
         const SimulatedPriceBanner(),
       if (coins.isEmpty)
@@ -210,7 +262,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               color: Colors.transparent,
               child: TextField(
                 readOnly: true,
-                onTap: () => context.push(Routes.search, extra: true),
+                onTap: () => context.go(Routes.search),
                 decoration: InputDecoration(
                   hintText: AppStrings.searchCoins,
                   hintStyle: TextStyle(
@@ -389,7 +441,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   );
 
   Widget _homeTab(HomeTab item, HomeTab selectedTab) => InkWell(
-    onTap: () => ref.read(homeTabProvider.notifier).select(item),
+    onTap: () => _selectTab(item),
     child: SizedBox(
       width: switch (item) {
         HomeTab.overview => 82,

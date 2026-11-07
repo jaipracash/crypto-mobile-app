@@ -5,17 +5,19 @@ import '../../core/constants/app_sizes.dart';
 import '../../core/constants/app_strings.dart';
 
 class SimulatedPriceBanner extends StatelessWidget {
-  const SimulatedPriceBanner({super.key});
+  const SimulatedPriceBanner({this.horizontalInset = true, super.key});
+
+  final bool horizontalInset;
 
   @override
   Widget build(BuildContext context) => Container(
-    margin: const EdgeInsets.fromLTRB(
-      AppSizes.screenPadding,
-      AppSizes.xs,
-      AppSizes.screenPadding,
+    margin: EdgeInsets.fromLTRB(
+      horizontalInset ? AppSizes.screenPadding : 0,
+      AppSizes.sm,
+      horizontalInset ? AppSizes.screenPadding : 0,
       AppSizes.xs,
     ),
-    padding: const EdgeInsets.symmetric(
+    padding: EdgeInsets.symmetric(
       horizontal: AppSizes.sm,
       vertical: AppSizes.xs,
     ),

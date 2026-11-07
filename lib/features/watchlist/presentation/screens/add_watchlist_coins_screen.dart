@@ -164,7 +164,7 @@ class _AddWatchlistCoinsScreenState
   ) {
     if (watchlist.hasError) {
       return ErrorView(
-        message: watchlist.error.toString(),
+        error: watchlist.error!,
         onRetry: () => ref.read(watchlistControllerProvider.notifier).refresh(),
       );
     }
@@ -175,7 +175,7 @@ class _AddWatchlistCoinsScreenState
     return coins.when(
       loading: () => const Center(child: CupertinoLoader()),
       error: (error, _) => ErrorView(
-        message: error.toString(),
+        error: error,
         onRetry: () => ref.invalidate(addWatchlistCoinsControllerProvider),
       ),
       data: (data) {

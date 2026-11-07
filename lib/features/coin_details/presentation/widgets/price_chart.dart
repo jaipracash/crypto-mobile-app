@@ -198,7 +198,7 @@ class PriceChart extends StatelessWidget {
               spots: spots,
               isCurved: false,
               color: color,
-              barWidth: 2.4,
+              barWidth: 1.6,
               isStrokeCapRound: true,
               dotData: const FlDotData(show: false),
               belowBarData: BarAreaData(
@@ -207,7 +207,7 @@ class PriceChart extends StatelessWidget {
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: [
-                    color.withValues(alpha: 0.2),
+                    color.withValues(alpha: 0.14),
                     color.withValues(alpha: 0.01),
                   ],
                 ),

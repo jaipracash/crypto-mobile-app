@@ -34,7 +34,7 @@ abstract final class AppSizes {
   static const chartTouchBorder = 2.0;
   static const loadingItemCount = 6;
   static const emptyStateHeightFraction = 0.65;
-  static const sparklineLineWidth = 1.2;
+  static const sparklineLineWidth = 1.0;
   static const hairline = 1.0;
   static const sheetHandleWidth = 36.0;
   static const sheetHandleHeight = 4.0;

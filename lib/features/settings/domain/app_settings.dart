@@ -4,7 +4,7 @@ enum AppThemeMode { system, light, dark }
 
 class AppSettings extends Equatable {
   const AppSettings({
-    this.themeMode = AppThemeMode.system,
+    this.themeMode = AppThemeMode.light,
     this.currency = 'usd',
     this.autoRefreshSeconds = 0,
   });

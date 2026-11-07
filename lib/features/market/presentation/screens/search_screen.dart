@@ -116,7 +116,8 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                       _tabStrip(),
                     ],
                     const SizedBox(height: AppSizes.sm),
-                    if (livePrices.isNotEmpty) const SimulatedPriceBanner(),
+                    if (livePrices.isNotEmpty)
+                      const SimulatedPriceBanner(horizontalInset: false),
                   ]),
                 ),
               ),
@@ -235,7 +236,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     error: (error, _) => SliverFillRemaining(
       hasScrollBody: false,
       child: ErrorView(
-        message: error.toString(),
+        error: error,
         onRetry: _selectedTab == HomeTab.trending
             ? () => ref.read(trendingControllerProvider.notifier).refresh()
             : () => ref.read(coinListControllerProvider.notifier).refresh(),
@@ -279,7 +280,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
       error: (error, _) => SliverFillRemaining(
         hasScrollBody: false,
         child: ErrorView(
-          message: error.toString(),
+          error: error,
           onRetry: () => ref.read(searchResultsProvider.notifier).retry(),
         ),
       ),

@@ -4,6 +4,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:gecko_lite/core/constants/app_strings.dart';
 import 'package:gecko_lite/features/coin_details/data/coin_details_dto.dart';
 import 'package:gecko_lite/features/coin_details/domain/coin_details.dart';
+import 'package:gecko_lite/features/coin_details/presentation/widgets/historical_data_card.dart';
 import 'package:gecko_lite/features/coin_details/presentation/widgets/price_chart.dart';
 import 'package:gecko_lite/features/coin_details/presentation/widgets/stats_grid.dart';
 import 'package:gecko_lite/features/market/domain/coin.dart';
@@ -108,6 +109,46 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+  testWidgets('historical data shows 24h and all-time high and low values', (
+    tester,
+  ) async {
+    final details = CoinDetails(
+      coin: const Coin(
+        id: 'bitcoin',
+        symbol: 'btc',
+        name: 'Bitcoin',
+        price: 76000,
+      ),
+      high24h: 76150,
+      low24h: 75584,
+      ath: 126080,
+      athChangePct: -39.9,
+      athDate: DateTime(2025, 10, 6),
+      atl: 67.81,
+      atlChangePct: 111681,
+      atlDate: DateTime(2013, 7, 5),
+    );
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: HistoricalDataCard(details: details, currency: 'usd'),
+        ),
+      ),
+    );
+
+    expect(find.text(AppStrings.historicalData), findsOneWidget);
+    expect(find.text(AppStrings.high24h), findsOneWidget);
+    expect(find.text(AppStrings.low24h), findsOneWidget);
+    expect(find.text(AppStrings.allTimeHigh), findsOneWidget);
+    expect(find.text(AppStrings.allTimeLow), findsOneWidget);
+    expect(find.textContaining('126,080.00'), findsOneWidget);
+    expect(find.textContaining('111681.00%'), findsOneWidget);
+    expect(find.byIcon(Icons.arrow_downward_rounded), findsOneWidget);
+    expect(find.byIcon(Icons.arrow_upward_rounded), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('price chart draws timestamp-ordered, sharp real price points', (
     tester,
   ) async {
@@ -136,6 +177,7 @@ void main() {
     final line = tester.widget<LineChart>(find.byType(LineChart));
     final lineData = line.data.lineBarsData.single;
     expect(lineData.isCurved, isFalse);
+    expect(lineData.barWidth, 1.6);
     expect(lineData.spots.map((spot) => spot.y), [100, 104, 101]);
     expect(line.data.titlesData.bottomTitles.sideTitles.showTitles, isTrue);
     expect(line.data.titlesData.rightTitles.sideTitles.showTitles, isTrue);

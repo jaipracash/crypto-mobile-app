@@ -5,13 +5,15 @@ import '../../domain/app_settings.dart';
 import 'settings_controller.dart';
 
 final themeModeProvider = Provider<ThemeMode>((ref) {
-  return switch (ref
+  final themeMode = ref
       .watch(settingsControllerProvider)
       .asData
       ?.value
-      .themeMode) {
+      .themeMode;
+  return switch (themeMode) {
     AppThemeMode.light => ThemeMode.light,
     AppThemeMode.dark => ThemeMode.dark,
-    _ => ThemeMode.system,
+    AppThemeMode.system => ThemeMode.system,
+    null => ThemeMode.light,
   };
 });

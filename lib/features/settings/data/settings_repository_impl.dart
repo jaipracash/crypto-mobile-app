@@ -13,7 +13,8 @@ class SettingsRepositoryImpl implements SettingsRepository {
     themeMode: switch (_preferences.getString(StorageKeys.themeMode)) {
       'light' => AppThemeMode.light,
       'dark' => AppThemeMode.dark,
-      _ => AppThemeMode.system,
+      'system' => AppThemeMode.system,
+      _ => AppThemeMode.light,
     },
     currency: _preferences.getString(StorageKeys.currency) ?? 'usd',
     autoRefreshSeconds:

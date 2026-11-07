@@ -137,7 +137,7 @@ class _CoinRowState extends State<CoinRow> {
                         duration: const Duration(milliseconds: 180),
                         style: theme.textTheme.bodyMedium!.copyWith(
                           color: flashColor,
-                          fontWeight: FontWeight.w500,
+                          fontWeight: FontWeight.w600,
                           fontFeatures: const [FontFeature.tabularFigures()],
                         ),
                         child: Text(
@@ -164,8 +164,8 @@ class _CoinRowState extends State<CoinRow> {
                     Sparkline(
                       values: widget.coin.sparkline7d,
                       positive: (widget.period.value(widget.coin) ?? 0) >= 0,
-                      width: 66,
-                      height: 28,
+                      width: 62,
+                      height: 24,
                       filled: true,
                     ),
                     const SizedBox(height: AppSizes.xs),

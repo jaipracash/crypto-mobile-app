@@ -74,17 +74,15 @@ void main() {
     final changePill = tester.widget<ChangePill>(find.byType(ChangePill));
     expect(sparkline.filled, isTrue);
     expect(sparkline.positive, isTrue);
-    expect(sparkline.width, 66);
-    expect(sparkline.height, 28);
-    expect(
-      tester
-          .widget<LineChart>(find.byType(LineChart))
-          .data
-          .lineBarsData
-          .single
-          .isCurved,
-      isTrue,
-    );
+    expect(sparkline.width, 62);
+    expect(sparkline.height, 24);
+    final sparklineData = tester
+        .widget<LineChart>(find.byType(LineChart))
+        .data
+        .lineBarsData
+        .single;
+    expect(sparklineData.isCurved, isTrue);
+    expect(sparklineData.barWidth, 1.0);
     expect(changePill.showBackground, isFalse);
     expect(
       tester.getTopLeft(find.byType(Sparkline)).dy,

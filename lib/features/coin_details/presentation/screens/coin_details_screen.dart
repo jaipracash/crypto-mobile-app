@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
@@ -22,6 +23,7 @@ import '../../../settings/presentation/controllers/settings_controller.dart';
 import '../../../watchlist/presentation/controllers/watchlist_controller.dart';
 import '../../domain/coin_details.dart';
 import '../controllers/coin_details_controller.dart';
+import '../widgets/historical_data_card.dart';
 import '../widgets/price_chart.dart';
 import '../widgets/stats_grid.dart';
 
@@ -167,14 +169,15 @@ class _CoinDetailsScreenState extends ConsumerState<CoinDetailsScreen>
                 onPressed: () => context.push(Routes.search),
                 icon: SvgPicture.asset(
                   'assets/search2.svg',
-                  width: AppSizes.iconSmall,
-                  height: AppSizes.iconSmall,
+                  width: AppSizes.iconMedium,
+                  height: AppSizes.iconMedium,
                   colorFilter: const ColorFilter.mode(
                     AppColors.lightTextSecondary,
                     BlendMode.srcIn,
                   ),
                 ),
                 padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
                 visualDensity: VisualDensity.compact,
               ),
               IconButton(
@@ -184,14 +187,15 @@ class _CoinDetailsScreenState extends ConsumerState<CoinDetailsScreen>
                 ),
                 icon: SvgPicture.asset(
                   'assets/notification-6-svgrepo-com.svg',
-                  width: 20,
-                  height: 20,
+                  width: 22,
+                  height: 22,
                   colorFilter: const ColorFilter.mode(
                     AppColors.lightTextSecondary,
                     BlendMode.srcIn,
                   ),
                 ),
                 padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
                 visualDensity: VisualDensity.compact,
               ),
               IconButton(
@@ -208,8 +212,8 @@ class _CoinDetailsScreenState extends ConsumerState<CoinDetailsScreen>
                   scale: _favoriteScale,
                   child: SvgPicture.asset(
                     watched ? 'assets/star-filled.svg' : 'assets/star.svg',
-                    width: 20,
-                    height: 20,
+                    width: 18,
+                    height: 18,
                     colorFilter: ColorFilter.mode(
                       watched
                           ? AppColors.watchlistStar
@@ -219,6 +223,7 @@ class _CoinDetailsScreenState extends ConsumerState<CoinDetailsScreen>
                   ),
                 ),
                 padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
                 visualDensity: VisualDensity.compact,
               ),
             ],
@@ -270,6 +275,8 @@ class _CoinDetailsScreenState extends ConsumerState<CoinDetailsScreen>
     );
     return TabBarView(
       controller: _tabController,
+      physics: const PageScrollPhysics(),
+      dragStartBehavior: DragStartBehavior.start,
       children: [
         _buildOverview(
           context,
@@ -283,8 +290,6 @@ class _CoinDetailsScreenState extends ConsumerState<CoinDetailsScreen>
           context,
           data,
           coinWithCurrentPrice,
-          chartData,
-          chartForSelectedRange,
           currency,
         ),
         _buildNews(context),
@@ -319,38 +324,7 @@ class _CoinDetailsScreenState extends ConsumerState<CoinDetailsScreen>
       ),
       children: [
         const SizedBox(height: AppSizes.md),
-        Wrap(
-          alignment: WrapAlignment.center,
-          crossAxisAlignment: WrapCrossAlignment.center,
-          spacing: AppSizes.sm,
-          runSpacing: AppSizes.xs,
-          children: [
-            Text(
-              _series == PriceChartSeries.price
-                  ? Formatters.currency(displayedPrice, currency)
-                  : Formatters.compact(displayedPrice, currencyCode: currency),
-              style: Theme.of(context).textTheme.displayLarge?.copyWith(
-                color: color,
-                fontSize: 30,
-                fontWeight: FontWeight.w700,
-                letterSpacing: -0.7,
-              ),
-            ),
-            ChangePill(
-              change:
-                  selectedChange ??
-                  (_days == 1 && _rangeHours == 24 ? coin.change24hPct : null),
-              showBackground: false,
-            ),
-            Text(
-              '(${_timeframeLabel(_days)})',
-              style: Theme.of(context).textTheme.bodySmall,
-            ),
-          ],
-        ),
-        const SizedBox(height: AppSizes.xs),
         Row(
-          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Flexible(
               child: Text(
@@ -367,6 +341,36 @@ class _CoinDetailsScreenState extends ConsumerState<CoinDetailsScreen>
               const SizedBox(width: AppSizes.sm),
               _RankBadge(rank: coin.rank!),
             ],
+          ],
+        ),
+        const SizedBox(height: AppSizes.xs),
+        Wrap(
+          alignment: WrapAlignment.start,
+          crossAxisAlignment: WrapCrossAlignment.center,
+          spacing: AppSizes.sm,
+          runSpacing: AppSizes.xs,
+          children: [
+            Text(
+              _series == PriceChartSeries.price
+                  ? Formatters.currency(displayedPrice, currency)
+                  : Formatters.compact(displayedPrice, currencyCode: currency),
+              style: Theme.of(context).textTheme.displayLarge?.copyWith(
+                color: color,
+                fontSize: 30,
+                fontWeight: FontWeight.w800,
+                letterSpacing: -0.7,
+              ),
+            ),
+            ChangePill(
+              change:
+                  selectedChange ??
+                  (_days == 1 && _rangeHours == 24 ? coin.change24hPct : null),
+              showBackground: false,
+            ),
+            Text(
+              '(${_timeframeLabel(_days)})',
+              style: Theme.of(context).textTheme.bodySmall,
+            ),
           ],
         ),
         if (displayedDate != null) ...[
@@ -391,9 +395,12 @@ class _CoinDetailsScreenState extends ConsumerState<CoinDetailsScreen>
           ),
         ],
         const SizedBox(height: AppSizes.md),
-        DataSourceBanner(source: chartData?.dataSource ?? data.dataSource),
+        DataSourceBanner(
+          source: chartData?.dataSource ?? data.dataSource,
+          horizontalInset: false,
+        ),
         if (ref.watch(liveCoinPricesProvider).isNotEmpty)
-          const SimulatedPriceBanner(),
+          const SimulatedPriceBanner(horizontalInset: false),
         AsyncValueView(
           value: chartForSelectedRange,
           onRetry: () =>
@@ -446,6 +453,16 @@ class _CoinDetailsScreenState extends ConsumerState<CoinDetailsScreen>
             ],
           ),
         ),
+        const SizedBox(height: AppSizes.xl),
+        Text(
+          AppStrings.marketStatistics,
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+            color: AppColors.lightTextPrimary,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+        const SizedBox(height: AppSizes.sm),
+        StatsGrid(details: data, currency: currency),
       ],
     );
   }
@@ -454,12 +471,8 @@ class _CoinDetailsScreenState extends ConsumerState<CoinDetailsScreen>
     BuildContext context,
     CoinDetails data,
     Coin coin,
-    CoinChart? chart,
-    AsyncValue<CoinChart> chartState,
     String currency,
   ) {
-    final points = _selectedPoints(chart);
-    final historicalPoints = points.reversed.take(12);
     return ListView(
       padding: const EdgeInsets.fromLTRB(
         AppSizes.screenPadding,
@@ -476,33 +489,7 @@ class _CoinDetailsScreenState extends ConsumerState<CoinDetailsScreen>
         const SizedBox(height: AppSizes.md),
         StatsGrid(details: data, currency: currency),
         const SizedBox(height: AppSizes.xl),
-        Text(
-          AppStrings.historicalData,
-          style: Theme.of(context).textTheme.titleLarge
-              ?.copyWith(fontWeight: FontWeight.w700),
-        ),
-        const SizedBox(height: AppSizes.sm),
-        if (chartState.isLoading && chart == null)
-          const Padding(
-            padding: EdgeInsets.all(AppSizes.lg),
-            child: Center(child: CupertinoLoader()),
-          )
-        else if (chartState.hasError)
-          Text(
-            chartState.error.toString(),
-            style: Theme.of(context).textTheme.bodySmall,
-          )
-        else if (historicalPoints.isEmpty)
-          Text(
-            AppStrings.noChartData,
-            style: Theme.of(context).textTheme.bodySmall,
-          )
-        else
-          _HistoricalDataTable(
-            points: historicalPoints.toList(growable: false),
-            currency: currency,
-            series: _series,
-          ),
+        HistoricalDataCard(details: data, currency: currency),
         const SizedBox(height: AppSizes.xl),
         Text(
           '${AppStrings.aboutCoin} ${coin.name}',
@@ -865,60 +852,6 @@ class _ChartMarker extends StatelessWidget {
   );
 }
 
-class _HistoricalDataTable extends StatelessWidget {
-  const _HistoricalDataTable({
-    required this.points,
-    required this.currency,
-    required this.series,
-  });
-
-  final List<PricePoint> points;
-  final String currency;
-  final PriceChartSeries series;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        border: Border.all(color: const Color(0xFFE3E7EC)),
-        borderRadius: BorderRadius.circular(AppSizes.radiusMd),
-      ),
-      child: Column(
-        children: [
-          for (var index = 0; index < points.length; index++) ...[
-            if (index > 0) const Divider(height: 1, color: Color(0xFFE9EDF2)),
-            Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppSizes.md,
-                vertical: AppSizes.sm,
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    Formatters.dateTime(points[index].timestamp),
-                    style: Theme.of(context).textTheme.bodySmall,
-                  ),
-                  Text(
-                    series == PriceChartSeries.price
-                        ? Formatters.currency(points[index].price, currency)
-                        : Formatters.compact(
-                            points[index].price,
-                            currencyCode: currency,
-                          ),
-                    style: Theme.of(context).textTheme.bodyMedium
-                        ?.copyWith(fontWeight: FontWeight.w600),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ],
-      ),
-    );
-  }
-}
-
 class _RankBadge extends StatelessWidget {
   const _RankBadge({required this.rank});
 
@@ -926,13 +859,10 @@ class _RankBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Container(
-    padding: const EdgeInsets.symmetric(
-      horizontal: AppSizes.sm,
-      vertical: AppSizes.xs,
-    ),
+    padding: const EdgeInsets.symmetric(horizontal: AppSizes.sm, vertical: 2),
     decoration: BoxDecoration(
       color: const Color(0xFFF0F3F6),
-      borderRadius: BorderRadius.circular(AppSizes.radiusSm),
+      borderRadius: BorderRadius.circular(AppSizes.radiusPill),
     ),
     child: Text(
       '#$rank',
