@@ -19,31 +19,10 @@ class CoinDetailsController extends FamilyAsyncNotifier<CoinDetails, String> {
   }
 }
 
-final chartControllerProvider =
-    AsyncNotifierProvider.family<ChartController, CoinChart, String>(
-      ChartController.new,
-    );
-
-class ChartController extends FamilyAsyncNotifier<CoinChart, String> {
-  int _days = 7;
-  int get days => _days;
-
-  @override
-  Future<CoinChart> build(String coinId) async {
-    final settings = await ref.watch(settingsControllerProvider.future);
-    return ref
-        .watch(coinDetailsRepositoryProvider)
-        .getChart(coinId, _days, settings.currency);
-  }
-
-  Future<void> setDays(int days) async {
-    _days = days;
-    state = const AsyncLoading();
-    state = await AsyncValue.guard(() async {
-      final settings = ref.read(settingsControllerProvider).asData?.value;
+final coinChartProvider = FutureProvider.autoDispose
+    .family<CoinChart, (String coinId, int days)>((ref, request) async {
+      final settings = await ref.watch(settingsControllerProvider.future);
       return ref
-          .read(coinDetailsRepositoryProvider)
-          .getChart(arg, days, settings?.currency ?? 'usd');
+          .watch(coinDetailsRepositoryProvider)
+          .getChart(request.$1, request.$2, settings.currency);
     });
-  }
-}

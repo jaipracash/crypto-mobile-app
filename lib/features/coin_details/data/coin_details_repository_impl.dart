@@ -30,7 +30,10 @@ class CoinDetailsRepositoryImpl implements CoinDetailsRepository {
       return CoinChartDto(
         Map<String, dynamic>.from(response.data as Map),
         response.headers.value('X-Data-Source') ?? 'live',
-      ).toEntity();
+        requestedCoinId: coinId,
+        requestedDays: days,
+        requestedCurrency: currency,
+       ).toEntity();
     } on DioException catch (error) {
       throw mapDioFailure(error);
     }

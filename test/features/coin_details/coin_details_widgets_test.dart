@@ -2,12 +2,78 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:gecko_lite/core/constants/app_strings.dart';
+import 'package:gecko_lite/features/coin_details/data/coin_details_dto.dart';
 import 'package:gecko_lite/features/coin_details/domain/coin_details.dart';
 import 'package:gecko_lite/features/coin_details/presentation/widgets/price_chart.dart';
 import 'package:gecko_lite/features/coin_details/presentation/widgets/stats_grid.dart';
 import 'package:gecko_lite/features/market/domain/coin.dart';
+import 'package:gecko_lite/shared/widgets/coin_avatar.dart';
 
 void main() {
+  test('coin chart reports the range requested from the repository', () {
+    final chart = CoinChartDto(
+      const {
+        'coin_id': 'bitcoin',
+        'days': 30,
+        'currency': 'usd',
+        'prices': [
+          [1794009600000, 100],
+          [1794096000000, 102],
+        ],
+        'market_caps': [
+          [1794009600000, 1000],
+          [1794096000000, 1020],
+        ],
+        'ohlc': [
+          [1794009600000, 100, 103, 99, 102],
+        ],
+      },
+      'live',
+      requestedCoinId: 'bitcoin',
+      requestedDays: 30,
+      requestedCurrency: 'usd',
+    ).toEntity();
+
+    expect(chart.days, 30);
+    expect(chart.prices, hasLength(2));
+    expect(chart.marketCaps, hasLength(2));
+    expect(chart.candles, hasLength(1));
+    expect(chart.candles.single.high, 103);
+  });
+
+  test('coin chart rejects data for a different coin or range', () {
+    expect(
+      () => CoinChartDto(
+        const {
+          'coin_id': 'ethereum',
+          'days': 7,
+          'currency': 'usd',
+          'prices': [],
+        },
+        'live',
+        requestedCoinId: 'bitcoin',
+        requestedDays: 7,
+        requestedCurrency: 'usd',
+      ).toEntity(),
+      throwsFormatException,
+    );
+    expect(
+      () => CoinChartDto(
+        const {
+          'coin_id': 'bitcoin',
+          'days': 30,
+          'currency': 'usd',
+          'prices': [],
+        },
+        'live',
+        requestedCoinId: 'bitcoin',
+        requestedDays: 7,
+        requestedCurrency: 'usd',
+      ).toEntity(),
+      throwsFormatException,
+    );
+  });
+
   testWidgets('coin info is shown in a bordered two-column panel', (
     tester,
   ) async {
@@ -72,7 +138,137 @@ void main() {
     expect(lineData.isCurved, isFalse);
     expect(lineData.spots.map((spot) => spot.y), [100, 104, 101]);
     expect(line.data.titlesData.bottomTitles.sideTitles.showTitles, isTrue);
-    expect(line.data.titlesData.leftTitles.sideTitles.showTitles, isTrue);
+    expect(line.data.titlesData.rightTitles.sideTitles.showTitles, isTrue);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('empty API history shows an empty state instead of a chart', (
+    tester,
+  ) async {
+    const chart = CoinChart(
+      coinId: 'bitcoin',
+      days: 7,
+      currency: 'usd',
+      prices: [],
+    );
+
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: Scaffold(
+          body: PriceChart(chart: chart, currency: 'usd', onTouch: _noTouch),
+        ),
+      ),
+    );
+
+    expect(find.byType(LineChart), findsNothing);
+    expect(find.text(AppStrings.noChartData), findsOneWidget);
+  });
+
+  testWidgets('price chart can plot market-cap history', (tester) async {
+    final chart = CoinChart(
+      coinId: 'bitcoin',
+      days: 7,
+      currency: 'usd',
+      prices: [
+        PricePoint(DateTime(2026, 11, 6), 100),
+        PricePoint(DateTime(2026, 11, 7), 101),
+      ],
+      marketCaps: [
+        PricePoint(DateTime(2026, 11, 6), 1000),
+        PricePoint(DateTime(2026, 11, 7), 1100),
+      ],
+    );
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: PriceChart(
+            chart: chart,
+            currency: 'usd',
+            series: PriceChartSeries.marketCap,
+            onTouch: (_) {},
+          ),
+        ),
+      ),
+    );
+
+    expect(find.byType(LineChart), findsOneWidget);
+    final renderedChart = tester.widget<LineChart>(find.byType(LineChart));
+    expect(renderedChart.data.lineBarsData.single.spots.map((spot) => spot.y), [
+      1000,
+      1100,
+    ]);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('candlestick chart renders sampled candle data', (tester) async {
+    final chart = CoinChart(
+      coinId: 'bitcoin',
+      days: 1,
+      currency: 'usd',
+      prices: [
+        PricePoint(DateTime(2026, 11, 6, 8), 100),
+        PricePoint(DateTime(2026, 11, 6, 9), 104),
+        PricePoint(DateTime(2026, 11, 6, 10), 101),
+      ],
+      candles: [
+        CandlePoint(
+          timestamp: DateTime(2026, 11, 6, 8),
+          open: 100,
+          high: 104,
+          low: 99,
+          close: 103,
+        ),
+        CandlePoint(
+          timestamp: DateTime(2026, 11, 6, 10),
+          open: 103,
+          high: 105,
+          low: 101,
+          close: 101,
+        ),
+      ],
+    );
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: PriceChart(
+            chart: chart,
+            currency: 'usd',
+            style: PriceChartStyle.candles,
+            onTouch: (_) {},
+          ),
+        ),
+      ),
+    );
+
+    final customPaint = tester.widgetList<CustomPaint>(
+      find.byType(CustomPaint),
+    );
+    expect(customPaint, isNotEmpty);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('details avatar does not duplicate the coin Hero tag', (
+    tester,
+  ) async {
+    const imageUrl = 'https://example.com/bitcoin.png';
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: Scaffold(
+          body: Row(
+            children: [
+              CoinAvatar(symbol: 'btc', imageUrl: imageUrl),
+              CoinAvatar(symbol: 'btc', imageUrl: imageUrl, enableHero: false),
+            ],
+          ),
+        ),
+      ),
+    );
+
+    expect(find.byType(Hero), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 }
+
+void _noTouch(PricePoint? point) {}

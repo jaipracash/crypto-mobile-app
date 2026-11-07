@@ -13,11 +13,13 @@ import '../../../../shared/widgets/cupertino_loader.dart';
 import '../../../../shared/widgets/data_source_banner.dart';
 import '../../../../shared/widgets/empty_view.dart';
 import '../../../../shared/widgets/shimmer_box.dart';
+import '../../../../shared/widgets/simulated_price_banner.dart';
 import '../../../settings/presentation/controllers/settings_controller.dart';
 import '../../../watchlist/presentation/controllers/watchlist_controller.dart';
 import '../../domain/coin.dart';
 import '../../domain/market_filters.dart';
 import '../../domain/market_models.dart';
+import '../controllers/live_price_controller.dart';
 import '../controllers/market_controller.dart';
 import '../widgets/coin_row.dart';
 import '../widgets/market_sheets.dart';
@@ -160,6 +162,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }) => Column(
     children: [
       DataSourceBanner(source: source),
+      if (ref.watch(liveCoinPricesProvider).isNotEmpty)
+        const SimulatedPriceBanner(),
       if (coins.isEmpty)
         Padding(
           padding: const EdgeInsets.all(AppSizes.xl),

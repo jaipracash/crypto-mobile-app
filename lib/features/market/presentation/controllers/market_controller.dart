@@ -9,6 +9,7 @@ import '../../../settings/presentation/controllers/settings_controller.dart';
 import '../../domain/coin.dart';
 import '../../domain/market_filters.dart';
 import '../../domain/market_models.dart';
+import 'live_price_controller.dart';
 
 enum HomeTab { all, trending, overview, gainers, losers }
 
@@ -248,10 +249,16 @@ final visibleCoinsProvider = Provider.family<List<Coin>, HomeTab>((ref, tab) {
             const <Coin>[]
       : ref.watch(coinListControllerProvider).asData?.value.items ??
             const <Coin>[];
+  final livePrices = ref.watch(liveCoinPricesProvider);
+  final currency =
+      ref.watch(settingsControllerProvider).asData?.value.currency ?? 'usd';
+  final pricedCoins = sourceCoins.map(
+    (coin) => withLivePrice(coin, livePrices, currency: currency),
+  );
   final filters = ref.watch(marketFiltersProvider);
   final period = ref.watch(changePeriodProvider);
   final query = ref.watch(searchQueryProvider).trim().toLowerCase();
-  var coins = sourceCoins.where((coin) {
+  var coins = pricedCoins.where((coin) {
     final marketCap = coin.marketCap;
     final volume = coin.volume24h;
     final price = coin.price;

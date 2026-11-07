@@ -75,6 +75,20 @@ abstract final class AppStrings {
   static const coinDetails = 'Coin details';
   static const marketStatistics = 'Market statistics';
   static const info = 'Info';
+  static const news = 'News';
+  static const historicalData = 'Historical data';
+  static const aboutCoin = 'About coin';
+  static const newsUnavailable = 'A news feed is not available yet.';
+  static const marketCapChartUnavailable =
+      'Market-cap history is not available for this coin.';
+  static const lineChart = 'Line';
+  static const candleChart = 'Candles';
+  static const chartSeries = 'Data';
+  static const chartType = 'Chart style';
+  static const candleChartUnavailable =
+      'Native candlestick data is unavailable for this coin or range.';
+  static const simulatedPriceStream =
+      'Demo only: prices are simulated and are not live market quotes.';
   static const about = 'About';
   static const website = 'Website';
   static const whitepaper = 'Whitepaper';

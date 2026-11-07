@@ -10,10 +10,12 @@ import '../../../../shared/widgets/change_pill.dart';
 import '../../../../shared/widgets/coin_avatar.dart';
 import '../../../../shared/widgets/cupertino_loader.dart';
 import '../../../../shared/widgets/error_view.dart';
+import '../../../../shared/widgets/simulated_price_banner.dart';
 import '../../../settings/presentation/controllers/settings_controller.dart';
 import '../../domain/coin.dart';
 import '../../domain/market_models.dart';
 import '../controllers/market_controller.dart';
+import '../controllers/live_price_controller.dart';
 
 class SearchScreen extends ConsumerStatefulWidget {
   const SearchScreen({this.animateFromHome = false, super.key});
@@ -58,12 +60,13 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     final currency =
         ref.watch(settingsControllerProvider).asData?.value.currency ?? 'usd';
     final marketCoins = ref.watch(visibleCoinsProvider(_selectedTab));
+    final livePrices = ref.watch(liveCoinPricesProvider);
     final marketCoinsById = {
       for (final coin in [
         ...?listState.asData?.value.items,
         ...?trendingState.asData?.value.items,
       ])
-        coin.id: coin,
+        coin.id: withLivePrice(coin, livePrices, currency: currency),
     };
     final AsyncValue<List<Coin>> marketState = _selectedTab == HomeTab.trending
         ? trendingState.whenData((data) => data.items)
@@ -113,6 +116,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                       _tabStrip(),
                     ],
                     const SizedBox(height: AppSizes.sm),
+                    if (livePrices.isNotEmpty) const SimulatedPriceBanner(),
                   ]),
                 ),
               ),

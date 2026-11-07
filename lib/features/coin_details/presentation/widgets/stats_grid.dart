@@ -59,17 +59,17 @@ class StatsGrid extends StatelessWidget {
         itemCount: items.length,
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 2,
-          mainAxisSpacing: AppSizes.lg,
+          mainAxisSpacing: AppSizes.sm,
           crossAxisSpacing: AppSizes.md,
-          childAspectRatio: 1.8,
+          childAspectRatio: 2.7,
         ),
         itemBuilder: (context, index) => Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.start,
           children: [
             Text(
               items[index].$1,
-              maxLines: 2,
+              maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: Theme.of(context).textTheme.bodySmall,
             ),

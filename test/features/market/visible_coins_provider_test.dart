@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:gecko_lite/features/market/domain/coin.dart';
 import 'package:gecko_lite/features/market/domain/market_filters.dart';
 import 'package:gecko_lite/features/market/presentation/controllers/market_controller.dart';
+import 'package:gecko_lite/features/market/presentation/controllers/live_price_controller.dart';
 import 'package:gecko_lite/features/watchlist/domain/watchlist_repository.dart';
 import 'package:gecko_lite/features/watchlist/presentation/controllers/watchlist_controller.dart';
 
@@ -124,6 +125,29 @@ void main() {
     expect(
       container.read(visibleCoinsProvider(HomeTab.all)).single.isWatchlisted,
       isFalse,
+    );
+  });
+
+  test('live price updates immediately replace visible coin prices', () async {
+    await container.read(coinListControllerProvider.future);
+    final controller = container.read(liveCoinPricesProvider.notifier);
+
+    controller.apply('usd', const [
+      LivePriceUpdate(coinId: 'bitcoin', price: 125),
+      LivePriceUpdate(coinId: 'ethereum', price: 12),
+    ]);
+
+    final updated = container.read(visibleCoinsProvider(HomeTab.all));
+    expect(updated.first.price, 125);
+    expect(updated[1].price, 12);
+
+    controller.apply('inr', const [
+      LivePriceUpdate(coinId: 'bitcoin', price: 10000),
+    ]);
+    expect(container.read(visibleCoinsProvider(HomeTab.all)).first.price, 125);
+    expect(
+      withLivePrice(_coins.first, {'usd:bitcoin': 125}, currency: 'inr').price,
+      120,
     );
   });
 }

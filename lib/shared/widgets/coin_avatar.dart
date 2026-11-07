@@ -8,11 +8,13 @@ class CoinAvatar extends StatelessWidget {
     required this.symbol,
     this.imageUrl,
     this.size = AppSizes.coinLogo,
+    this.enableHero = true,
     super.key,
   });
   final String symbol;
   final String? imageUrl;
   final double size;
+  final bool enableHero;
   @override
   Widget build(BuildContext context) {
     final fallback = CircleAvatar(
@@ -24,20 +26,19 @@ class CoinAvatar extends StatelessWidget {
       ),
     );
     if (imageUrl == null || imageUrl!.isEmpty) return fallback;
-    return Hero(
-      tag: 'coin-${imageUrl!}',
-      child: CachedNetworkImage(
-        imageUrl: imageUrl!,
-        width: size,
-        height: size,
-        imageBuilder: (context, provider) => CircleAvatar(
-          radius: size / 2,
-          backgroundColor: Colors.transparent,
-          backgroundImage: provider,
-        ),
-        placeholder: (_, _) => fallback,
-        errorWidget: (_, _, _) => fallback,
+    final image = CachedNetworkImage(
+      imageUrl: imageUrl!,
+      width: size,
+      height: size,
+      imageBuilder: (context, provider) => CircleAvatar(
+        radius: size / 2,
+        backgroundColor: Colors.transparent,
+        backgroundImage: provider,
       ),
+      placeholder: (_, _) => fallback,
+      errorWidget: (_, _, _) => fallback,
     );
+    if (!enableHero) return image;
+    return Hero(tag: 'coin-${imageUrl!}', child: image);
   }
 }
