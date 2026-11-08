@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../core/constants/app_sizes.dart';
 
@@ -7,7 +8,7 @@ class CoinAvatar extends StatelessWidget {
   const CoinAvatar({
     required this.symbol,
     this.imageUrl,
-    this.size = AppSizes.coinLogo,
+    this.size = AppSizes.coinLogo.w,
     this.enableHero = true,
     super.key,
   });

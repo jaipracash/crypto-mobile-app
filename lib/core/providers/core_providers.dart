@@ -12,9 +12,7 @@ final deviceIdProvider = Provider<String>(
   (ref) => throw StateError('The device ID must be initialized in main.'),
 );
 
-final apiBaseUrlProvider = Provider<String>(
-  (ref) => ApiConstants.apiBaseUrl,
-);
+final apiBaseUrlProvider = Provider<String>((ref) => ApiConstants.apiBaseUrl);
 
 final dioProvider = Provider<DioClient>((ref) {
   return DioClient(

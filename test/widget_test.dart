@@ -6,7 +6,7 @@ import 'package:gecko_lite/core/error/failure.dart';
 import 'package:gecko_lite/features/market/domain/coin.dart';
 import 'package:gecko_lite/shared/widgets/async_value_view.dart';
 import 'package:gecko_lite/shared/widgets/coin_tile.dart';
-import 'package:gecko_lite/shared/widgets/cupertino_loader.dart';
+import 'package:gecko_lite/shared/widgets/app_loader.dart';
 import 'package:gecko_lite/shared/widgets/error_view.dart';
 import 'package:gecko_lite/shared/widgets/simulated_price_banner.dart';
 
@@ -51,7 +51,14 @@ void main() {
     );
 
     await tester.pumpWidget(view(const AsyncLoading<List<int>>()));
-    expect(find.byType(CupertinoLoader), findsOneWidget);
+    expect(find.byType(AppLoader), findsOneWidget);
+    expect(
+      find.descendant(
+        of: find.byType(AppLoader),
+        matching: find.byType(CustomPaint),
+      ),
+      findsOneWidget,
+    );
 
     await tester.pumpWidget(
       view(AsyncError<List<int>>(Exception('offline'), StackTrace.current)),
@@ -70,7 +77,7 @@ void main() {
         ),
       ),
     );
-    expect(find.byType(CupertinoLoader), findsOneWidget);
+    expect(find.byType(AppLoader), findsOneWidget);
     expect(find.text('Try again'), findsNothing);
   });
 

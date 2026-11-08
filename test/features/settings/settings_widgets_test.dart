@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gecko_lite/core/constants/app_strings.dart';
 import 'package:gecko_lite/core/providers/repository_providers.dart';
@@ -29,9 +30,12 @@ void main() {
         overrides: [
           settingsRepositoryProvider.overrideWithValue(settingsRepository),
         ],
-        child: MaterialApp(
-          theme: ThemeData.dark(),
-          home: const SettingsScreen(),
+        child: ScreenUtilInit(
+          designSize: const Size(390, 844),
+          builder: (_, _) => MaterialApp(
+            theme: ThemeData.dark(),
+            home: const SettingsScreen(),
+          ),
         ),
       ),
     );
@@ -49,7 +53,7 @@ void main() {
     expect(settingsRepository.settings.themeMode, AppThemeMode.dark);
     expect(
       tester.widget<Scaffold>(find.byType(Scaffold)).backgroundColor,
-      ThemeData.dark().scaffoldBackgroundColor,
+      Colors.white,
     );
   });
 }

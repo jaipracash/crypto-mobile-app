@@ -170,6 +170,28 @@ void main() {
     expect(container.read(homeTabProvider), HomeTab.all);
   });
 
+  test('search query does not filter the home market coin list', () async {
+    final container = ProviderContainer(
+      overrides: [
+        coinListControllerProvider.overrideWith(
+          _SearchTestCoinListController.new,
+        ),
+        settingsControllerProvider.overrideWith(
+          _SearchTestSettingsController.new,
+        ),
+      ],
+    );
+    addTearDown(container.dispose);
+
+    await container.read(coinListControllerProvider.future);
+    container.read(searchQueryProvider.notifier).set('ethereum');
+
+    expect(
+      container.read(visibleCoinsProvider(HomeTab.all)).map((coin) => coin.id),
+      ['bitcoin'],
+    );
+  });
+
   testWidgets('provided navigation SVG assets render', (tester) async {
     const assets = [
       'assets/flutter.svg',

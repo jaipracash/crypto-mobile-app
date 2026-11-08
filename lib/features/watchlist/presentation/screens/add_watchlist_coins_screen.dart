@@ -3,12 +3,13 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../../core/constants/app_sizes.dart';
 import '../../../../core/constants/app_strings.dart';
 import '../../../../shared/widgets/change_pill.dart';
 import '../../../../shared/widgets/coin_avatar.dart';
-import '../../../../shared/widgets/cupertino_loader.dart';
+import '../../../../shared/widgets/app_loader.dart';
 import '../../../../shared/widgets/error_view.dart';
 import '../../../market/domain/coin.dart';
 import '../../domain/watchlist_repository.dart';
@@ -75,10 +76,10 @@ class _AddWatchlistCoinsScreenState
         children: [
           Padding(
             padding: const EdgeInsets.fromLTRB(
-              AppSizes.screenPadding,
-              AppSizes.sm,
-              AppSizes.screenPadding,
-              AppSizes.md,
+              AppSizes.screenPadding.w,
+              AppSizes.sm.w,
+              AppSizes.screenPadding.w,
+              AppSizes.md.w,
             ),
             child: TextField(
               controller: _searchController,
@@ -87,11 +88,11 @@ class _AddWatchlistCoinsScreenState
               decoration: InputDecoration(
                 hintText: AppStrings.searchAllCoins,
                 prefixIcon: Padding(
-                  padding: const EdgeInsets.all(AppSizes.md),
+                  padding: const EdgeInsets.all(AppSizes.md.w),
                   child: SvgPicture.asset(
                     'assets/search-alt-2-svgrepo-com.svg',
-                    width: AppSizes.iconMedium,
-                    height: AppSizes.iconMedium,
+                    width: AppSizes.iconMedium.w,
+                    height: AppSizes.iconMedium.w,
                     colorFilter: ColorFilter.mode(
                       Theme.of(context).colorScheme.onSurfaceVariant,
                       BlendMode.srcIn,
@@ -116,10 +117,10 @@ class _AddWatchlistCoinsScreenState
             top: false,
             child: Padding(
               padding: const EdgeInsets.fromLTRB(
-                AppSizes.screenPadding,
-                AppSizes.sm,
-                AppSizes.screenPadding,
-                AppSizes.md,
+                AppSizes.screenPadding.w,
+                AppSizes.sm.w,
+                AppSizes.screenPadding.w,
+                AppSizes.md.w,
               ),
               child: SizedBox(
                 width: double.infinity,
@@ -140,7 +141,7 @@ class _AddWatchlistCoinsScreenState
                       ? null
                       : () => _addSelected(available, watchlistIds),
                   child: _saving
-                      ? const CupertinoLoader()
+                      ? const AppLoader()
                       : Text(
                           selectionCount == 0
                               ? AppStrings.addCoins
@@ -169,11 +170,11 @@ class _AddWatchlistCoinsScreenState
       );
     }
     if (watchlist.isLoading || watchlistIds == null) {
-      return const Center(child: CupertinoLoader());
+      return const Center(child: AppLoader());
     }
 
     return coins.when(
-      loading: () => const Center(child: CupertinoLoader()),
+      loading: () => const Center(child: AppLoader()),
       error: (error, _) => ErrorView(
         error: error,
         onRetry: () => ref.invalidate(addWatchlistCoinsControllerProvider),
@@ -218,8 +219,8 @@ class _AddWatchlistCoinsScreenState
                 );
               }
               return const Padding(
-                padding: EdgeInsets.all(AppSizes.md),
-                child: Center(child: CupertinoLoader()),
+                padding: EdgeInsets.all(AppSizes.md.w),
+                child: Center(child: AppLoader()),
               );
             }
             final coin = available[index];
@@ -227,15 +228,32 @@ class _AddWatchlistCoinsScreenState
             return _SelectableCoinRow(
               coin: coin,
               selected: watchlisted || _selectedIds.contains(coin.id),
-              enabled: !watchlisted && !_saving,
-              onTap: () => setState(() {
-                if (!_selectedIds.add(coin.id)) _selectedIds.remove(coin.id);
-              }),
+              enabled: !_saving,
+              onTap: () => _toggleSelection(coin, watchlisted),
             );
           },
         );
       },
     );
+  }
+
+  Future<void> _toggleSelection(Coin coin, bool watchlisted) async {
+    if (!watchlisted) {
+      setState(() {
+        if (!_selectedIds.add(coin.id)) _selectedIds.remove(coin.id);
+      });
+      return;
+    }
+
+    try {
+      await ref.read(watchlistControllerProvider.notifier).toggle(coin);
+      if (mounted) setState(() => _selectedIds.remove(coin.id));
+    } catch (error) {
+      if (mounted) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(error.toString())));
+      }
+    }
   }
 
   Future<void> _addSelected(
@@ -295,12 +313,16 @@ class _SelectableCoinRow extends StatelessWidget {
         height: 72,
         child: Padding(
           padding: const EdgeInsets.symmetric(
-            horizontal: AppSizes.screenPadding,
+            horizontal: AppSizes.screenPadding.w,
           ),
           child: Row(
             children: [
-              CoinAvatar(symbol: coin.symbol, imageUrl: coin.image),
-              const SizedBox(width: AppSizes.md),
+              CoinAvatar(
+                symbol: coin.symbol,
+                imageUrl: coin.image,
+                enableHero: false,
+              ),
+              const SizedBox(width: AppSizes.md.w),
               Expanded(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -313,7 +335,7 @@ class _SelectableCoinRow extends StatelessWidget {
                       style: Theme.of(context).textTheme.bodyMedium
                           ?.copyWith(fontWeight: FontWeight.w600),
                     ),
-                    const SizedBox(height: AppSizes.xs),
+                    const SizedBox(height: AppSizes.xs.w),
                     ChangePill(
                       change: coin.change24hPct,
                       showBackground: false,

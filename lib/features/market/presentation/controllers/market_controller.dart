@@ -257,7 +257,6 @@ final visibleCoinsProvider = Provider.family<List<Coin>, HomeTab>((ref, tab) {
   );
   final filters = ref.watch(marketFiltersProvider);
   final period = ref.watch(changePeriodProvider);
-  final query = ref.watch(searchQueryProvider).trim().toLowerCase();
   var coins = pricedCoins.where((coin) {
     final marketCap = coin.marketCap;
     final volume = coin.volume24h;
@@ -293,11 +292,6 @@ final visibleCoinsProvider = Provider.family<List<Coin>, HomeTab>((ref, tab) {
       return false;
     }
     if (filters.price == 'over100' && (price == null || price <= 100)) {
-      return false;
-    }
-    if (query.isNotEmpty &&
-        !coin.name.toLowerCase().contains(query) &&
-        !coin.symbol.toLowerCase().contains(query)) {
       return false;
     }
     return true;

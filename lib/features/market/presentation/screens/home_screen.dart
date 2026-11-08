@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../../core/constants/app_sizes.dart';
 import '../../../../core/constants/app_strings.dart';
@@ -9,7 +10,7 @@ import '../../../../core/utils/formatters.dart';
 import '../../../../core/router/routes.dart';
 import '../../../../shared/widgets/async_value_view.dart';
 import '../../../../shared/widgets/change_pill.dart';
-import '../../../../shared/widgets/cupertino_loader.dart';
+import '../../../../shared/widgets/app_loader.dart';
 import '../../../../shared/widgets/empty_view.dart';
 import '../../../../shared/widgets/shimmer_box.dart';
 import '../../../../shared/widgets/simulated_price_banner.dart';
@@ -80,15 +81,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 SliverToBoxAdapter(
                   child: Padding(
                     padding: const EdgeInsets.fromLTRB(
-                      AppSizes.screenPadding,
-                      AppSizes.sm,
-                      AppSizes.screenPadding,
-                      AppSizes.sm,
+                      AppSizes.screenPadding.w,
+                      AppSizes.sm.w,
+                      AppSizes.screenPadding.w,
+                      AppSizes.sm.w,
                     ),
                     child: Column(
                       children: [
                         _searchSection(),
-                        const SizedBox(height: AppSizes.md),
+                        const SizedBox(height: AppSizes.md.w),
                         const GlobalStatsStrip(),
                       ],
                     ),
@@ -97,8 +98,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 SliverPersistentHeader(
                   pinned: true,
                   delegate: _HomeControlsDelegate(
-                    minHeight: AppSizes.homePinnedHeaderHeight,
-                    maxHeight: AppSizes.homePinnedHeaderHeight,
+                    minHeight: AppSizes.homePinnedHeaderHeight.h,
+                    maxHeight: AppSizes.homePinnedHeaderHeight.h,
                     child: _homeControls(tab, filters),
                   ),
                 ),
@@ -198,8 +199,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       value: overview,
       onRetry: () => ref.read(globalStatsControllerProvider.notifier).refresh(),
       loading: const SizedBox(
-        height: AppSizes.marketCardHeight * 2,
-        child: Center(child: CupertinoLoader()),
+        height: AppSizes.marketCardHeight.h * 2,
+        child: Center(child: AppLoader()),
       ),
       builder: (snapshot) => Column(
         children: [MarketOverviewPanel(snapshot: snapshot, currency: currency)],
@@ -218,7 +219,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         const SimulatedPriceBanner(),
       if (coins.isEmpty)
         Padding(
-          padding: const EdgeInsets.all(AppSizes.xl),
+          padding: const EdgeInsets.all(AppSizes.xl.w),
           child: EmptyView(
             title: tab == HomeTab.trending
                 ? AppStrings.noTrending
@@ -274,8 +275,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   ),
                   prefixIcon: Padding(
                     padding: const EdgeInsets.only(
-                      left: AppSizes.md,
-                      right: AppSizes.xs,
+                      left: AppSizes.md.w,
+                      right: AppSizes.xs.w,
                     ),
                     child: SvgPicture.asset(
                       'assets/search2.svg',
@@ -292,15 +293,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       .colorScheme
                       .surfaceContainerHighest,
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(AppSizes.radiusMd),
+                    borderRadius: BorderRadius.circular(AppSizes.radiusMd.r),
                     borderSide: BorderSide.none,
                   ),
                   enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(AppSizes.radiusMd),
+                    borderRadius: BorderRadius.circular(AppSizes.radiusMd.r),
                     borderSide: BorderSide.none,
                   ),
                   focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(AppSizes.radiusMd),
+                    borderRadius: BorderRadius.circular(AppSizes.radiusMd.r),
                     borderSide: BorderSide.none,
                   ),
                   isDense: true,
@@ -337,7 +338,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             children: [
               Expanded(
                 child: SizedBox(
-                  height: AppSizes.homeTabHeight,
+                  height: AppSizes.homeTabHeight.h,
                   child: Stack(
                     fit: StackFit.expand,
                     children: [
@@ -357,7 +358,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         right: 0,
                         child: IgnorePointer(
                           child: Container(
-                            width: AppSizes.xxl,
+                            width: AppSizes.xxl.w,
                             decoration: BoxDecoration(
                               gradient: LinearGradient(
                                 begin: Alignment.centerLeft,
@@ -377,13 +378,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 ),
               ),
               SizedBox(
-                height: AppSizes.homeTabHeight,
+                height: AppSizes.homeTabHeight.h,
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     SizedBox(
-                      width: AppSizes.filterButtonExtent,
-                      height: AppSizes.homeTabHeight,
+                      width: AppSizes.filterButtonExtent.w,
+                      height: AppSizes.homeTabHeight.h,
                       child: IconButton(
                         tooltip: AppStrings.sortCoins,
                         onPressed: () => _openSheet(const SortSheet()),
@@ -395,7 +396,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       ),
                     ),
                     SizedBox(
-                      width: AppSizes.filterButtonExtent,
+                      width: AppSizes.filterButtonExtent.w,
                       child: Stack(
                         clipBehavior: Clip.none,
                         children: [
@@ -404,7 +405,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                             onPressed: () => _openSheet(const FilterSheet()),
                             icon: _controlIcon(
                               'assets/filter-svgrepo-com.svg',
-                              size: AppSizes.iconMedium,
+                              size: AppSizes.iconMedium.w,
                             ),
                             padding: EdgeInsets.zero,
                             visualDensity: VisualDensity.compact,
@@ -414,7 +415,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                               top: 2,
                               right: 2,
                               child: CircleAvatar(
-                                radius: AppSizes.filterBadgeRadius,
+                                radius: AppSizes.filterBadgeRadius.r,
                                 backgroundColor: Theme.of(context)
                                     .colorScheme
                                     .surfaceContainerHighest,
@@ -422,7 +423,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                   '${filters.activeCount}',
                                   style: Theme.of(context).textTheme.labelSmall
                                       ?.copyWith(
-                                        fontSize: AppSizes.filterBadgeTextSize,
+                                        fontSize:
+                                            AppSizes.filterBadgeTextSize.sp,
                                       ),
                                 ),
                               ),
@@ -450,7 +452,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         HomeTab.gainers => 108,
         HomeTab.losers => 66,
       },
-      height: AppSizes.homeTabHeight,
+      height: AppSizes.homeTabHeight.h,
       child: Stack(
         alignment: Alignment.bottomCenter,
         children: [
@@ -469,11 +471,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           ),
           if (item == selectedTab)
             Container(
-              width: AppSizes.tabIndicatorWidth,
-              height: AppSizes.homeTabUnderlineHeight,
+              width: AppSizes.tabIndicatorWidth.w,
+              height: AppSizes.homeTabUnderlineHeight.h,
               decoration: BoxDecoration(
                 color: Theme.of(context).colorScheme.primary,
-                borderRadius: BorderRadius.circular(AppSizes.radiusPill),
+                borderRadius: BorderRadius.circular(AppSizes.radiusPill.r),
               ),
             ),
         ],
@@ -481,7 +483,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     ),
   );
 
-  Widget _controlIcon(String asset, {double size = AppSizes.iconLarge}) =>
+  Widget _controlIcon(String asset, {double size = AppSizes.iconLarge.w}) =>
       SvgPicture.asset(
         asset,
         width: size,
@@ -568,7 +570,7 @@ class GlobalStatsStrip extends ConsumerWidget {
         Expanded(
           child: _OverviewTap(snapshot: snapshot, child: cap),
         ),
-        const SizedBox(width: AppSizes.sm),
+        const SizedBox(width: AppSizes.sm.w),
         Expanded(
           child: _OverviewTap(snapshot: snapshot, child: volume),
         ),
@@ -584,7 +586,7 @@ class _OverviewTap extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => InkWell(
-    borderRadius: BorderRadius.circular(AppSizes.radiusMd),
+    borderRadius: BorderRadius.circular(AppSizes.radiusMd.r),
     onTap: () =>
         showMarketSheet(context, MarketOverviewSheet(snapshot: snapshot)),
     child: child,
@@ -599,11 +601,11 @@ class _MetricCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Container(
-    height: AppSizes.marketCardHeight,
-    padding: const EdgeInsets.all(AppSizes.md),
+    height: AppSizes.marketCardHeight.h,
+    padding: const EdgeInsets.all(AppSizes.md.w),
     decoration: BoxDecoration(
       color: Theme.of(context).colorScheme.surface,
-      borderRadius: BorderRadius.circular(AppSizes.radiusMd),
+      borderRadius: BorderRadius.circular(AppSizes.radiusMd.r),
       border: Border.all(color: Theme.of(context).dividerColor),
     ),
     child: Column(
@@ -611,7 +613,7 @@ class _MetricCard extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Text(label, style: Theme.of(context).textTheme.bodySmall),
-        const SizedBox(height: AppSizes.xs),
+        const SizedBox(height: AppSizes.xs.w),
         Row(
           children: [
             Expanded(
@@ -637,18 +639,18 @@ class _MetricSkeleton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Container(
-    height: AppSizes.marketCardHeight,
-    padding: const EdgeInsets.all(AppSizes.md),
+    height: AppSizes.marketCardHeight.h,
+    padding: const EdgeInsets.all(AppSizes.md.w),
     decoration: BoxDecoration(
       color: Theme.of(context).colorScheme.surface,
-      borderRadius: BorderRadius.circular(AppSizes.radiusMd),
+      borderRadius: BorderRadius.circular(AppSizes.radiusMd.r),
     ),
     child: const Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         ShimmerBox(width: 84, height: 12),
-        SizedBox(height: AppSizes.sm),
+        SizedBox(height: AppSizes.sm.w),
         ShimmerBox(width: 120, height: 18),
       ],
     ),

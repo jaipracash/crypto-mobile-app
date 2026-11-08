@@ -3,6 +3,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_sizes.dart';
@@ -122,7 +123,7 @@ class _CoinDetailsScreenState extends ConsumerState<CoinDetailsScreen>
                         size: 28,
                         enableHero: false,
                       ),
-                      const SizedBox(width: AppSizes.sm),
+                      const SizedBox(width: AppSizes.sm.w),
                       Text(
                         liveDetailsCoin.symbol.toUpperCase(),
                         style: Theme.of(context).textTheme.titleSmall?.copyWith(
@@ -139,7 +140,9 @@ class _CoinDetailsScreenState extends ConsumerState<CoinDetailsScreen>
               controller: _tabController,
               isScrollable: true,
               tabAlignment: TabAlignment.start,
-              labelPadding: const EdgeInsets.symmetric(horizontal: AppSizes.lg),
+              labelPadding: const EdgeInsets.symmetric(
+                horizontal: AppSizes.lg.w,
+              ),
               tabs: const [
                 Tab(text: AppStrings.overview),
                 Tab(text: AppStrings.info),
@@ -165,8 +168,8 @@ class _CoinDetailsScreenState extends ConsumerState<CoinDetailsScreen>
                 onPressed: () => context.push(Routes.search),
                 icon: SvgPicture.asset(
                   'assets/search2.svg',
-                  width: AppSizes.iconMedium,
-                  height: AppSizes.iconMedium,
+                  width: AppSizes.iconMedium.w,
+                  height: AppSizes.iconMedium.w,
                   colorFilter: const ColorFilter.mode(
                     AppColors.lightTextSecondary,
                     BlendMode.srcIn,
@@ -308,13 +311,13 @@ class _CoinDetailsScreenState extends ConsumerState<CoinDetailsScreen>
     final color = isPositive ? AppColors.lightGain : AppColors.lightLoss;
     return ListView(
       padding: const EdgeInsets.fromLTRB(
-        AppSizes.screenPadding,
-        AppSizes.sm,
-        AppSizes.screenPadding,
-        AppSizes.xxl,
+        AppSizes.screenPadding.w,
+        AppSizes.sm.w,
+        AppSizes.screenPadding.w,
+        AppSizes.xxl.w,
       ),
       children: [
-        const SizedBox(height: AppSizes.md),
+        const SizedBox(height: AppSizes.md.w),
         Row(
           children: [
             Flexible(
@@ -329,17 +332,17 @@ class _CoinDetailsScreenState extends ConsumerState<CoinDetailsScreen>
               ),
             ),
             if (coin.rank != null) ...[
-              const SizedBox(width: AppSizes.sm),
+              const SizedBox(width: AppSizes.sm.w),
               _RankBadge(rank: coin.rank!),
             ],
           ],
         ),
-        const SizedBox(height: AppSizes.xs),
+        const SizedBox(height: AppSizes.xs.w),
         Wrap(
           alignment: WrapAlignment.start,
           crossAxisAlignment: WrapCrossAlignment.center,
-          spacing: AppSizes.sm,
-          runSpacing: AppSizes.xs,
+          spacing: AppSizes.sm.w,
+          runSpacing: AppSizes.xs.w,
           children: [
             Text(
               _series == PriceChartSeries.price
@@ -365,18 +368,18 @@ class _CoinDetailsScreenState extends ConsumerState<CoinDetailsScreen>
           ],
         ),
         if (displayedDate != null) ...[
-          const SizedBox(height: AppSizes.xs),
+          const SizedBox(height: AppSizes.xs.w),
           Text(
             Formatters.dateTime(displayedDate),
             style: Theme.of(context).textTheme.bodySmall,
           ),
         ],
-        const SizedBox(height: AppSizes.md),
+        const SizedBox(height: AppSizes.md.w),
         _chartToolbar(context, chartData),
         if (chartData != null &&
             chartData.candles.isEmpty &&
             _series == PriceChartSeries.price) ...[
-          const SizedBox(height: AppSizes.xs),
+          const SizedBox(height: AppSizes.xs.w),
           Align(
             alignment: Alignment.centerLeft,
             child: Text(
@@ -385,18 +388,18 @@ class _CoinDetailsScreenState extends ConsumerState<CoinDetailsScreen>
             ),
           ),
         ],
-        const SizedBox(height: AppSizes.md),
+        const SizedBox(height: AppSizes.md.w),
         if (ref.watch(liveCoinPricesProvider).isNotEmpty) ...[
           const SimulatedPriceBanner(horizontalInset: false),
-          const SizedBox(height: AppSizes.sm),
+          const SizedBox(height: AppSizes.sm.w),
         ],
         AsyncValueView(
           value: chartForSelectedRange,
           onRetry: () =>
               ref.invalidate(coinChartProvider((widget.coinId, _days))),
           loading: const ShimmerBox(
-            height: AppSizes.chartHeight,
-            radius: AppSizes.radiusSm,
+            height: AppSizes.chartHeight.h,
+            radius: AppSizes.radiusSm.r,
           ),
           isEmpty: (value) =>
               (_series == PriceChartSeries.price
@@ -417,12 +420,12 @@ class _CoinDetailsScreenState extends ConsumerState<CoinDetailsScreen>
         ),
         Container(
           padding: const EdgeInsets.symmetric(
-            horizontal: AppSizes.md,
-            vertical: AppSizes.sm,
+            horizontal: AppSizes.md.w,
+            vertical: AppSizes.sm.w,
           ),
           decoration: BoxDecoration(
             color: const Color(0xFFF4F6F8),
-            borderRadius: BorderRadius.circular(AppSizes.radiusSm),
+            borderRadius: BorderRadius.circular(AppSizes.radiusSm.r),
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -442,7 +445,7 @@ class _CoinDetailsScreenState extends ConsumerState<CoinDetailsScreen>
             ],
           ),
         ),
-        const SizedBox(height: AppSizes.xl),
+        const SizedBox(height: AppSizes.xl.w),
         Text(
           AppStrings.marketStatistics,
           style: Theme.of(context).textTheme.titleMedium?.copyWith(
@@ -450,7 +453,7 @@ class _CoinDetailsScreenState extends ConsumerState<CoinDetailsScreen>
             fontWeight: FontWeight.w700,
           ),
         ),
-        const SizedBox(height: AppSizes.sm),
+        const SizedBox(height: AppSizes.sm.w),
         StatsGrid(details: data, currency: currency),
       ],
     );
@@ -464,10 +467,10 @@ class _CoinDetailsScreenState extends ConsumerState<CoinDetailsScreen>
   ) {
     return ListView(
       padding: const EdgeInsets.fromLTRB(
-        AppSizes.screenPadding,
-        AppSizes.lg,
-        AppSizes.screenPadding,
-        AppSizes.xxl,
+        AppSizes.screenPadding.w,
+        AppSizes.lg.w,
+        AppSizes.screenPadding.w,
+        AppSizes.xxl.w,
       ),
       children: [
         Text(
@@ -475,17 +478,17 @@ class _CoinDetailsScreenState extends ConsumerState<CoinDetailsScreen>
           style: Theme.of(context).textTheme.titleMedium
               ?.copyWith(fontWeight: FontWeight.w700),
         ),
-        const SizedBox(height: AppSizes.md),
+        const SizedBox(height: AppSizes.md.w),
         StatsGrid(details: data, currency: currency),
-        const SizedBox(height: AppSizes.xl),
+        const SizedBox(height: AppSizes.xl.w),
         HistoricalDataCard(details: data, currency: currency),
-        const SizedBox(height: AppSizes.xl),
+        const SizedBox(height: AppSizes.xl.w),
         Text(
           '${AppStrings.aboutCoin} ${coin.name}',
           style: Theme.of(context).textTheme.titleMedium
               ?.copyWith(fontWeight: FontWeight.w700),
         ),
-        const SizedBox(height: AppSizes.sm),
+        const SizedBox(height: AppSizes.sm.w),
         Text(
           data.description.isEmpty
               ? AppStrings.descriptionUnavailable
@@ -525,7 +528,7 @@ class _CoinDetailsScreenState extends ConsumerState<CoinDetailsScreen>
       padding: const EdgeInsets.all(3),
       decoration: BoxDecoration(
         color: const Color(0xFFF0F3F6),
-        borderRadius: BorderRadius.circular(AppSizes.radiusMd),
+        borderRadius: BorderRadius.circular(AppSizes.radiusMd.r),
       ),
       child: Row(
         children: timeframes.map((entry) {
@@ -535,9 +538,9 @@ class _CoinDetailsScreenState extends ConsumerState<CoinDetailsScreen>
               padding: const EdgeInsets.symmetric(horizontal: 2),
               child: Material(
                 color: selected ? Colors.white : Colors.transparent,
-                borderRadius: BorderRadius.circular(AppSizes.radiusSm),
+                borderRadius: BorderRadius.circular(AppSizes.radiusSm.r),
                 child: InkWell(
-                  borderRadius: BorderRadius.circular(AppSizes.radiusSm),
+                  borderRadius: BorderRadius.circular(AppSizes.radiusSm.r),
                   splashFactory: NoSplash.splashFactory,
                   overlayColor: const WidgetStatePropertyAll(
                     Colors.transparent,
@@ -621,7 +624,7 @@ class _CoinDetailsScreenState extends ConsumerState<CoinDetailsScreen>
   Widget _chartToolbar(BuildContext context, CoinChart? chart) => Row(
     children: [
       Expanded(child: _timeframes(context)),
-      const SizedBox(width: AppSizes.sm),
+      const SizedBox(width: AppSizes.sm.w),
       SizedBox(
         width: 38,
         height: 38,
@@ -649,18 +652,21 @@ class _CoinDetailsScreenState extends ConsumerState<CoinDetailsScreen>
                 ? AppColors.brand.withValues(alpha: 0.12)
                 : const Color(0xFFF0F3F6),
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(AppSizes.radiusSm),
+              borderRadius: BorderRadius.circular(AppSizes.radiusSm.r),
             ),
           ),
           icon: _chartStyle == PriceChartStyle.candles
-              ? const Icon(Icons.show_chart_rounded, size: AppSizes.iconMedium)
+              ? const Icon(
+                  Icons.show_chart_rounded,
+                  size: AppSizes.iconMedium.w,
+                )
               : Icon(
                   Icons.candlestick_chart_rounded,
-                  size: AppSizes.iconMedium,
+                  size: AppSizes.iconMedium.w,
                 ),
         ),
       ),
-      const SizedBox(width: AppSizes.xs),
+      const SizedBox(width: AppSizes.xs.w),
       SizedBox(
         width: 38,
         height: 38,
@@ -673,13 +679,13 @@ class _CoinDetailsScreenState extends ConsumerState<CoinDetailsScreen>
             foregroundColor: AppColors.lightTextPrimary,
             backgroundColor: const Color(0xFFF0F3F6),
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(AppSizes.radiusSm),
+              borderRadius: BorderRadius.circular(AppSizes.radiusSm.r),
             ),
           ),
           icon: SvgPicture.asset(
             'assets/filter-svgrepo-com.svg',
-            width: AppSizes.iconMedium,
-            height: AppSizes.iconMedium,
+            width: AppSizes.iconMedium.w,
+            height: AppSizes.iconMedium.w,
             colorFilter: const ColorFilter.mode(
               AppColors.lightTextPrimary,
               BlendMode.srcIn,
@@ -697,19 +703,19 @@ class _CoinDetailsScreenState extends ConsumerState<CoinDetailsScreen>
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (sheetContext) => Padding(
-        padding: const EdgeInsets.only(top: AppSizes.xxl),
+        padding: const EdgeInsets.only(top: AppSizes.xxl.w),
         child: Material(
           color: Colors.white,
           clipBehavior: Clip.antiAlias,
           borderRadius: const BorderRadius.vertical(
-            top: Radius.circular(AppSizes.radiusLg),
+            top: Radius.circular(AppSizes.radiusLg.r),
           ),
           child: Padding(
             padding: const EdgeInsets.fromLTRB(
-              AppSizes.lg,
-              AppSizes.md,
-              AppSizes.lg,
-              AppSizes.xl,
+              AppSizes.lg.w,
+              AppSizes.md.w,
+              AppSizes.lg.w,
+              AppSizes.xl.w,
             ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -717,21 +723,23 @@ class _CoinDetailsScreenState extends ConsumerState<CoinDetailsScreen>
               children: [
                 Center(
                   child: Container(
-                    width: AppSizes.sheetHandleWidth,
-                    height: AppSizes.sheetHandleHeight,
+                    width: AppSizes.sheetHandleWidth.w,
+                    height: AppSizes.sheetHandleHeight.h,
                     decoration: BoxDecoration(
                       color: AppColors.lightBorder,
-                      borderRadius: BorderRadius.circular(AppSizes.radiusPill),
+                      borderRadius: BorderRadius.circular(
+                        AppSizes.radiusPill.r,
+                      ),
                     ),
                   ),
                 ),
-                const SizedBox(height: AppSizes.lg),
+                const SizedBox(height: AppSizes.lg.w),
                 Text(
                   AppStrings.filter,
                   style: Theme.of(sheetContext).textTheme.titleMedium
                       ?.copyWith(fontWeight: FontWeight.w700),
                 ),
-                const SizedBox(height: AppSizes.md),
+                const SizedBox(height: AppSizes.md.w),
                 Text(
                   AppStrings.chartSeries,
                   style: Theme.of(sheetContext).textTheme.labelLarge?.copyWith(
@@ -739,7 +747,7 @@ class _CoinDetailsScreenState extends ConsumerState<CoinDetailsScreen>
                     fontWeight: FontWeight.w600,
                   ),
                 ),
-                const SizedBox(height: AppSizes.xs),
+                const SizedBox(height: AppSizes.xs.w),
                 SizedBox(
                   width: double.infinity,
                   child: SegmentedButton<PriceChartSeries>(
@@ -776,33 +784,36 @@ class _CoinDetailsScreenState extends ConsumerState<CoinDetailsScreen>
 
   Widget _detailsLoading() => ListView(
     padding: const EdgeInsets.fromLTRB(
-      AppSizes.screenPadding,
-      AppSizes.lg,
-      AppSizes.screenPadding,
-      AppSizes.xxl,
+      AppSizes.screenPadding.w,
+      AppSizes.lg.w,
+      AppSizes.screenPadding.w,
+      AppSizes.xxl.w,
     ),
     children: [
       const ShimmerBox(width: 132, height: 16),
-      const SizedBox(height: AppSizes.md),
+      const SizedBox(height: AppSizes.md.w),
       const ShimmerBox(width: 196, height: 34),
-      const SizedBox(height: AppSizes.lg),
+      const SizedBox(height: AppSizes.lg.w),
       Row(
         children: [
-          const ShimmerBox(width: 64, height: 32, radius: AppSizes.radiusSm),
-          const SizedBox(width: AppSizes.sm),
-          const ShimmerBox(width: 64, height: 32, radius: AppSizes.radiusSm),
-          const SizedBox(width: AppSizes.sm),
-          const ShimmerBox(width: 64, height: 32, radius: AppSizes.radiusSm),
-          const SizedBox(width: AppSizes.sm),
-          const ShimmerBox(width: 64, height: 32, radius: AppSizes.radiusSm),
+          const ShimmerBox(width: 64, height: 32, radius: AppSizes.radiusSm.r),
+          const SizedBox(width: AppSizes.sm.w),
+          const ShimmerBox(width: 64, height: 32, radius: AppSizes.radiusSm.r),
+          const SizedBox(width: AppSizes.sm.w),
+          const ShimmerBox(width: 64, height: 32, radius: AppSizes.radiusSm.r),
+          const SizedBox(width: AppSizes.sm.w),
+          const ShimmerBox(width: 64, height: 32, radius: AppSizes.radiusSm.r),
         ],
       ),
-      const SizedBox(height: AppSizes.md),
-      const ShimmerBox(height: AppSizes.chartHeight, radius: AppSizes.radiusSm),
-      const SizedBox(height: AppSizes.md),
-      const ShimmerBox(height: 52, radius: AppSizes.radiusSm),
-      const SizedBox(height: AppSizes.xl),
-      const ShimmerBox(height: 168, radius: AppSizes.radiusSm),
+      const SizedBox(height: AppSizes.md.w),
+      const ShimmerBox(
+        height: AppSizes.chartHeight.h,
+        radius: AppSizes.radiusSm.r,
+      ),
+      const SizedBox(height: AppSizes.md.w),
+      const ShimmerBox(height: 52, radius: AppSizes.radiusSm.r),
+      const SizedBox(height: AppSizes.xl.w),
+      const ShimmerBox(height: 168, radius: AppSizes.radiusSm.r),
     ],
   );
 }
@@ -838,10 +849,10 @@ class _RankBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Container(
-    padding: const EdgeInsets.symmetric(horizontal: AppSizes.sm, vertical: 2),
+    padding: const EdgeInsets.symmetric(horizontal: AppSizes.sm.w, vertical: 2),
     decoration: BoxDecoration(
       color: const Color(0xFFF0F3F6),
-      borderRadius: BorderRadius.circular(AppSizes.radiusPill),
+      borderRadius: BorderRadius.circular(AppSizes.radiusPill.r),
     ),
     child: Text(
       '#$rank',

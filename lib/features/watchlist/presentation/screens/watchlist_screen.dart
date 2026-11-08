@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../../core/constants/app_sizes.dart';
 import '../../../../core/constants/app_strings.dart';
@@ -68,7 +69,7 @@ class _WatchlistScreenState extends ConsumerState<WatchlistScreen> {
                         AppSizes.emptyStateHeightFraction,
                     child: Padding(
                       padding: const EdgeInsets.symmetric(
-                        vertical: AppSizes.xl,
+                        vertical: AppSizes.xl.w,
                       ),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -78,18 +79,18 @@ class _WatchlistScreenState extends ConsumerState<WatchlistScreen> {
                             width: 176,
                             height: 176,
                           ),
-                          const SizedBox(height: AppSizes.lg),
+                          const SizedBox(height: AppSizes.lg.w),
                           Text(
                             AppStrings.emptyWatchlist,
                             style: Theme.of(context).textTheme.titleMedium,
                           ),
-                          const SizedBox(height: AppSizes.xs),
+                          const SizedBox(height: AppSizes.xs.w),
                           Text(
                             AppStrings.saveCoinsMessage,
                             textAlign: TextAlign.center,
                             style: Theme.of(context).textTheme.bodySmall,
                           ),
-                          const SizedBox(height: AppSizes.lg),
+                          const SizedBox(height: AppSizes.lg.w),
                           _addCoinsButton(context),
                         ],
                       ),
@@ -112,7 +113,7 @@ class _WatchlistScreenState extends ConsumerState<WatchlistScreen> {
                 _watchlistControls(context, visibleItems.length),
                 if (visibleItems.isEmpty)
                   Padding(
-                    padding: const EdgeInsets.all(AppSizes.xl),
+                    padding: const EdgeInsets.all(AppSizes.xl.w),
                     child: Center(
                       child: Text(
                         _filter == _WatchlistFilter.gainers
@@ -128,7 +129,7 @@ class _WatchlistScreenState extends ConsumerState<WatchlistScreen> {
                     direction: DismissDirection.endToStart,
                     background: Container(
                       alignment: Alignment.centerRight,
-                      padding: const EdgeInsets.only(right: AppSizes.xl),
+                      padding: const EdgeInsets.only(right: AppSizes.xl.w),
                       color: Theme.of(context).colorScheme.error,
                       child: Icon(
                         Icons.delete_outline,
@@ -146,8 +147,8 @@ class _WatchlistScreenState extends ConsumerState<WatchlistScreen> {
                 ),
                 Padding(
                   padding: const EdgeInsets.only(
-                    top: AppSizes.md,
-                    bottom: AppSizes.xl,
+                    top: AppSizes.md.w,
+                    bottom: AppSizes.xl.w,
                   ),
                   child: _addCoinsButton(context, withIcon: true),
                 ),
@@ -173,7 +174,7 @@ class _WatchlistScreenState extends ConsumerState<WatchlistScreen> {
       ),
     );
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: AppSizes.screenPadding),
+      padding: const EdgeInsets.symmetric(horizontal: AppSizes.screenPadding.w),
       child: SizedBox(
         width: double.infinity,
         child: withIcon
@@ -224,10 +225,10 @@ class _WatchlistScreenState extends ConsumerState<WatchlistScreen> {
 
   Widget _watchlistControls(BuildContext context, int count) => Padding(
     padding: const EdgeInsets.fromLTRB(
-      AppSizes.screenPadding,
-      AppSizes.sm,
-      AppSizes.screenPadding,
-      AppSizes.sm,
+      AppSizes.screenPadding.w,
+      AppSizes.sm.w,
+      AppSizes.screenPadding.w,
+      AppSizes.sm.w,
     ),
     child: Row(
       children: [
@@ -243,8 +244,8 @@ class _WatchlistScreenState extends ConsumerState<WatchlistScreen> {
           onPressed: () => _showSortOptions(context),
           icon: SvgPicture.asset(
             'assets/sort-vertical-svgrepo-com.svg',
-            width: AppSizes.iconLarge,
-            height: AppSizes.iconLarge,
+            width: AppSizes.iconLarge.w,
+            height: AppSizes.iconLarge.w,
             colorFilter: ColorFilter.mode(
               Theme.of(context).colorScheme.onSurfaceVariant,
               BlendMode.srcIn,
@@ -256,8 +257,8 @@ class _WatchlistScreenState extends ConsumerState<WatchlistScreen> {
           onPressed: () => _showFilterOptions(context),
           icon: SvgPicture.asset(
             'assets/filter-svgrepo-com.svg',
-            width: AppSizes.iconLarge,
-            height: AppSizes.iconLarge,
+            width: AppSizes.iconLarge.w,
+            height: AppSizes.iconLarge.w,
             colorFilter: ColorFilter.mode(
               Theme.of(context).colorScheme.onSurfaceVariant,
               BlendMode.srcIn,
@@ -277,7 +278,7 @@ class _WatchlistScreenState extends ConsumerState<WatchlistScreen> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Padding(
-              padding: const EdgeInsets.all(AppSizes.md),
+              padding: const EdgeInsets.all(AppSizes.md.w),
               child: Text(
                 AppStrings.sortWatchlist,
                 style: Theme.of(context).textTheme.titleMedium,
@@ -321,7 +322,7 @@ class _WatchlistScreenState extends ConsumerState<WatchlistScreen> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Padding(
-              padding: const EdgeInsets.all(AppSizes.md),
+              padding: const EdgeInsets.all(AppSizes.md.w),
               child: Text(
                 AppStrings.filterWatchlist,
                 style: Theme.of(context).textTheme.titleMedium,

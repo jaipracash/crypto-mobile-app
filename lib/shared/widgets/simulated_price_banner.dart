@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_sizes.dart';
@@ -14,27 +15,27 @@ class SimulatedPriceBanner extends StatelessWidget {
     final dark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       margin: EdgeInsets.fromLTRB(
-        horizontalInset ? AppSizes.screenPadding : 0,
-        AppSizes.sm,
-        horizontalInset ? AppSizes.screenPadding : 0,
-        AppSizes.xs,
+        horizontalInset ? AppSizes.screenPadding.w : 0,
+        AppSizes.sm.w,
+        horizontalInset ? AppSizes.screenPadding.w : 0,
+        AppSizes.xs.w,
       ),
       padding: EdgeInsets.symmetric(
-        horizontal: AppSizes.sm,
-        vertical: AppSizes.xs,
+        horizontal: AppSizes.sm.w,
+        vertical: AppSizes.xs.w,
       ),
       decoration: BoxDecoration(
         color: AppColors.warning.withValues(alpha: dark ? 0.2 : 0.12),
-        borderRadius: BorderRadius.circular(AppSizes.radiusSm),
+        borderRadius: BorderRadius.circular(AppSizes.radiusSm.r),
       ),
       child: Row(
         children: [
           Icon(
             Icons.info_outline_rounded,
-            size: AppSizes.iconSmall,
+            size: AppSizes.iconSmall.w,
             color: dark ? const Color(0xFFFFC857) : AppColors.warning,
           ),
-          const SizedBox(width: AppSizes.xs),
+          const SizedBox(width: AppSizes.xs.w),
           Expanded(
             child: Text(
               AppStrings.simulatedPriceStream,

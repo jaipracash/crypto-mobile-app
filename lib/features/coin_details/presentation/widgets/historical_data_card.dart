@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_sizes.dart';
@@ -19,11 +20,11 @@ class HistoricalDataCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Container(
-    padding: const EdgeInsets.all(AppSizes.lg),
+    padding: const EdgeInsets.all(AppSizes.lg.w),
     decoration: BoxDecoration(
       color: Colors.white,
       border: Border.all(color: Theme.of(context).dividerColor),
-      borderRadius: BorderRadius.circular(AppSizes.radiusMd),
+      borderRadius: BorderRadius.circular(AppSizes.radiusMd.r),
     ),
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -35,7 +36,7 @@ class HistoricalDataCard extends StatelessWidget {
             fontWeight: FontWeight.w700,
           ),
         ),
-        const SizedBox(height: AppSizes.lg),
+        const SizedBox(height: AppSizes.lg.w),
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -45,7 +46,7 @@ class HistoricalDataCard extends StatelessWidget {
                 value: Formatters.currency(details.high24h, currency),
               ),
             ),
-            const SizedBox(width: AppSizes.md),
+            const SizedBox(width: AppSizes.md.w),
             Expanded(
               child: _HistoricalValue(
                 label: AppStrings.low24h,
@@ -54,7 +55,7 @@ class HistoricalDataCard extends StatelessWidget {
             ),
           ],
         ),
-        const SizedBox(height: AppSizes.xl),
+        const SizedBox(height: AppSizes.xl.w),
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -66,7 +67,7 @@ class HistoricalDataCard extends StatelessWidget {
                 date: details.athDate,
               ),
             ),
-            const SizedBox(width: AppSizes.md),
+            const SizedBox(width: AppSizes.md.w),
             Expanded(
               child: _HistoricalValue(
                 label: AppStrings.allTimeLow,
@@ -105,14 +106,13 @@ class _HistoricalValue extends StatelessWidget {
       children: [
         Text(
           label,
-          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-            color: AppColors.lightTextSecondary,
-          ),
+          style: Theme.of(context).textTheme.bodyMedium
+              ?.copyWith(color: AppColors.lightTextSecondary),
         ),
-        const SizedBox(height: AppSizes.xs),
+        const SizedBox(height: AppSizes.xs.w),
         Wrap(
           crossAxisAlignment: WrapCrossAlignment.center,
-          spacing: AppSizes.xs,
+          spacing: AppSizes.xs.w,
           runSpacing: 0,
           children: [
             Text(
@@ -127,15 +127,13 @@ class _HistoricalValue extends StatelessWidget {
                 change! >= 0
                     ? Icons.arrow_upward_rounded
                     : Icons.arrow_downward_rounded,
-                size: AppSizes.iconSmall,
+                size: AppSizes.iconSmall.w,
                 color: changeColor,
               ),
               Text(
                 Formatters.percent(change),
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: changeColor,
-                  fontWeight: FontWeight.w600,
-                ),
+                style: Theme.of(context).textTheme.bodySmall
+                    ?.copyWith(color: changeColor, fontWeight: FontWeight.w600),
               ),
             ],
           ],
@@ -144,9 +142,8 @@ class _HistoricalValue extends StatelessWidget {
           const SizedBox(height: 2),
           Text(
             _formatDate(date!),
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              color: AppColors.lightTextSecondary,
-            ),
+            style: Theme.of(context).textTheme.bodySmall
+                ?.copyWith(color: AppColors.lightTextSecondary),
           ),
         ],
       ],

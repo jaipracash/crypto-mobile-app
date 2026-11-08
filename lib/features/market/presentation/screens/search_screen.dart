@@ -2,13 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../../core/constants/app_sizes.dart';
 import '../../../../core/constants/app_strings.dart';
 import '../../../../core/utils/formatters.dart';
 import '../../../../shared/widgets/change_pill.dart';
 import '../../../../shared/widgets/coin_avatar.dart';
-import '../../../../shared/widgets/cupertino_loader.dart';
+import '../../../../shared/widgets/app_loader.dart';
 import '../../../../shared/widgets/error_view.dart';
 import '../../../../shared/widgets/simulated_price_banner.dart';
 import '../../../settings/presentation/controllers/settings_controller.dart';
@@ -89,9 +90,9 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
             slivers: [
               SliverPadding(
                 padding: const EdgeInsets.fromLTRB(
-                  AppSizes.screenPadding,
-                  AppSizes.md,
-                  AppSizes.screenPadding,
+                  AppSizes.screenPadding.w,
+                  AppSizes.md.w,
+                  AppSizes.screenPadding.w,
                   0,
                 ),
                 sliver: SliverList(
@@ -105,17 +106,17 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                             ),
                           )
                         : searchField,
-                    const SizedBox(height: AppSizes.lg),
+                    const SizedBox(height: AppSizes.lg.w),
                     if (query.trim().isEmpty) ...[
                       Text(
                         'Popular Coins',
                         style: Theme.of(context).textTheme.titleMedium
                             ?.copyWith(fontWeight: FontWeight.w700),
                       ),
-                      const SizedBox(height: AppSizes.sm),
+                      const SizedBox(height: AppSizes.sm.w),
                       _tabStrip(),
                     ],
-                    const SizedBox(height: AppSizes.sm),
+                    const SizedBox(height: AppSizes.sm.w),
                     if (livePrices.isNotEmpty)
                       const SimulatedPriceBanner(horizontalInset: false),
                   ]),
@@ -144,7 +145,10 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
       ),
       prefixIconConstraints: const BoxConstraints(minWidth: 36, minHeight: 48),
       prefixIcon: Padding(
-        padding: const EdgeInsets.only(left: AppSizes.md, right: AppSizes.xs),
+        padding: const EdgeInsets.only(
+          left: AppSizes.md.w,
+          right: AppSizes.xs.w,
+        ),
         child: SvgPicture.asset(
           'assets/search2.svg',
           width: 14,
@@ -168,15 +172,15 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
       filled: true,
       fillColor: Theme.of(context).colorScheme.surfaceContainerHighest,
       border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(AppSizes.radiusMd),
+        borderRadius: BorderRadius.circular(AppSizes.radiusMd.r),
         borderSide: BorderSide.none,
       ),
       enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(AppSizes.radiusMd),
+        borderRadius: BorderRadius.circular(AppSizes.radiusMd.r),
         borderSide: BorderSide.none,
       ),
       focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(AppSizes.radiusMd),
+        borderRadius: BorderRadius.circular(AppSizes.radiusMd.r),
         borderSide: BorderSide.none,
       ),
       isDense: true,
@@ -184,11 +188,11 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
   );
 
   Widget _tabStrip() => SizedBox(
-    height: AppSizes.chipHeight + AppSizes.xs,
+    height: AppSizes.chipHeight.h + AppSizes.xs.w,
     child: ListView.separated(
       scrollDirection: Axis.horizontal,
       itemCount: _tabs.length,
-      separatorBuilder: (_, _) => const SizedBox(width: AppSizes.sm),
+      separatorBuilder: (_, _) => const SizedBox(width: AppSizes.sm.w),
       itemBuilder: (context, index) {
         final tab = _tabs[index];
         final selected = tab == _selectedTab;
@@ -196,17 +200,17 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
         return Material(
           color: Colors.transparent,
           child: InkWell(
-            borderRadius: BorderRadius.circular(AppSizes.radiusSm),
+            borderRadius: BorderRadius.circular(AppSizes.radiusSm.r),
             onTap: () => setState(() => _selectedTab = tab),
             child: Container(
-              height: AppSizes.chipHeight,
-              padding: const EdgeInsets.symmetric(horizontal: AppSizes.md),
+              height: AppSizes.chipHeight.h,
+              padding: const EdgeInsets.symmetric(horizontal: AppSizes.md.w),
               alignment: Alignment.center,
               decoration: BoxDecoration(
                 color: selected
                     ? scheme.primary
                     : scheme.surfaceContainerHighest.withValues(alpha: 0.62),
-                borderRadius: BorderRadius.circular(AppSizes.radiusSm),
+                borderRadius: BorderRadius.circular(AppSizes.radiusSm.r),
               ),
               child: Text(
                 _tabLabel(tab),
@@ -231,7 +235,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
   ) => state.when(
     loading: () => const SliverFillRemaining(
       hasScrollBody: false,
-      child: Center(child: CupertinoLoader()),
+      child: Center(child: AppLoader()),
     ),
     error: (error, _) => SliverFillRemaining(
       hasScrollBody: false,
@@ -249,10 +253,10 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
           )
         : SliverPadding(
             padding: const EdgeInsets.fromLTRB(
-              AppSizes.screenPadding,
+              AppSizes.screenPadding.w,
               0,
-              AppSizes.screenPadding,
-              AppSizes.lg,
+              AppSizes.screenPadding.w,
+              AppSizes.lg.w,
             ),
             sliver: SliverToBoxAdapter(
               child: _MarketCoinTable(coins: coins, currency: currency),
@@ -275,7 +279,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     return results.when(
       loading: () => const SliverFillRemaining(
         hasScrollBody: false,
-        child: Center(child: CupertinoLoader()),
+        child: Center(child: AppLoader()),
       ),
       error: (error, _) => SliverFillRemaining(
         hasScrollBody: false,
@@ -291,14 +295,15 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
             )
           : SliverPadding(
               padding: const EdgeInsets.fromLTRB(
-                AppSizes.screenPadding,
+                AppSizes.screenPadding.w,
                 0,
-                AppSizes.screenPadding,
-                AppSizes.lg,
+                AppSizes.screenPadding.w,
+                AppSizes.lg.w,
               ),
               sliver: SliverList.separated(
                 itemCount: items.length,
-                separatorBuilder: (_, _) => const SizedBox(height: AppSizes.sm),
+                separatorBuilder: (_, _) =>
+                    const SizedBox(height: AppSizes.sm.w),
                 itemBuilder: (context, index) {
                   final coin = items[index];
                   return _SearchResultCard(
@@ -348,11 +353,15 @@ class _MarketSearchRow extends StatelessWidget {
     child: SizedBox(
       height: 76,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: AppSizes.md),
+        padding: const EdgeInsets.symmetric(horizontal: AppSizes.md.w),
         child: Row(
           children: [
-            CoinAvatar(symbol: coin.symbol, imageUrl: coin.image),
-            const SizedBox(width: AppSizes.sm),
+            CoinAvatar(
+              symbol: coin.symbol,
+              imageUrl: coin.image,
+              enableHero: false,
+            ),
+            const SizedBox(width: AppSizes.sm.w),
             Expanded(
               flex: 4,
               child: Column(
@@ -395,7 +404,7 @@ class _MarketSearchRow extends StatelessWidget {
                       fontFeatures: const [FontFeature.tabularFigures()],
                     ),
                   ),
-                  const SizedBox(height: AppSizes.xs),
+                  const SizedBox(height: AppSizes.xs.w),
                   ChangePill(
                     change: coin.change24hPct,
                     compact: true,
@@ -428,11 +437,15 @@ class _SearchResultCard extends StatelessWidget {
     child: SizedBox(
       height: 76,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: AppSizes.md),
+        padding: const EdgeInsets.symmetric(horizontal: AppSizes.md.w),
         child: Row(
           children: [
-            CoinAvatar(symbol: coin.symbol, imageUrl: coin.image),
-            const SizedBox(width: AppSizes.sm),
+            CoinAvatar(
+              symbol: coin.symbol,
+              imageUrl: coin.image,
+              enableHero: false,
+            ),
+            const SizedBox(width: AppSizes.sm.w),
             Expanded(
               flex: 5,
               child: Column(
@@ -475,7 +488,7 @@ class _SearchResultCard extends StatelessWidget {
                       fontFeatures: const [FontFeature.tabularFigures()],
                     ),
                   ),
-                  const SizedBox(height: AppSizes.xs),
+                  const SizedBox(height: AppSizes.xs.w),
                   ChangePill(
                     change: marketData?.change24hPct,
                     compact: true,

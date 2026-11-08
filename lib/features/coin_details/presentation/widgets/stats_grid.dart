@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../../core/constants/app_sizes.dart';
 import '../../../../core/constants/app_strings.dart';
@@ -50,17 +51,17 @@ class StatsGrid extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         border: Border.all(color: Theme.of(context).dividerColor),
-        borderRadius: BorderRadius.circular(AppSizes.radiusMd),
+        borderRadius: BorderRadius.circular(AppSizes.radiusMd.r),
       ),
-      padding: const EdgeInsets.all(AppSizes.lg),
+      padding: const EdgeInsets.all(AppSizes.lg.w),
       child: GridView.builder(
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
         itemCount: items.length,
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 2,
-          mainAxisSpacing: AppSizes.sm,
-          crossAxisSpacing: AppSizes.md,
+          mainAxisSpacing: AppSizes.sm.w,
+          crossAxisSpacing: AppSizes.md.w,
           childAspectRatio: 2.7,
         ),
         itemBuilder: (context, index) => Column(
@@ -73,7 +74,7 @@ class StatsGrid extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
               style: Theme.of(context).textTheme.bodySmall,
             ),
-            const SizedBox(height: AppSizes.xs),
+            const SizedBox(height: AppSizes.xs.w),
             Text(
               items[index].$2,
               maxLines: 1,

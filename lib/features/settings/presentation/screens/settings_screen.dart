@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-import '../../../../core/constants/app_sizes.dart';
 import '../../../../core/constants/app_strings.dart';
+import '../../../../core/theme/app_theme.dart';
 import '../../domain/app_settings.dart';
 import '../controllers/settings_controller.dart';
 
@@ -15,59 +16,67 @@ class SettingsScreen extends ConsumerWidget {
         ref.watch(settingsControllerProvider).asData?.value.themeMode ??
         AppThemeMode.light;
     final controller = ref.read(settingsControllerProvider.notifier);
-    final baseTheme = Theme.of(context);
+    final baseTheme = AppTheme.light();
     final colors = baseTheme.colorScheme;
 
-    return Scaffold(
-      backgroundColor: baseTheme.scaffoldBackgroundColor,
-      appBar: AppBar(title: const Text(AppStrings.settings)),
-      body: Padding(
-        padding: const EdgeInsets.all(AppSizes.screenPadding),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              AppStrings.preferences,
-              style: baseTheme.textTheme.titleSmall?.copyWith(
-                color: colors.onSurfaceVariant,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-            const SizedBox(height: AppSizes.lg),
-            Row(
-              children: [
-                Text(
-                  AppStrings.theme,
-                  style: baseTheme.textTheme.titleMedium?.copyWith(
-                    color: colors.onSurface,
-                    fontWeight: FontWeight.w600,
-                  ),
+    return Theme(
+      data: baseTheme,
+      child: Scaffold(
+        backgroundColor: Colors.white,
+        appBar: AppBar(
+          title: const Text(AppStrings.settings),
+          backgroundColor: Colors.white,
+          foregroundColor: colors.onSurface,
+          surfaceTintColor: Colors.transparent,
+        ),
+        body: Padding(
+          padding: EdgeInsets.all(16.w),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                AppStrings.preferences,
+                style: baseTheme.textTheme.titleSmall?.copyWith(
+                  color: colors.onSurfaceVariant,
+                  fontWeight: FontWeight.w500,
                 ),
-                const SizedBox(width: AppSizes.md),
-                Expanded(
-                  child: Align(
-                    alignment: Alignment.centerRight,
-                    child: ConstrainedBox(
-                      constraints: const BoxConstraints(maxWidth: 248),
-                      child: _ThemeSelector(
-                        selected: theme,
-                        background: colors.surfaceContainerHighest,
-                        selectedBackground: colors.surface,
-                        selectedForeground: colors.onSurface,
-                        unselectedForeground: colors.onSurfaceVariant,
-                        onSelected: controller.setTheme,
-                        labels: const {
-                          AppThemeMode.light: AppStrings.light,
-                          AppThemeMode.dark: AppStrings.dark,
-                          AppThemeMode.system: AppStrings.system,
-                        },
+              ),
+              SizedBox(height: 16.h),
+              Row(
+                children: [
+                  Text(
+                    AppStrings.theme,
+                    style: baseTheme.textTheme.titleMedium?.copyWith(
+                      color: colors.onSurface,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  SizedBox(width: 12.w),
+                  Expanded(
+                    child: Align(
+                      alignment: Alignment.centerRight,
+                      child: ConstrainedBox(
+                        constraints: BoxConstraints(maxWidth: 248.w),
+                        child: _ThemeSelector(
+                          selected: theme,
+                          background: colors.surfaceContainerHighest,
+                          selectedBackground: colors.surface,
+                          selectedForeground: colors.onSurface,
+                          unselectedForeground: colors.onSurfaceVariant,
+                          onSelected: controller.setTheme,
+                          labels: const {
+                            AppThemeMode.light: AppStrings.light,
+                            AppThemeMode.dark: AppStrings.dark,
+                            AppThemeMode.system: AppStrings.system,
+                          },
+                        ),
                       ),
                     ),
                   ),
-                ),
-              ],
-            ),
-          ],
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -100,11 +109,11 @@ class _ThemeSelector extends StatelessWidget {
     builder: (context, constraints) {
       final selectedIndex = _options.indexOf(selected);
       return Container(
-        height: 40,
-        padding: const EdgeInsets.all(3),
+        height: 40.h,
+        padding: EdgeInsets.all(3.w),
         decoration: BoxDecoration(
           color: background,
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(20.r),
         ),
         child: Stack(
           children: [
@@ -118,7 +127,7 @@ class _ThemeSelector extends StatelessWidget {
                 child: DecoratedBox(
                   decoration: BoxDecoration(
                     color: selectedBackground,
-                    borderRadius: BorderRadius.circular(14),
+                    borderRadius: BorderRadius.circular(14.r),
                     boxShadow: const [
                       BoxShadow(
                         color: Color(0x120E1B2A),
@@ -140,7 +149,7 @@ class _ThemeSelector extends StatelessWidget {
                       label: labels[option],
                       child: InkWell(
                         key: ValueKey('theme-option-${option.name}'),
-                        borderRadius: BorderRadius.circular(14),
+                        borderRadius: BorderRadius.circular(14.r),
                         onTap: () => onSelected(option),
                         child: Center(
                           child: AnimatedDefaultTextStyle(

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_sizes.dart';
@@ -29,12 +30,12 @@ class ChangePill extends StatelessWidget {
     if (!showBackground) return text;
     return Container(
       padding: EdgeInsets.symmetric(
-        horizontal: compact ? AppSizes.sm : AppSizes.md,
-        vertical: AppSizes.xs,
+        horizontal: compact ? AppSizes.sm.w : AppSizes.md.w,
+        vertical: AppSizes.xs.w,
       ),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(AppSizes.radiusPill),
+        borderRadius: BorderRadius.circular(AppSizes.radiusPill.r),
       ),
       child: text,
     );

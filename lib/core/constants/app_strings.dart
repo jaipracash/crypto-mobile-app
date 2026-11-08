@@ -1,5 +1,5 @@
 abstract final class AppStrings {
-  static const appName = 'GeckoLite';
+  static const appName = 'Crypto App';
   static const market = 'Market';
   static const home = 'Home';
   static const search = 'Search';

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_sizes.dart';
@@ -8,7 +9,7 @@ class ShimmerBox extends StatelessWidget {
   const ShimmerBox({
     this.width,
     this.height,
-    this.radius = AppSizes.radiusMd,
+    this.radius = AppSizes.radiusMd.r,
     super.key,
   });
   final double? width;

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../constants/app_colors.dart';
 import '../constants/app_sizes.dart';
@@ -24,9 +25,9 @@ abstract final class AppTheme {
     final scheme = ColorScheme(
       brightness: brightness,
       primary: AppColors.brand,
-      onPrimary: const Color(0xFF102000),
-      secondary: AppColors.brand,
-      onSecondary: const Color(0xFF102000),
+      onPrimary: Colors.white,
+      secondary: AppColors.brandAccent,
+      onSecondary: const Color(0xFF0F172A),
       error: dark ? AppColors.darkLoss : AppColors.lightLoss,
       onError: Colors.white,
       surface: surface,
@@ -54,7 +55,7 @@ abstract final class AppTheme {
         color: surface,
         elevation: 0,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppSizes.radiusMd),
+          borderRadius: BorderRadius.circular(AppSizes.radiusMd.r),
           side: BorderSide(color: border),
         ),
       ),
@@ -64,12 +65,12 @@ abstract final class AppTheme {
             ? AppColors.darkSurfaceVariant
             : AppColors.lightSurfaceVariant,
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(AppSizes.radiusMd),
+          borderRadius: BorderRadius.circular(AppSizes.radiusMd.r),
           borderSide: BorderSide.none,
         ),
         contentPadding: const EdgeInsets.symmetric(
-          horizontal: AppSizes.lg,
-          vertical: AppSizes.md,
+          horizontal: AppSizes.lg.w,
+          vertical: AppSizes.md.w,
         ),
       ),
       navigationBarTheme: NavigationBarThemeData(

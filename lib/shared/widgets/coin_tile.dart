@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../core/constants/app_sizes.dart';
 import '../../core/utils/formatters.dart';
@@ -23,24 +24,24 @@ class CoinTile extends StatelessWidget {
     final theme = Theme.of(context);
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(AppSizes.radiusMd),
+      borderRadius: BorderRadius.circular(AppSizes.radiusMd.r),
       child: SizedBox(
-        height: AppSizes.coinTileHeight,
+        height: AppSizes.coinTileHeight.h,
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: AppSizes.sm),
+          padding: const EdgeInsets.symmetric(horizontal: AppSizes.sm.w),
           child: Row(
             children: [
               SizedBox(
-                width: AppSizes.rankColumn,
+                width: AppSizes.rankColumn.w,
                 child: Text(
                   coin.rank?.toString() ?? '—',
                   textAlign: TextAlign.center,
                   style: theme.textTheme.bodySmall,
                 ),
               ),
-              const SizedBox(width: AppSizes.sm),
+              const SizedBox(width: AppSizes.sm.w),
               CoinAvatar(symbol: coin.symbol, imageUrl: coin.image),
-              const SizedBox(width: AppSizes.md),
+              const SizedBox(width: AppSizes.md.w),
               Expanded(
                 flex: 5,
                 child: Column(
@@ -76,12 +77,12 @@ class CoinTile extends StatelessWidget {
                         fontWeight: FontWeight.w600,
                       ),
                     ),
-                    const SizedBox(height: AppSizes.xs),
+                    const SizedBox(height: AppSizes.xs.w),
                     ChangePill(change: coin.change24hPct, compact: true),
                   ],
                 ),
               ),
-              const SizedBox(width: AppSizes.sm),
+              const SizedBox(width: AppSizes.sm.w),
               Sparkline(
                 values: coin.sparkline7d,
                 positive: (coin.change24hPct ?? 0) >= 0,

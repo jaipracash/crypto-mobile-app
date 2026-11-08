@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 
 abstract final class AppColors {
-  static const brand = Color(0xFF8DC647);
-  static const lightBackground = Color(0xFFF7F8FA);
-  static const darkBackground = Color(0xFF0D1117);
+  static const brand = Color(0xFF2563EB);
+  static const brandAccent = Color(0xFF38BDF8);
+  static const lightBackground = Color(0xFFF8FAFC);
+  static const darkBackground = Color(0xFF0F172A);
   static const lightSurface = Color(0xFFFFFFFF);
   static const darkSurface = Color(0xFF161B22);
   static const lightSurfaceVariant = Color(0xFFEEF1F4);

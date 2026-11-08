@@ -66,8 +66,26 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: Routes.coin,
         parentNavigatorKey: rootNavigatorKey,
-        builder: (context, state) =>
-            CoinDetailsScreen(coinId: state.pathParameters['id']!),
+        pageBuilder: (context, state) => CustomTransitionPage<void>(
+          key: state.pageKey,
+          child: CoinDetailsScreen(coinId: state.pathParameters['id']!),
+          transitionDuration: const Duration(milliseconds: 320),
+          reverseTransitionDuration: const Duration(milliseconds: 280),
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            final curvedAnimation = CurvedAnimation(
+              parent: animation,
+              curve: Curves.easeOutCubic,
+              reverseCurve: Curves.easeInCubic,
+            );
+            return SlideTransition(
+              position: Tween<Offset>(
+                begin: const Offset(1, 0),
+                end: Offset.zero,
+              ).animate(curvedAnimation),
+              child: child,
+            );
+          },
+        ),
       ),
     ],
   );

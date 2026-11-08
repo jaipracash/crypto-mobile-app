@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/constants/app_strings.dart';
-import 'cupertino_loader.dart';
+import 'app_loader.dart';
 import 'empty_view.dart';
 import 'error_view.dart';
 
@@ -28,11 +28,11 @@ class AsyncValueView<T> extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (value.isLoading && value.hasError) {
-      return loading ?? const Center(child: CupertinoLoader());
+      return loading ?? const Center(child: AppLoader());
     }
 
     return value.when(
-      loading: () => loading ?? const Center(child: CupertinoLoader()),
+      loading: () => loading ?? const Center(child: AppLoader()),
       error: (error, _) => ErrorView(error: error, onRetry: onRetry),
       data: (data) => isEmpty?.call(data) == true
           ? EmptyView(title: emptyTitle, message: emptyMessage)

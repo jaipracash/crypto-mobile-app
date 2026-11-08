@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_sizes.dart';
@@ -19,23 +20,23 @@ class DataSourceBanner extends StatelessWidget {
     if (source == 'live' || source == 'mock') return const SizedBox.shrink();
     return Container(
       margin: EdgeInsets.fromLTRB(
-        horizontalInset ? AppSizes.screenPadding : 0,
-        AppSizes.sm,
-        horizontalInset ? AppSizes.screenPadding : 0,
+        horizontalInset ? AppSizes.screenPadding.w : 0,
+        AppSizes.sm.w,
+        horizontalInset ? AppSizes.screenPadding.w : 0,
         0,
       ),
       padding: EdgeInsets.symmetric(
-        horizontal: AppSizes.md,
-        vertical: AppSizes.sm,
+        horizontal: AppSizes.md.w,
+        vertical: AppSizes.sm.w,
       ),
       decoration: BoxDecoration(
         color: AppColors.warning.withValues(alpha: 0.14),
-        borderRadius: BorderRadius.circular(AppSizes.radiusSm),
+        borderRadius: BorderRadius.circular(AppSizes.radiusSm.r),
       ),
       child: Row(
         children: [
           const Icon(Icons.info_outline, size: 16, color: AppColors.warning),
-          const SizedBox(width: AppSizes.sm),
+          const SizedBox(width: AppSizes.sm.w),
           Expanded(
             child: Text(
               AppStrings.cachedData,

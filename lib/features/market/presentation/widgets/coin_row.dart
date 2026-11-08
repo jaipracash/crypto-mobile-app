@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_sizes.dart';
@@ -67,15 +68,15 @@ class _CoinRowState extends State<CoinRow> {
     return InkWell(
       onTap: widget.onTap,
       child: SizedBox(
-        height: AppSizes.coinRowHeight,
+        height: AppSizes.coinRowHeight.h,
         child: Padding(
           padding: const EdgeInsets.symmetric(
-            horizontal: AppSizes.screenPadding,
+            horizontal: AppSizes.screenPadding.w,
           ),
           child: Row(
             children: [
               SizedBox(
-                width: AppSizes.rankColumn,
+                width: AppSizes.rankColumn.w,
                 child: Text(
                   widget.coin.rank?.toString() ?? AppStrings.notAvailable,
                   textAlign: TextAlign.center,
@@ -85,12 +86,13 @@ class _CoinRowState extends State<CoinRow> {
                   ),
                 ),
               ),
-              const SizedBox(width: AppSizes.sm),
+              const SizedBox(width: AppSizes.sm.w),
               CoinAvatar(
                 symbol: widget.coin.symbol,
                 imageUrl: widget.coin.image,
+                enableHero: false,
               ),
-              const SizedBox(width: AppSizes.md),
+              const SizedBox(width: AppSizes.md.w),
               Expanded(
                 flex: 4,
                 child: Row(
@@ -109,7 +111,7 @@ class _CoinRowState extends State<CoinRow> {
                               height: 1.0,
                             ),
                           ),
-                          const SizedBox(height: AppSizes.xs),
+                          const SizedBox(height: AppSizes.xs.w),
                           Text(
                             '${widget.coin.symbol.toUpperCase()} · ${Formatters.compact(widget.coin.marketCap, currencyCode: widget.currency)}',
                             maxLines: 1,
@@ -124,7 +126,7 @@ class _CoinRowState extends State<CoinRow> {
                   ],
                 ),
               ),
-              const SizedBox(width: AppSizes.xs),
+              const SizedBox(width: AppSizes.xs.w),
               Expanded(
                 flex: 4,
                 child: Column(
@@ -132,7 +134,7 @@ class _CoinRowState extends State<CoinRow> {
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     Padding(
-                      padding: const EdgeInsets.only(right: AppSizes.sm),
+                      padding: const EdgeInsets.only(right: AppSizes.sm.w),
                       child: AnimatedDefaultTextStyle(
                         duration: const Duration(milliseconds: 180),
                         style: theme.textTheme.bodyMedium!.copyWith(
@@ -154,7 +156,7 @@ class _CoinRowState extends State<CoinRow> {
                   ],
                 ),
               ),
-              const SizedBox(width: AppSizes.sm),
+              const SizedBox(width: AppSizes.sm.w),
               Expanded(
                 flex: 3,
                 child: Column(
@@ -168,7 +170,7 @@ class _CoinRowState extends State<CoinRow> {
                       height: 24,
                       filled: true,
                     ),
-                    const SizedBox(height: AppSizes.xs),
+                    const SizedBox(height: AppSizes.xs.w),
                     ChangePill(
                       change: widget.period.value(widget.coin),
                       compact: true,
@@ -197,31 +199,31 @@ class CoinTableHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => SizedBox(
-    height: AppSizes.homeColumnHeaderHeight,
+    height: AppSizes.homeColumnHeaderHeight.h,
     child: Padding(
-      padding: const EdgeInsets.symmetric(horizontal: AppSizes.screenPadding),
+      padding: const EdgeInsets.symmetric(horizontal: AppSizes.screenPadding.w),
       child: Row(
         children: [
           SizedBox(
-            width: AppSizes.rankColumn,
+            width: AppSizes.rankColumn.w,
             child: Text(
               '#',
               textAlign: TextAlign.center,
               style: _style(context),
             ),
           ),
-          const SizedBox(width: AppSizes.sm),
-          const SizedBox(width: AppSizes.coinLogo),
-          const SizedBox(width: AppSizes.md),
+          const SizedBox(width: AppSizes.sm.w),
+          const SizedBox(width: AppSizes.coinLogo.w),
+          const SizedBox(width: AppSizes.md.w),
           Expanded(
             flex: 4,
             child: Text(AppStrings.coin, style: _style(context)),
           ),
-          const SizedBox(width: AppSizes.xs),
+          const SizedBox(width: AppSizes.xs.w),
           Expanded(
             flex: 4,
             child: Padding(
-              padding: const EdgeInsets.only(right: AppSizes.sm),
+              padding: const EdgeInsets.only(right: AppSizes.sm.w),
               child: Text(
                 AppStrings.price,
                 textAlign: TextAlign.right,
@@ -229,7 +231,7 @@ class CoinTableHeader extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(width: AppSizes.sm),
+          const SizedBox(width: AppSizes.sm.w),
           Expanded(
             flex: 3,
             child: Row(
@@ -247,7 +249,10 @@ class CoinTableHeader extends StatelessWidget {
                             style: _style(context),
                           ),
                         ),
-                        const Icon(Icons.expand_more, size: AppSizes.iconSmall),
+                        const Icon(
+                          Icons.expand_more,
+                          size: AppSizes.iconSmall.w,
+                        ),
                       ],
                     ),
                   ),
@@ -263,7 +268,7 @@ class CoinTableHeader extends StatelessWidget {
   TextStyle? _style(BuildContext context) =>
       Theme.of(context).textTheme.labelMedium?.copyWith(
         color: Theme.of(context).colorScheme.onSurface,
-        fontSize: AppSizes.homeColumnTitleFontSize,
+        fontSize: AppSizes.homeColumnTitleFontSize.sp,
         fontWeight: FontWeight.w600,
       );
 }
@@ -273,25 +278,22 @@ class CoinRowSkeleton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => SizedBox(
-    height: AppSizes.coinRowHeight,
+    height: AppSizes.coinRowHeight.h,
     child: Padding(
-      padding: const EdgeInsets.symmetric(horizontal: AppSizes.screenPadding),
+      padding: const EdgeInsets.symmetric(horizontal: AppSizes.screenPadding.w),
       child: Row(
         children: [
           const SizedBox(
-            width: AppSizes.rankColumn,
-            child: ShimmerBox(
-              width: AppSizes.rankColumn,
-              height: AppSizes.loadingBoxHeight,
-            ),
+            width: AppSizes.rankColumn.w,
+            child: ShimmerBox(width: AppSizes.rankColumn.w, height: 32),
           ),
-          const SizedBox(width: AppSizes.sm),
+          const SizedBox(width: AppSizes.sm.w),
           const ShimmerBox(
-            width: AppSizes.coinLogo,
-            height: AppSizes.coinLogo,
-            radius: AppSizes.radiusPill,
+            width: AppSizes.coinLogo.w,
+            height: AppSizes.coinLogo.w,
+            radius: AppSizes.radiusPill.r,
           ),
-          const SizedBox(width: AppSizes.md),
+          const SizedBox(width: AppSizes.md.w),
           const Expanded(
             flex: 5,
             child: Row(
@@ -300,9 +302,9 @@ class CoinRowSkeleton extends StatelessWidget {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      ShimmerBox(height: AppSizes.loadingBoxHeight / 2),
-                      SizedBox(height: AppSizes.xs),
-                      ShimmerBox(height: AppSizes.loadingBoxHeight / 3),
+                      ShimmerBox(height: AppSizes.loadingBoxHeight.h / 2),
+                      SizedBox(height: AppSizes.xs.w),
+                      ShimmerBox(height: AppSizes.loadingBoxHeight.h / 3),
                     ],
                   ),
                 ),
@@ -318,13 +320,13 @@ class CoinRowSkeleton extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   ShimmerBox(
-                    width: AppSizes.loadingPriceWidth,
-                    height: AppSizes.loadingBoxHeight / 2,
+                    width: AppSizes.loadingPriceWidth.w,
+                    height: AppSizes.loadingBoxHeight.h / 2,
                   ),
-                  SizedBox(height: AppSizes.xs),
+                  SizedBox(height: AppSizes.xs.w),
                   ShimmerBox(
-                    width: AppSizes.loadingChangeWidth,
-                    height: AppSizes.chipHeight / 2,
+                    width: AppSizes.loadingChangeWidth.w,
+                    height: AppSizes.chipHeight.h / 2,
                   ),
                 ],
               ),

@@ -3,6 +3,7 @@ import 'dart:ui' as ui;
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_sizes.dart';
@@ -51,7 +52,7 @@ class PriceChart extends StatelessWidget {
     }
     if (points.length < 2) {
       return SizedBox(
-        height: AppSizes.chartHeight,
+        height: AppSizes.chartHeight.h,
         child: Center(
           child: Text(
             series == PriceChartSeries.marketCap
@@ -87,7 +88,7 @@ class PriceChart extends StatelessWidget {
     final xInterval = ((spots.length - 1) / 3).clamp(1.0, double.infinity);
 
     return SizedBox(
-      height: AppSizes.chartHeight + 34,
+      height: AppSizes.chartHeight.h + 34,
       child: LineChart(
         LineChartData(
           minY: minY,
@@ -114,7 +115,7 @@ class PriceChart extends StatelessWidget {
                 interval: yInterval,
                 reservedSize: 56,
                 getTitlesWidget: (value, _) => Padding(
-                  padding: const EdgeInsets.only(right: AppSizes.xs),
+                  padding: const EdgeInsets.only(right: AppSizes.xs.w),
                   child: Text(
                     Formatters.compact(value, currencyCode: currency),
                     maxLines: 1,
@@ -134,7 +135,7 @@ class PriceChart extends StatelessWidget {
                   final index = value.round().clamp(0, points.length - 1);
                   final pattern = chart.days <= 1 ? 'HH:mm' : 'MMM d';
                   return Padding(
-                    padding: const EdgeInsets.only(top: AppSizes.xs),
+                    padding: const EdgeInsets.only(top: AppSizes.xs.w),
                     child: Text(
                       DateFormat(pattern)
                           .format(points[index].timestamp.toLocal()),
@@ -179,14 +180,14 @@ class PriceChart extends StatelessWidget {
               return TouchedSpotIndicatorData(
                 FlLine(
                   color: color.withValues(alpha: 0.6),
-                  strokeWidth: AppSizes.chartCrosshairWidth,
+                  strokeWidth: AppSizes.chartCrosshairWidth.w,
                   dashArray: [3, 3],
                 ),
                 FlDotData(
                   getDotPainter: (_, _, _, _) => FlDotCirclePainter(
-                    radius: AppSizes.chartTouchDot,
+                    radius: AppSizes.chartTouchDot.w,
                     color: color,
-                    strokeWidth: AppSizes.chartTouchBorder,
+                    strokeWidth: AppSizes.chartTouchBorder.w,
                     strokeColor: Colors.white,
                   ),
                 ),
@@ -230,7 +231,7 @@ class PriceChart extends StatelessWidget {
     }
     if (candles.isEmpty) {
       return SizedBox(
-        height: AppSizes.chartHeight,
+        height: AppSizes.chartHeight.h,
         child: Center(
           child: Text(
             AppStrings.candleChartUnavailable,
@@ -253,7 +254,7 @@ class PriceChart extends StatelessWidget {
               .clamp(0.000000001, double.infinity)
               .toDouble();
     return SizedBox(
-      height: AppSizes.chartHeight + 34,
+      height: AppSizes.chartHeight.h + 34,
       child: CustomPaint(
         painter: _CandlestickPainter(
           candles: candles,

@@ -33,7 +33,7 @@ class CoinDetailsRepositoryImpl implements CoinDetailsRepository {
         requestedCoinId: coinId,
         requestedDays: days,
         requestedCurrency: currency,
-       ).toEntity();
+      ).toEntity();
     } on DioException catch (error) {
       throw mapDioFailure(error);
     }

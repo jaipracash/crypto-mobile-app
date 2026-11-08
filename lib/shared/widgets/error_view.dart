@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../core/constants/app_strings.dart';
 import '../../core/constants/app_sizes.dart';
@@ -19,10 +20,10 @@ class ErrorView extends StatelessWidget {
     return Center(
       child: Padding(
         padding: const EdgeInsets.fromLTRB(
-          AppSizes.xl,
-          AppSizes.xl + AppSizes.md,
-          AppSizes.xl,
-          AppSizes.xl,
+          AppSizes.xl.w,
+          AppSizes.xl.w + AppSizes.md.w,
+          AppSizes.xl.w,
+          AppSizes.xl.w,
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -33,7 +34,7 @@ class ErrorView extends StatelessWidget {
                 textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.titleMedium,
               ),
-              const SizedBox(height: AppSizes.sm),
+              const SizedBox(height: AppSizes.sm.w),
               SvgPicture.asset(
                 'assets/no_interente.svg',
                 width: 140,
@@ -41,7 +42,7 @@ class ErrorView extends StatelessWidget {
                 fit: BoxFit.contain,
                 semanticsLabel: AppStrings.noInternetConnection,
               ),
-              const SizedBox(height: AppSizes.sm),
+              const SizedBox(height: AppSizes.sm.w),
               Text(
                 AppStrings.checkInternetConnection,
                 textAlign: TextAlign.center,
@@ -55,7 +56,7 @@ class ErrorView extends StatelessWidget {
                 fit: BoxFit.contain,
                 semanticsLabel: AppStrings.somethingWentWrong,
               ),
-              const SizedBox(height: AppSizes.md),
+              const SizedBox(height: AppSizes.md.w),
               Text(
                 AppStrings.somethingWentWrong,
                 textAlign: TextAlign.center,
@@ -67,7 +68,7 @@ class ErrorView extends StatelessWidget {
                 style: Theme.of(context).textTheme.bodyMedium,
               ),
             ],
-            const SizedBox(height: AppSizes.lg),
+            const SizedBox(height: AppSizes.lg.w),
             FilledButton.icon(
               style: FilledButton.styleFrom(
                 backgroundColor: Theme.of(context).colorScheme.primary,

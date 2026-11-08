@@ -1,5 +1,6 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_sizes.dart';
@@ -8,8 +9,8 @@ class Sparkline extends StatelessWidget {
   const Sparkline({
     required this.values,
     this.positive = true,
-    this.width = AppSizes.sparklineWidth,
-    this.height = AppSizes.sparklineHeight,
+    this.width = AppSizes.sparklineWidth.w,
+    this.height = AppSizes.sparklineHeight.h,
     this.filled = false,
     super.key,
   });
@@ -52,7 +53,7 @@ class Sparkline extends StatelessWidget {
                   .toList(),
               isCurved: true,
               curveSmoothness: 0.18,
-              barWidth: AppSizes.sparklineLineWidth,
+              barWidth: AppSizes.sparklineLineWidth.w,
               color: color,
               isStrokeCapRound: true,
               dotData: const FlDotData(show: false),
