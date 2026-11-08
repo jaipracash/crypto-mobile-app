@@ -260,10 +260,9 @@ class CoinTableHeader extends StatelessWidget {
     ),
   );
 
-  TextStyle? _style(BuildContext context) => Theme.of(context)
-      .textTheme
-      .labelMedium
-      ?.copyWith(
+  TextStyle? _style(BuildContext context) =>
+      Theme.of(context).textTheme.labelMedium?.copyWith(
+        color: Theme.of(context).colorScheme.onSurface,
         fontSize: AppSizes.homeColumnTitleFontSize,
         fontWeight: FontWeight.w600,
       );

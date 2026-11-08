@@ -11,85 +11,63 @@ class SettingsScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    const background = Colors.white;
-    const foreground = Color(0xFF172033);
     final theme =
         ref.watch(settingsControllerProvider).asData?.value.themeMode ??
         AppThemeMode.light;
     final controller = ref.read(settingsControllerProvider.notifier);
     final baseTheme = Theme.of(context);
-    final colors = baseTheme.colorScheme.copyWith(
-      brightness: Brightness.light,
-      surface: background,
-      onSurface: foreground,
-      surfaceContainerHighest: const Color(0xFFF0F3F7),
-      onSurfaceVariant: const Color(0xFF68778C),
-      outlineVariant: const Color(0xFFE1E5EA),
-    );
+    final colors = baseTheme.colorScheme;
 
-    return Theme(
-      data: baseTheme.copyWith(
-        brightness: Brightness.light,
-        colorScheme: colors,
-        scaffoldBackgroundColor: background,
-        appBarTheme: baseTheme.appBarTheme.copyWith(
-          backgroundColor: background,
-          foregroundColor: foreground,
-          surfaceTintColor: Colors.transparent,
-        ),
-      ),
-      child: Builder(
-        builder: (context) => Scaffold(
-          backgroundColor: background,
-          appBar: AppBar(title: const Text(AppStrings.settings)),
-          body: Padding(
-            padding: const EdgeInsets.all(AppSizes.screenPadding),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+    return Scaffold(
+      backgroundColor: baseTheme.scaffoldBackgroundColor,
+      appBar: AppBar(title: const Text(AppStrings.settings)),
+      body: Padding(
+        padding: const EdgeInsets.all(AppSizes.screenPadding),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              AppStrings.preferences,
+              style: baseTheme.textTheme.titleSmall?.copyWith(
+                color: colors.onSurfaceVariant,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            const SizedBox(height: AppSizes.lg),
+            Row(
               children: [
                 Text(
-                  AppStrings.preferences,
-                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                    color: colors.onSurfaceVariant,
-                    fontWeight: FontWeight.w500,
+                  AppStrings.theme,
+                  style: baseTheme.textTheme.titleMedium?.copyWith(
+                    color: colors.onSurface,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
-                const SizedBox(height: AppSizes.lg),
-                Row(
-                  children: [
-                    Text(
-                      AppStrings.theme,
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        color: foreground,
-                        fontWeight: FontWeight.w600,
+                const SizedBox(width: AppSizes.md),
+                Expanded(
+                  child: Align(
+                    alignment: Alignment.centerRight,
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 248),
+                      child: _ThemeSelector(
+                        selected: theme,
+                        background: colors.surfaceContainerHighest,
+                        selectedBackground: colors.surface,
+                        selectedForeground: colors.onSurface,
+                        unselectedForeground: colors.onSurfaceVariant,
+                        onSelected: controller.setTheme,
+                        labels: const {
+                          AppThemeMode.light: AppStrings.light,
+                          AppThemeMode.dark: AppStrings.dark,
+                          AppThemeMode.system: AppStrings.system,
+                        },
                       ),
                     ),
-                    const SizedBox(width: AppSizes.md),
-                    Expanded(
-                      child: Align(
-                        alignment: Alignment.centerRight,
-                        child: ConstrainedBox(
-                          constraints: const BoxConstraints(maxWidth: 248),
-                          child: _ThemeSelector(
-                            selected: theme,
-                            background: colors.surfaceContainerHighest,
-                            selectedForeground: foreground,
-                            unselectedForeground: colors.onSurfaceVariant,
-                            onSelected: controller.setTheme,
-                            labels: const {
-                              AppThemeMode.light: AppStrings.light,
-                              AppThemeMode.dark: AppStrings.dark,
-                              AppThemeMode.system: AppStrings.system,
-                            },
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
               ],
             ),
-          ),
+          ],
         ),
       ),
     );
@@ -100,6 +78,7 @@ class _ThemeSelector extends StatelessWidget {
   const _ThemeSelector({
     required this.selected,
     required this.background,
+    required this.selectedBackground,
     required this.selectedForeground,
     required this.unselectedForeground,
     required this.onSelected,
@@ -108,6 +87,7 @@ class _ThemeSelector extends StatelessWidget {
 
   final AppThemeMode selected;
   final Color background;
+  final Color selectedBackground;
   final Color selectedForeground;
   final Color unselectedForeground;
   final ValueChanged<AppThemeMode> onSelected;
@@ -137,7 +117,7 @@ class _ThemeSelector extends StatelessWidget {
                 height: double.infinity,
                 child: DecoratedBox(
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: selectedBackground,
                     borderRadius: BorderRadius.circular(14),
                     boxShadow: const [
                       BoxShadow(

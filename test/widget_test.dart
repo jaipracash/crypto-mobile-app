@@ -8,6 +8,7 @@ import 'package:gecko_lite/shared/widgets/async_value_view.dart';
 import 'package:gecko_lite/shared/widgets/coin_tile.dart';
 import 'package:gecko_lite/shared/widgets/cupertino_loader.dart';
 import 'package:gecko_lite/shared/widgets/error_view.dart';
+import 'package:gecko_lite/shared/widgets/simulated_price_banner.dart';
 
 void main() {
   testWidgets('CoinTile shows coin identity and market price', (tester) async {
@@ -61,6 +62,16 @@ void main() {
     await tester.pumpWidget(view(const AsyncData<List<int>>([])));
     await tester.pumpAndSettle();
     expect(find.text('No data'), findsOneWidget);
+
+    await tester.pumpWidget(
+      view(
+        const AsyncLoading<List<int>>().copyWithPrevious(
+          AsyncError<List<int>>(Exception('offline'), StackTrace.empty),
+        ),
+      ),
+    );
+    expect(find.byType(CupertinoLoader), findsOneWidget);
+    expect(find.text('Try again'), findsNothing);
   });
 
   testWidgets('ErrorView displays the offline illustration for no internet', (
@@ -81,6 +92,22 @@ void main() {
     expect(find.text('Check your connection and try again.'), findsOneWidget);
     expect(find.byType(SvgPicture), findsOneWidget);
     expect(find.text('Try again'), findsOneWidget);
+  });
+
+  testWidgets('demo notice text is readable in dark theme', (tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: ThemeData.dark(),
+        home: const Scaffold(body: SimulatedPriceBanner()),
+      ),
+    );
+
+    final notice = tester.widget<Text>(
+      find.text(
+        'Demo only: prices are simulated and are not live market quotes.',
+      ),
+    );
+    expect(notice.style?.color, ThemeData.dark().colorScheme.onSurface);
   });
 
   testWidgets('ErrorView displays a friendly generic error state', (
@@ -105,5 +132,10 @@ void main() {
     expect(find.text('internal technical detail'), findsNothing);
     expect(find.byType(SvgPicture), findsOneWidget);
     expect(find.text('Try again'), findsOneWidget);
+    final retryButton = tester.widget<FilledButton>(find.byType(FilledButton));
+    expect(
+      retryButton.style?.backgroundColor?.resolve({}),
+      Theme.of(tester.element(find.byType(FilledButton))).colorScheme.primary,
+    );
   });
 }

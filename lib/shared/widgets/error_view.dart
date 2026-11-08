@@ -18,7 +18,12 @@ class ErrorView extends StatelessWidget {
         failure is Failure && failure.type == FailureType.noInternet;
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(AppSizes.xl),
+        padding: const EdgeInsets.fromLTRB(
+          AppSizes.xl,
+          AppSizes.xl + AppSizes.md,
+          AppSizes.xl,
+          AppSizes.xl,
+        ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -63,7 +68,11 @@ class ErrorView extends StatelessWidget {
               ),
             ],
             const SizedBox(height: AppSizes.lg),
-            OutlinedButton.icon(
+            FilledButton.icon(
+              style: FilledButton.styleFrom(
+                backgroundColor: Theme.of(context).colorScheme.primary,
+                foregroundColor: Colors.white,
+              ),
               onPressed: onRetry,
               icon: const Icon(Icons.refresh),
               label: const Text(AppStrings.tryAgain),

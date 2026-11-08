@@ -138,6 +138,22 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+  testWidgets('market table headers use high-contrast color in dark theme', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: ThemeData.dark(),
+        home: Scaffold(
+          body: CoinTableHeader(period: ChangePeriod.day, onPeriodTap: () {}),
+        ),
+      ),
+    );
+
+    final nameHeader = tester.widget<Text>(find.text(AppStrings.coin));
+    expect(nameHeader.style?.color, ThemeData.dark().colorScheme.onSurface);
+  });
+
   test('market tabs place Overview after Trending', () {
     expect(HomeTab.values, [
       HomeTab.all,

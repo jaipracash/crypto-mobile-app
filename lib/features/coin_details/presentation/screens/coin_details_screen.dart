@@ -3,7 +3,6 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_sizes.dart';
@@ -14,8 +13,7 @@ import '../../../../core/utils/formatters.dart';
 import '../../../../shared/widgets/async_value_view.dart';
 import '../../../../shared/widgets/change_pill.dart';
 import '../../../../shared/widgets/coin_avatar.dart';
-import '../../../../shared/widgets/cupertino_loader.dart';
-import '../../../../shared/widgets/data_source_banner.dart';
+import '../../../../shared/widgets/shimmer_box.dart';
 import '../../../../shared/widgets/simulated_price_banner.dart';
 import '../../../market/domain/coin.dart';
 import '../../../market/presentation/controllers/live_price_controller.dart';
@@ -42,14 +40,13 @@ class _CoinDetailsScreenState extends ConsumerState<CoinDetailsScreen>
   PricePoint? _hoveredPoint;
   int _days = 7;
   int _rangeHours = 7 * 24;
-  bool _aboutExpanded = false;
   PriceChartSeries _series = PriceChartSeries.price;
   PriceChartStyle _chartStyle = PriceChartStyle.line;
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
+    _tabController = TabController(length: 2, vsync: this);
     _favoriteAnimationController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 520),
@@ -146,7 +143,6 @@ class _CoinDetailsScreenState extends ConsumerState<CoinDetailsScreen>
               tabs: const [
                 Tab(text: AppStrings.overview),
                 Tab(text: AppStrings.info),
-                Tab(text: AppStrings.news),
               ],
               labelColor: AppColors.brand,
               unselectedLabelColor: AppColors.lightTextSecondary,
@@ -232,6 +228,7 @@ class _CoinDetailsScreenState extends ConsumerState<CoinDetailsScreen>
             value: details,
             onRetry: () =>
                 ref.invalidate(coinDetailsControllerProvider(widget.coinId)),
+            loading: _detailsLoading(),
             builder: (data) => _buildDetails(context, data, chart, currency),
           ),
         ),
@@ -286,13 +283,7 @@ class _CoinDetailsScreenState extends ConsumerState<CoinDetailsScreen>
           chartData,
           currency,
         ),
-        _buildInfo(
-          context,
-          data,
-          coinWithCurrentPrice,
-          currency,
-        ),
-        _buildNews(context),
+        _buildInfo(context, data, coinWithCurrentPrice, currency),
       ],
     );
   }
@@ -395,19 +386,17 @@ class _CoinDetailsScreenState extends ConsumerState<CoinDetailsScreen>
           ),
         ],
         const SizedBox(height: AppSizes.md),
-        DataSourceBanner(
-          source: chartData?.dataSource ?? data.dataSource,
-          horizontalInset: false,
-        ),
-        if (ref.watch(liveCoinPricesProvider).isNotEmpty)
+        if (ref.watch(liveCoinPricesProvider).isNotEmpty) ...[
           const SimulatedPriceBanner(horizontalInset: false),
+          const SizedBox(height: AppSizes.sm),
+        ],
         AsyncValueView(
           value: chartForSelectedRange,
           onRetry: () =>
               ref.invalidate(coinChartProvider((widget.coinId, _days))),
-          loading: const SizedBox(
+          loading: const ShimmerBox(
             height: AppSizes.chartHeight,
-            child: Center(child: CupertinoLoader()),
+            radius: AppSizes.radiusSm,
           ),
           isEmpty: (value) =>
               (_series == PriceChartSeries.price
@@ -483,7 +472,7 @@ class _CoinDetailsScreenState extends ConsumerState<CoinDetailsScreen>
       children: [
         Text(
           AppStrings.info,
-          style: Theme.of(context).textTheme.titleLarge
+          style: Theme.of(context).textTheme.titleMedium
               ?.copyWith(fontWeight: FontWeight.w700),
         ),
         const SizedBox(height: AppSizes.md),
@@ -493,7 +482,7 @@ class _CoinDetailsScreenState extends ConsumerState<CoinDetailsScreen>
         const SizedBox(height: AppSizes.xl),
         Text(
           '${AppStrings.aboutCoin} ${coin.name}',
-          style: Theme.of(context).textTheme.titleLarge
+          style: Theme.of(context).textTheme.titleMedium
               ?.copyWith(fontWeight: FontWeight.w700),
         ),
         const SizedBox(height: AppSizes.sm),
@@ -501,34 +490,8 @@ class _CoinDetailsScreenState extends ConsumerState<CoinDetailsScreen>
           data.description.isEmpty
               ? AppStrings.descriptionUnavailable
               : data.description,
-          maxLines: _aboutExpanded ? null : 4,
-          overflow: _aboutExpanded
-              ? TextOverflow.visible
-              : TextOverflow.ellipsis,
           style: Theme.of(context).textTheme.bodyMedium,
         ),
-        if (data.description.length > 180)
-          TextButton(
-            onPressed: () => setState(() => _aboutExpanded = !_aboutExpanded),
-            child: Text(
-              _aboutExpanded ? AppStrings.showLess : AppStrings.readMore,
-            ),
-          ),
-        if (data.website != null || data.whitepaper != null) ...[
-          const SizedBox(height: AppSizes.md),
-          Wrap(
-            spacing: AppSizes.sm,
-            children: [
-              if (data.website != null)
-                _LinkButton(label: AppStrings.website, url: data.website!),
-              if (data.whitepaper != null)
-                _LinkButton(
-                  label: AppStrings.whitepaper,
-                  url: data.whitepaper!,
-                ),
-            ],
-          ),
-        ],
       ],
     );
   }
@@ -575,6 +538,10 @@ class _CoinDetailsScreenState extends ConsumerState<CoinDetailsScreen>
                 borderRadius: BorderRadius.circular(AppSizes.radiusSm),
                 child: InkWell(
                   borderRadius: BorderRadius.circular(AppSizes.radiusSm),
+                  splashFactory: NoSplash.splashFactory,
+                  overlayColor: const WidgetStatePropertyAll(
+                    Colors.transparent,
+                  ),
                   onTap: () {
                     if (selected) return;
                     setState(() {
@@ -618,30 +585,6 @@ class _CoinDetailsScreenState extends ConsumerState<CoinDetailsScreen>
     }
   }
 
-  Widget _buildNews(BuildContext context) => Center(
-    child: Padding(
-      padding: const EdgeInsets.all(AppSizes.xl),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            Icons.newspaper_outlined,
-            size: 40,
-            color: AppColors.lightTextSecondary,
-          ),
-          const SizedBox(height: AppSizes.md),
-          Text(AppStrings.news, style: Theme.of(context).textTheme.titleMedium),
-          const SizedBox(height: AppSizes.xs),
-          Text(
-            AppStrings.newsUnavailable,
-            textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.bodySmall,
-          ),
-        ],
-      ),
-    ),
-  );
-
   List<PricePoint> _selectedPoints(CoinChart? chart) {
     if (chart == null) return const [];
     final points = _series == PriceChartSeries.price
@@ -683,8 +626,47 @@ class _CoinDetailsScreenState extends ConsumerState<CoinDetailsScreen>
         width: 38,
         height: 38,
         child: IconButton(
+          tooltip: _chartStyle == PriceChartStyle.candles
+              ? AppStrings.lineChart
+              : AppStrings.candleChart,
+          onPressed:
+              chart?.candles.isNotEmpty == true &&
+                  _series == PriceChartSeries.price
+              ? () => setState(() {
+                  _chartStyle = _chartStyle == PriceChartStyle.candles
+                      ? PriceChartStyle.line
+                      : PriceChartStyle.candles;
+                  _hoveredPoint = null;
+                })
+              : null,
+          padding: EdgeInsets.zero,
+          visualDensity: VisualDensity.compact,
+          style: IconButton.styleFrom(
+            foregroundColor: _chartStyle == PriceChartStyle.candles
+                ? AppColors.brand
+                : AppColors.lightTextPrimary,
+            backgroundColor: _chartStyle == PriceChartStyle.candles
+                ? AppColors.brand.withValues(alpha: 0.12)
+                : const Color(0xFFF0F3F6),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(AppSizes.radiusSm),
+            ),
+          ),
+          icon: _chartStyle == PriceChartStyle.candles
+              ? const Icon(Icons.show_chart_rounded, size: AppSizes.iconMedium)
+              : Icon(
+                  Icons.candlestick_chart_rounded,
+                  size: AppSizes.iconMedium,
+                ),
+        ),
+      ),
+      const SizedBox(width: AppSizes.xs),
+      SizedBox(
+        width: 38,
+        height: 38,
+        child: IconButton(
           tooltip: AppStrings.filter,
-          onPressed: () => _showChartOptions(chart),
+          onPressed: _showChartOptions,
           padding: EdgeInsets.zero,
           visualDensity: VisualDensity.compact,
           style: IconButton.styleFrom(
@@ -708,8 +690,7 @@ class _CoinDetailsScreenState extends ConsumerState<CoinDetailsScreen>
     ],
   );
 
-  Future<void> _showChartOptions(CoinChart? chart) async {
-    final canShowCandles = chart?.candles.isNotEmpty ?? false;
+  Future<void> _showChartOptions() async {
     await showModalBottomSheet<void>(
       context: context,
       useSafeArea: true,
@@ -785,40 +766,6 @@ class _CoinDetailsScreenState extends ConsumerState<CoinDetailsScreen>
                     }),
                   ),
                 ),
-                const SizedBox(height: AppSizes.md),
-                Text(
-                  AppStrings.chartType,
-                  style: Theme.of(sheetContext).textTheme.labelLarge?.copyWith(
-                    color: AppColors.lightTextSecondary,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                const SizedBox(height: AppSizes.xs),
-                SizedBox(
-                  width: double.infinity,
-                  child: SegmentedButton<PriceChartStyle>(
-                    segments: [
-                      const ButtonSegment(
-                        value: PriceChartStyle.line,
-                        icon: Icon(Icons.show_chart_rounded),
-                        label: Text(AppStrings.lineChart),
-                      ),
-                      ButtonSegment(
-                        value: PriceChartStyle.candles,
-                        icon: const Icon(Icons.candlestick_chart_rounded),
-                        label: const Text(AppStrings.candleChart),
-                        enabled:
-                            canShowCandles && _series == PriceChartSeries.price,
-                      ),
-                    ],
-                    selected: {_chartStyle},
-                    showSelectedIcon: false,
-                    onSelectionChanged: (selection) => setState(() {
-                      _chartStyle = selection.first;
-                      _hoveredPoint = null;
-                    }),
-                  ),
-                ),
               ],
             ),
           ),
@@ -826,6 +773,38 @@ class _CoinDetailsScreenState extends ConsumerState<CoinDetailsScreen>
       ),
     );
   }
+
+  Widget _detailsLoading() => ListView(
+    padding: const EdgeInsets.fromLTRB(
+      AppSizes.screenPadding,
+      AppSizes.lg,
+      AppSizes.screenPadding,
+      AppSizes.xxl,
+    ),
+    children: [
+      const ShimmerBox(width: 132, height: 16),
+      const SizedBox(height: AppSizes.md),
+      const ShimmerBox(width: 196, height: 34),
+      const SizedBox(height: AppSizes.lg),
+      Row(
+        children: [
+          const ShimmerBox(width: 64, height: 32, radius: AppSizes.radiusSm),
+          const SizedBox(width: AppSizes.sm),
+          const ShimmerBox(width: 64, height: 32, radius: AppSizes.radiusSm),
+          const SizedBox(width: AppSizes.sm),
+          const ShimmerBox(width: 64, height: 32, radius: AppSizes.radiusSm),
+          const SizedBox(width: AppSizes.sm),
+          const ShimmerBox(width: 64, height: 32, radius: AppSizes.radiusSm),
+        ],
+      ),
+      const SizedBox(height: AppSizes.md),
+      const ShimmerBox(height: AppSizes.chartHeight, radius: AppSizes.radiusSm),
+      const SizedBox(height: AppSizes.md),
+      const ShimmerBox(height: 52, radius: AppSizes.radiusSm),
+      const SizedBox(height: AppSizes.xl),
+      const ShimmerBox(height: 168, radius: AppSizes.radiusSm),
+    ],
+  );
 }
 
 class _ChartMarker extends StatelessWidget {
@@ -871,22 +850,5 @@ class _RankBadge extends StatelessWidget {
         fontWeight: FontWeight.w600,
       ),
     ),
-  );
-}
-
-class _LinkButton extends StatelessWidget {
-  const _LinkButton({required this.label, required this.url});
-  final String label;
-  final String url;
-  @override
-  Widget build(BuildContext context) => OutlinedButton.icon(
-    onPressed: () async {
-      final uri = Uri.tryParse(url);
-      if (uri != null && await canLaunchUrl(uri)) {
-        await launchUrl(uri, mode: LaunchMode.externalApplication);
-      }
-    },
-    icon: const Icon(Icons.open_in_new, size: 16),
-    label: Text(label),
   );
 }

@@ -29,7 +29,10 @@ void main() {
         overrides: [
           settingsRepositoryProvider.overrideWithValue(settingsRepository),
         ],
-        child: const MaterialApp(home: SettingsScreen()),
+        child: MaterialApp(
+          theme: ThemeData.dark(),
+          home: const SettingsScreen(),
+        ),
       ),
     );
     await tester.pumpAndSettle();
@@ -46,7 +49,7 @@ void main() {
     expect(settingsRepository.settings.themeMode, AppThemeMode.dark);
     expect(
       tester.widget<Scaffold>(find.byType(Scaffold)).backgroundColor,
-      Colors.white,
+      ThemeData.dark().scaffoldBackgroundColor,
     );
   });
 }

@@ -33,13 +33,19 @@ class _WatchlistScreenState extends ConsumerState<WatchlistScreen> {
   @override
   Widget build(BuildContext context) {
     final ref = this.ref;
+    final theme = Theme.of(context);
+    final backgroundColor = theme.brightness == Brightness.light
+        ? Colors.white
+        : theme.scaffoldBackgroundColor;
     final coins = ref.watch(watchlistControllerProvider);
     final currency =
         ref.watch(settingsControllerProvider).asData?.value.currency ?? 'usd';
     final livePrices = ref.watch(liveCoinPricesProvider);
     return Scaffold(
+      backgroundColor: backgroundColor,
       appBar: AppBar(
         title: const Text(AppStrings.watchlist),
+        backgroundColor: backgroundColor,
         scrolledUnderElevation: 0,
         surfaceTintColor: Colors.transparent,
       ),
@@ -48,7 +54,8 @@ class _WatchlistScreenState extends ConsumerState<WatchlistScreen> {
             ref.read(watchlistControllerProvider.notifier).refresh(),
         child: AsyncValueView(
           value: coins,
-          onRetry: () => ref.invalidate(watchlistControllerProvider),
+          onRetry: () =>
+              ref.read(watchlistControllerProvider.notifier).refresh(),
           builder: (data) {
             final items = data.items;
             if (items.isEmpty) {

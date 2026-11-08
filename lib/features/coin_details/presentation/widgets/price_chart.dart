@@ -67,7 +67,7 @@ class PriceChart extends StatelessWidget {
         ? chart.changePct ?? 0
         : (points.last.price - points.first.price) / points.first.price * 100;
     final positive = selectedChange >= 0;
-    final color = positive ? AppColors.lightGain : AppColors.lightLoss;
+    final color = positive ? AppColors.darkGain : AppColors.lightLoss;
     final textColor = Theme.of(context).colorScheme.onSurfaceVariant;
     final spots = points.indexed
         .map((entry) => FlSpot(entry.$1.toDouble(), entry.$2.price))
@@ -261,7 +261,7 @@ class PriceChart extends StatelessWidget {
           days: chart.days,
           minY: minPrice - safePadding,
           maxY: maxPrice + safePadding,
-          positiveColor: AppColors.lightGain,
+          positiveColor: AppColors.darkGain,
           negativeColor: AppColors.lightLoss,
           gridColor: const Color(0xFFE9EDF2),
         ),
@@ -346,15 +346,41 @@ class _CandlestickPainter extends CustomPainter {
     final range = maxY - minY;
     double yFor(double value) =>
         chartRect.bottom - (value - minY) / range * chartRect.height;
+    final lastClose = candles.last.close;
+    final lastCloseY = yFor(lastClose);
+    final lastCloseColor = candles.last.close >= candles.last.open
+        ? positiveColor
+        : negativeColor;
+    final closePaint = Paint()
+      ..color = lastCloseColor.withValues(alpha: 0.65)
+      ..strokeWidth = 1;
+    for (var x = chartRect.left; x < chartRect.right; x += 7) {
+      canvas.drawLine(
+        Offset(x, lastCloseY),
+        Offset(
+          (x + 3).clamp(chartRect.left, chartRect.right).toDouble(),
+          lastCloseY,
+        ),
+        closePaint,
+      );
+    }
+    _drawLabel(
+      canvas,
+      Formatters.compact(lastClose, currencyCode: currency),
+      Offset(chartRect.right + 4, lastCloseY - 6),
+      maxWidth: rightInset - 8,
+      color: lastCloseColor,
+    );
+
     final step = chartRect.width / candles.length;
-    final bodyWidth = (step * 0.56).clamp(2.0, 12.0);
+    final bodyWidth = (step * 0.68).clamp(3.0, 14.0);
     for (var index = 0; index < candles.length; index++) {
       final candle = candles[index];
       final x = chartRect.left + step * (index + 0.5);
       final color = candle.close >= candle.open ? positiveColor : negativeColor;
       final paint = Paint()
         ..color = color
-        ..strokeWidth = 1.4;
+        ..strokeWidth = 1.2;
       canvas.drawLine(
         Offset(x, yFor(candle.high)),
         Offset(x, yFor(candle.low)),
@@ -370,7 +396,10 @@ class _CandlestickPainter extends CustomPainter {
         x + bodyWidth / 2,
         bottom > top ? bottom : top + 1.5,
       );
-      canvas.drawRect(body, paint);
+      canvas.drawRRect(
+        RRect.fromRectAndRadius(body, const Radius.circular(1)),
+        paint,
+      );
     }
   }
 
@@ -379,14 +408,12 @@ class _CandlestickPainter extends CustomPainter {
     String text,
     Offset offset, {
     required double maxWidth,
+    Color color = AppColors.lightTextSecondary,
   }) {
     final painter = TextPainter(
       text: TextSpan(
         text: text,
-        style: const TextStyle(
-          color: AppColors.lightTextSecondary,
-          fontSize: 10,
-        ),
+        style: TextStyle(color: color, fontSize: 10),
       ),
       textDirection: ui.TextDirection.ltr,
       maxLines: 1,

@@ -26,11 +26,17 @@ class AsyncValueView<T> extends StatelessWidget {
   final Widget? loading;
 
   @override
-  Widget build(BuildContext context) => value.when(
-    loading: () => loading ?? const Center(child: CupertinoLoader()),
-    error: (error, _) => ErrorView(error: error, onRetry: onRetry),
-    data: (data) => isEmpty?.call(data) == true
-        ? EmptyView(title: emptyTitle, message: emptyMessage)
-        : builder(data),
-  );
+  Widget build(BuildContext context) {
+    if (value.isLoading && value.hasError) {
+      return loading ?? const Center(child: CupertinoLoader());
+    }
+
+    return value.when(
+      loading: () => loading ?? const Center(child: CupertinoLoader()),
+      error: (error, _) => ErrorView(error: error, onRetry: onRetry),
+      data: (data) => isEmpty?.call(data) == true
+          ? EmptyView(title: emptyTitle, message: emptyMessage)
+          : builder(data),
+    );
+  }
 }
