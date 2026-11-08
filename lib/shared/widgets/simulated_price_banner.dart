@@ -35,7 +35,7 @@ class SimulatedPriceBanner extends StatelessWidget {
             size: AppSizes.iconSmall.w,
             color: dark ? const Color(0xFFFFC857) : AppColors.warning,
           ),
-          const SizedBox(width: AppSizes.xs.w),
+          SizedBox(width: AppSizes.xs.w),
           Expanded(
             child: Text(
               AppStrings.simulatedPriceStream,

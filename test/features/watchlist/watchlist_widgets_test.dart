@@ -16,6 +16,8 @@ import 'package:gecko_lite/features/watchlist/presentation/controllers/watchlist
 import 'package:gecko_lite/features/watchlist/presentation/screens/add_watchlist_coins_screen.dart';
 import 'package:gecko_lite/features/watchlist/presentation/screens/watchlist_screen.dart';
 
+import '../../helpers/screen_util_test_wrapper.dart';
+
 const _coins = [
   Coin(id: 'bitcoin', symbol: 'btc', name: 'Bitcoin', change24hPct: 2.4),
   Coin(id: 'ethereum', symbol: 'eth', name: 'Ethereum', change24hPct: -1.2),
@@ -91,17 +93,21 @@ void main() {
     addTearDown(router.dispose);
 
     await tester.pumpWidget(
-      ProviderScope(
-        overrides: [
-          addWatchlistCoinsControllerProvider.overrideWith(
-            _TestAddCoinsController.new,
-          ),
-          watchlistControllerProvider.overrideWith(
-            _EmptyTestWatchlistController.new,
-          ),
-          settingsControllerProvider.overrideWith(_TestSettingsController.new),
-        ],
-        child: MaterialApp.router(routerConfig: router),
+      screenUtilTestWrapper(
+        ProviderScope(
+          overrides: [
+            addWatchlistCoinsControllerProvider.overrideWith(
+              _TestAddCoinsController.new,
+            ),
+            watchlistControllerProvider.overrideWith(
+              _EmptyTestWatchlistController.new,
+            ),
+            settingsControllerProvider.overrideWith(
+              _TestSettingsController.new,
+            ),
+          ],
+          child: MaterialApp.router(routerConfig: router),
+        ),
       ),
     );
     await tester.pumpAndSettle();
@@ -134,19 +140,25 @@ void main() {
   testWidgets('tapping an already watchlisted coin removes it', (tester) async {
     final repository = _TestWatchlistRepository();
     await tester.pumpWidget(
-      ProviderScope(
-        overrides: [
-          addWatchlistCoinsControllerProvider.overrideWith(
-            _TestAddCoinsController.new,
-          ),
-          watchlistControllerProvider.overrideWith(
-            _PopulatedTestWatchlistController.new,
-          ),
-          watchlistRepositoryProvider.overrideWithValue(repository),
-          coinListControllerProvider.overrideWith(_TestCoinListController.new),
-          settingsControllerProvider.overrideWith(_TestSettingsController.new),
-        ],
-        child: const MaterialApp(home: AddWatchlistCoinsScreen()),
+      screenUtilTestWrapper(
+        ProviderScope(
+          overrides: [
+            addWatchlistCoinsControllerProvider.overrideWith(
+              _TestAddCoinsController.new,
+            ),
+            watchlistControllerProvider.overrideWith(
+              _PopulatedTestWatchlistController.new,
+            ),
+            watchlistRepositoryProvider.overrideWithValue(repository),
+            coinListControllerProvider.overrideWith(
+              _TestCoinListController.new,
+            ),
+            settingsControllerProvider.overrideWith(
+              _TestSettingsController.new,
+            ),
+          ],
+          child: const MaterialApp(home: AddWatchlistCoinsScreen()),
+        ),
       ),
     );
     await tester.pumpAndSettle();
@@ -164,14 +176,18 @@ void main() {
     tester,
   ) async {
     await tester.pumpWidget(
-      ProviderScope(
-        overrides: [
-          watchlistControllerProvider.overrideWith(
-            _PopulatedTestWatchlistController.new,
-          ),
-          settingsControllerProvider.overrideWith(_TestSettingsController.new),
-        ],
-        child: const MaterialApp(home: WatchlistScreen()),
+      screenUtilTestWrapper(
+        ProviderScope(
+          overrides: [
+            watchlistControllerProvider.overrideWith(
+              _PopulatedTestWatchlistController.new,
+            ),
+            settingsControllerProvider.overrideWith(
+              _TestSettingsController.new,
+            ),
+          ],
+          child: const MaterialApp(home: WatchlistScreen()),
+        ),
       ),
     );
     await tester.pumpAndSettle();

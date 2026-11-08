@@ -53,12 +53,12 @@ class StatsGrid extends StatelessWidget {
         border: Border.all(color: Theme.of(context).dividerColor),
         borderRadius: BorderRadius.circular(AppSizes.radiusMd.r),
       ),
-      padding: const EdgeInsets.all(AppSizes.lg.w),
+      padding: EdgeInsets.all(AppSizes.lg.w),
       child: GridView.builder(
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
         itemCount: items.length,
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 2,
           mainAxisSpacing: AppSizes.sm.w,
           crossAxisSpacing: AppSizes.md.w,
@@ -74,7 +74,7 @@ class StatsGrid extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
               style: Theme.of(context).textTheme.bodySmall,
             ),
-            const SizedBox(height: AppSizes.xs.w),
+            SizedBox(height: AppSizes.xs.w),
             Text(
               items[index].$2,
               maxLines: 1,

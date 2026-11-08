@@ -75,7 +75,7 @@ class _AddWatchlistCoinsScreenState
       body: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.fromLTRB(
+            padding: EdgeInsets.fromLTRB(
               AppSizes.screenPadding.w,
               AppSizes.sm.w,
               AppSizes.screenPadding.w,
@@ -88,7 +88,7 @@ class _AddWatchlistCoinsScreenState
               decoration: InputDecoration(
                 hintText: AppStrings.searchAllCoins,
                 prefixIcon: Padding(
-                  padding: const EdgeInsets.all(AppSizes.md.w),
+                  padding: EdgeInsets.all(AppSizes.md.w),
                   child: SvgPicture.asset(
                     'assets/search-alt-2-svgrepo-com.svg',
                     width: AppSizes.iconMedium.w,
@@ -116,7 +116,7 @@ class _AddWatchlistCoinsScreenState
           SafeArea(
             top: false,
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(
+              padding: EdgeInsets.fromLTRB(
                 AppSizes.screenPadding.w,
                 AppSizes.sm.w,
                 AppSizes.screenPadding.w,
@@ -218,7 +218,7 @@ class _AddWatchlistCoinsScreenState
                   child: Text('$error', textAlign: TextAlign.center),
                 );
               }
-              return const Padding(
+              return Padding(
                 padding: EdgeInsets.all(AppSizes.md.w),
                 child: Center(child: AppLoader()),
               );
@@ -312,9 +312,7 @@ class _SelectableCoinRow extends StatelessWidget {
       child: SizedBox(
         height: 72,
         child: Padding(
-          padding: const EdgeInsets.symmetric(
-            horizontal: AppSizes.screenPadding.w,
-          ),
+          padding: EdgeInsets.symmetric(horizontal: AppSizes.screenPadding.w),
           child: Row(
             children: [
               CoinAvatar(
@@ -322,7 +320,7 @@ class _SelectableCoinRow extends StatelessWidget {
                 imageUrl: coin.image,
                 enableHero: false,
               ),
-              const SizedBox(width: AppSizes.md.w),
+              SizedBox(width: AppSizes.md.w),
               Expanded(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -335,7 +333,7 @@ class _SelectableCoinRow extends StatelessWidget {
                       style: Theme.of(context).textTheme.bodyMedium
                           ?.copyWith(fontWeight: FontWeight.w600),
                     ),
-                    const SizedBox(height: AppSizes.xs.w),
+                    SizedBox(height: AppSizes.xs.w),
                     ChangePill(
                       change: coin.change24hPct,
                       showBackground: false,

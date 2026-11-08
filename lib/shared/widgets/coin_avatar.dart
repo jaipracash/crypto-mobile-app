@@ -8,16 +8,17 @@ class CoinAvatar extends StatelessWidget {
   const CoinAvatar({
     required this.symbol,
     this.imageUrl,
-    this.size = AppSizes.coinLogo.w,
+    this.size,
     this.enableHero = true,
     super.key,
   });
   final String symbol;
   final String? imageUrl;
-  final double size;
+  final double? size;
   final bool enableHero;
   @override
   Widget build(BuildContext context) {
+    final size = this.size ?? AppSizes.coinLogo.w;
     final fallback = CircleAvatar(
       radius: size / 2,
       backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,

@@ -1,20 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:shimmer/shimmer.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:shimmer/shimmer.dart';
 
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_sizes.dart';
 
 class ShimmerBox extends StatelessWidget {
-  const ShimmerBox({
-    this.width,
-    this.height,
-    this.radius = AppSizes.radiusMd.r,
-    super.key,
-  });
+  const ShimmerBox({this.width, this.height, this.radius, super.key});
   final double? width;
   final double? height;
-  final double radius;
+  final double? radius;
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +24,7 @@ class ShimmerBox extends StatelessWidget {
         height: height,
         decoration: BoxDecoration(
           color: Theme.of(context).colorScheme.surface,
-          borderRadius: BorderRadius.circular(radius),
+          borderRadius: BorderRadius.circular(radius ?? AppSizes.radiusMd.r),
         ),
       ),
     );

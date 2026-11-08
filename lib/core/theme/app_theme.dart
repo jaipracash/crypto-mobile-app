@@ -68,7 +68,7 @@ abstract final class AppTheme {
           borderRadius: BorderRadius.circular(AppSizes.radiusMd.r),
           borderSide: BorderSide.none,
         ),
-        contentPadding: const EdgeInsets.symmetric(
+        contentPadding: EdgeInsets.symmetric(
           horizontal: AppSizes.lg.w,
           vertical: AppSizes.md.w,
         ),

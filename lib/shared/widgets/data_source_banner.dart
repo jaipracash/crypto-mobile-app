@@ -36,7 +36,7 @@ class DataSourceBanner extends StatelessWidget {
       child: Row(
         children: [
           const Icon(Icons.info_outline, size: 16, color: AppColors.warning),
-          const SizedBox(width: AppSizes.sm.w),
+          SizedBox(width: AppSizes.sm.w),
           Expanded(
             child: Text(
               AppStrings.cachedData,

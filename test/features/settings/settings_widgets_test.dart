@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gecko_lite/core/constants/app_strings.dart';
 import 'package:gecko_lite/core/providers/repository_providers.dart';
 import 'package:gecko_lite/features/settings/domain/app_settings.dart';
 import 'package:gecko_lite/features/settings/domain/settings_repository.dart';
 import 'package:gecko_lite/features/settings/presentation/screens/settings_screen.dart';
+
+import '../../helpers/screen_util_test_wrapper.dart';
 
 class _MemorySettingsRepository implements SettingsRepository {
   AppSettings settings = const AppSettings();
@@ -30,12 +31,8 @@ void main() {
         overrides: [
           settingsRepositoryProvider.overrideWithValue(settingsRepository),
         ],
-        child: ScreenUtilInit(
-          designSize: const Size(390, 844),
-          builder: (_, _) => MaterialApp(
-            theme: ThemeData.dark(),
-            home: const SettingsScreen(),
-          ),
+        child: screenUtilTestWrapper(
+          MaterialApp(theme: ThemeData.dark(), home: const SettingsScreen()),
         ),
       ),
     );

@@ -19,7 +19,7 @@ class EmptyView extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Center(
     child: Padding(
-      padding: const EdgeInsets.all(AppSizes.xl.w),
+      padding: EdgeInsets.all(AppSizes.xl.w),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -28,10 +28,10 @@ class EmptyView extends StatelessWidget {
             size: AppSizes.xxl.w,
             color: Theme.of(context).colorScheme.onSurfaceVariant,
           ),
-          const SizedBox(height: AppSizes.md.w),
+          SizedBox(height: AppSizes.md.w),
           Text(title, style: Theme.of(context).textTheme.titleMedium),
           if (message != null) ...[
-            const SizedBox(height: AppSizes.xs.w),
+            SizedBox(height: AppSizes.xs.w),
             Text(
               message!,
               textAlign: TextAlign.center,
@@ -39,7 +39,7 @@ class EmptyView extends StatelessWidget {
             ),
           ],
           if (actionLabel != null && onAction != null) ...[
-            const SizedBox(height: AppSizes.lg.w),
+            SizedBox(height: AppSizes.lg.w),
             FilledButton.tonal(onPressed: onAction, child: Text(actionLabel!)),
           ],
         ],

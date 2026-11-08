@@ -16,6 +16,8 @@ import 'package:gecko_lite/features/settings/presentation/controllers/settings_c
 import 'package:gecko_lite/shared/widgets/change_pill.dart';
 import 'package:gecko_lite/shared/widgets/sparkline.dart';
 
+import '../../helpers/screen_util_test_wrapper.dart';
+
 class _SearchTestCoinListController extends CoinListController {
   @override
   Future<CoinListState> build() async => const CoinListState(
@@ -56,13 +58,15 @@ void main() {
       sparkline7d: [65000, 66500, 65800, 67420],
     );
     await tester.pumpWidget(
-      MaterialApp(
-        home: Scaffold(
-          body: CoinRow(
-            coin: coin,
-            currency: 'usd',
-            period: ChangePeriod.day,
-            onTap: () {},
+      screenUtilTestWrapper(
+        MaterialApp(
+          home: Scaffold(
+            body: CoinRow(
+              coin: coin,
+              currency: 'usd',
+              period: ChangePeriod.day,
+              onTap: () {},
+            ),
           ),
         ),
       ),
@@ -112,20 +116,22 @@ void main() {
       change24hPct: 2.4,
     );
     await tester.pumpWidget(
-      MaterialApp(
-        home: Scaffold(
-          body: SizedBox(
-            width: 390,
-            child: Column(
-              children: [
-                CoinTableHeader(period: ChangePeriod.day, onPeriodTap: () {}),
-                CoinRow(
-                  coin: coin,
-                  currency: 'usd',
-                  period: ChangePeriod.day,
-                  onTap: () {},
-                ),
-              ],
+      screenUtilTestWrapper(
+        MaterialApp(
+          home: Scaffold(
+            body: SizedBox(
+              width: 390,
+              child: Column(
+                children: [
+                  CoinTableHeader(period: ChangePeriod.day, onPeriodTap: () {}),
+                  CoinRow(
+                    coin: coin,
+                    currency: 'usd',
+                    period: ChangePeriod.day,
+                    onTap: () {},
+                  ),
+                ],
+              ),
             ),
           ),
         ),
@@ -142,10 +148,12 @@ void main() {
     tester,
   ) async {
     await tester.pumpWidget(
-      MaterialApp(
-        theme: ThemeData.dark(),
-        home: Scaffold(
-          body: CoinTableHeader(period: ChangePeriod.day, onPeriodTap: () {}),
+      screenUtilTestWrapper(
+        MaterialApp(
+          theme: ThemeData.dark(),
+          home: Scaffold(
+            body: CoinTableHeader(period: ChangePeriod.day, onPeriodTap: () {}),
+          ),
         ),
       ),
     );
@@ -203,12 +211,14 @@ void main() {
       'assets/sort-vertical-svgrepo-com.svg',
     ];
     await tester.pumpWidget(
-      MaterialApp(
-        home: Scaffold(
-          body: Wrap(
-            children: assets
-                .map((asset) => SvgPicture.asset(asset, width: 24))
-                .toList(),
+      screenUtilTestWrapper(
+        MaterialApp(
+          home: Scaffold(
+            body: Wrap(
+              children: assets
+                  .map((asset) => SvgPicture.asset(asset, width: 24))
+                  .toList(),
+            ),
           ),
         ),
       ),
@@ -223,19 +233,21 @@ void main() {
     tester,
   ) async {
     await tester.pumpWidget(
-      ProviderScope(
-        overrides: [
-          coinListControllerProvider.overrideWith(
-            _SearchTestCoinListController.new,
-          ),
-          trendingControllerProvider.overrideWith(
-            _SearchTestTrendingController.new,
-          ),
-          settingsControllerProvider.overrideWith(
-            _SearchTestSettingsController.new,
-          ),
-        ],
-        child: const MaterialApp(home: SearchScreen(animateFromHome: true)),
+      screenUtilTestWrapper(
+        ProviderScope(
+          overrides: [
+            coinListControllerProvider.overrideWith(
+              _SearchTestCoinListController.new,
+            ),
+            trendingControllerProvider.overrideWith(
+              _SearchTestTrendingController.new,
+            ),
+            settingsControllerProvider.overrideWith(
+              _SearchTestSettingsController.new,
+            ),
+          ],
+          child: const MaterialApp(home: SearchScreen(animateFromHome: true)),
+        ),
       ),
     );
     await tester.pumpAndSettle();
@@ -271,20 +283,22 @@ void main() {
     final container = ProviderContainer();
     addTearDown(container.dispose);
     await tester.pumpWidget(
-      UncontrolledProviderScope(
-        container: container,
-        child: MaterialApp(
-          home: Scaffold(
-            body: Consumer(
-              builder: (context, ref, _) => Column(
-                children: [
-                  Text('${ref.watch(marketFiltersProvider).activeCount}'),
-                  TextButton(
-                    onPressed: () =>
-                        showMarketSheet(context, const FilterSheet()),
-                    child: const Text(AppStrings.filter),
-                  ),
-                ],
+      screenUtilTestWrapper(
+        UncontrolledProviderScope(
+          container: container,
+          child: MaterialApp(
+            home: Scaffold(
+              body: Consumer(
+                builder: (context, ref, _) => Column(
+                  children: [
+                    Text('${ref.watch(marketFiltersProvider).activeCount}'),
+                    TextButton(
+                      onPressed: () =>
+                          showMarketSheet(context, const FilterSheet()),
+                      child: const Text(AppStrings.filter),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -335,14 +349,17 @@ void main() {
     final container = ProviderContainer();
     addTearDown(container.dispose);
     await tester.pumpWidget(
-      UncontrolledProviderScope(
-        container: container,
-        child: MaterialApp(
-          home: Scaffold(
-            body: Builder(
-              builder: (context) => TextButton(
-                onPressed: () => showMarketSheet(context, const FilterSheet()),
-                child: const Text(AppStrings.filter),
+      screenUtilTestWrapper(
+        UncontrolledProviderScope(
+          container: container,
+          child: MaterialApp(
+            home: Scaffold(
+              body: Builder(
+                builder: (context) => TextButton(
+                  onPressed: () =>
+                      showMarketSheet(context, const FilterSheet()),
+                  child: const Text(AppStrings.filter),
+                ),
               ),
             ),
           ),
@@ -373,14 +390,16 @@ void main() {
     final container = ProviderContainer();
     addTearDown(container.dispose);
     await tester.pumpWidget(
-      UncontrolledProviderScope(
-        container: container,
-        child: MaterialApp(
-          home: Scaffold(
-            body: Builder(
-              builder: (context) => TextButton(
-                onPressed: () => showMarketSheet(context, const SortSheet()),
-                child: const Text(AppStrings.sortCoins),
+      screenUtilTestWrapper(
+        UncontrolledProviderScope(
+          container: container,
+          child: MaterialApp(
+            home: Scaffold(
+              body: Builder(
+                builder: (context) => TextButton(
+                  onPressed: () => showMarketSheet(context, const SortSheet()),
+                  child: const Text(AppStrings.sortCoins),
+                ),
               ),
             ),
           ),
@@ -407,19 +426,21 @@ void main() {
     tester,
   ) async {
     await tester.pumpWidget(
-      const MaterialApp(
-        home: Scaffold(
-          body: MarketOverviewPanel(
-            snapshot: MarketSnapshot(
-              totalMarketCap: 2500000000000,
-              totalVolume24h: 95000000000,
-              marketCapChange24hPct: 2.5,
-              btcDominance: 54,
-              ethDominance: 17,
-              othersDominance: 29,
-              activeCoins: 12000,
+      screenUtilTestWrapper(
+        const MaterialApp(
+          home: Scaffold(
+            body: MarketOverviewPanel(
+              snapshot: MarketSnapshot(
+                totalMarketCap: 2500000000000,
+                totalVolume24h: 95000000000,
+                marketCapChange24hPct: 2.5,
+                btcDominance: 54,
+                ethDominance: 17,
+                othersDominance: 29,
+                activeCoins: 12000,
+              ),
+              currency: 'usd',
             ),
-            currency: 'usd',
           ),
         ),
       ),
@@ -438,14 +459,17 @@ void main() {
     final container = ProviderContainer();
     addTearDown(container.dispose);
     await tester.pumpWidget(
-      UncontrolledProviderScope(
-        container: container,
-        child: MaterialApp(
-          home: Scaffold(
-            body: Builder(
-              builder: (context) => TextButton(
-                onPressed: () => showMarketSheet(context, const PeriodSheet()),
-                child: const Text(AppStrings.changePeriod),
+      screenUtilTestWrapper(
+        UncontrolledProviderScope(
+          container: container,
+          child: MaterialApp(
+            home: Scaffold(
+              body: Builder(
+                builder: (context) => TextButton(
+                  onPressed: () =>
+                      showMarketSheet(context, const PeriodSheet()),
+                  child: const Text(AppStrings.changePeriod),
+                ),
               ),
             ),
           ),

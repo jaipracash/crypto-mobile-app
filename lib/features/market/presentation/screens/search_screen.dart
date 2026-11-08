@@ -89,7 +89,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
           child: CustomScrollView(
             slivers: [
               SliverPadding(
-                padding: const EdgeInsets.fromLTRB(
+                padding: EdgeInsets.fromLTRB(
                   AppSizes.screenPadding.w,
                   AppSizes.md.w,
                   AppSizes.screenPadding.w,
@@ -106,17 +106,17 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                             ),
                           )
                         : searchField,
-                    const SizedBox(height: AppSizes.lg.w),
+                    SizedBox(height: AppSizes.lg.w),
                     if (query.trim().isEmpty) ...[
                       Text(
                         'Popular Coins',
                         style: Theme.of(context).textTheme.titleMedium
                             ?.copyWith(fontWeight: FontWeight.w700),
                       ),
-                      const SizedBox(height: AppSizes.sm.w),
+                      SizedBox(height: AppSizes.sm.w),
                       _tabStrip(),
                     ],
-                    const SizedBox(height: AppSizes.sm.w),
+                    SizedBox(height: AppSizes.sm.w),
                     if (livePrices.isNotEmpty)
                       const SimulatedPriceBanner(horizontalInset: false),
                   ]),
@@ -145,10 +145,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
       ),
       prefixIconConstraints: const BoxConstraints(minWidth: 36, minHeight: 48),
       prefixIcon: Padding(
-        padding: const EdgeInsets.only(
-          left: AppSizes.md.w,
-          right: AppSizes.xs.w,
-        ),
+        padding: EdgeInsets.only(left: AppSizes.md.w, right: AppSizes.xs.w),
         child: SvgPicture.asset(
           'assets/search2.svg',
           width: 14,
@@ -192,7 +189,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     child: ListView.separated(
       scrollDirection: Axis.horizontal,
       itemCount: _tabs.length,
-      separatorBuilder: (_, _) => const SizedBox(width: AppSizes.sm.w),
+      separatorBuilder: (_, _) => SizedBox(width: AppSizes.sm.w),
       itemBuilder: (context, index) {
         final tab = _tabs[index];
         final selected = tab == _selectedTab;
@@ -204,7 +201,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
             onTap: () => setState(() => _selectedTab = tab),
             child: Container(
               height: AppSizes.chipHeight.h,
-              padding: const EdgeInsets.symmetric(horizontal: AppSizes.md.w),
+              padding: EdgeInsets.symmetric(horizontal: AppSizes.md.w),
               alignment: Alignment.center,
               decoration: BoxDecoration(
                 color: selected
@@ -252,7 +249,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
             child: Center(child: Text(AppStrings.noCoinsFound)),
           )
         : SliverPadding(
-            padding: const EdgeInsets.fromLTRB(
+            padding: EdgeInsets.fromLTRB(
               AppSizes.screenPadding.w,
               0,
               AppSizes.screenPadding.w,
@@ -294,7 +291,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
               child: Center(child: Text(AppStrings.noCoinsFound)),
             )
           : SliverPadding(
-              padding: const EdgeInsets.fromLTRB(
+              padding: EdgeInsets.fromLTRB(
                 AppSizes.screenPadding.w,
                 0,
                 AppSizes.screenPadding.w,
@@ -302,8 +299,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
               ),
               sliver: SliverList.separated(
                 itemCount: items.length,
-                separatorBuilder: (_, _) =>
-                    const SizedBox(height: AppSizes.sm.w),
+                separatorBuilder: (_, _) => SizedBox(height: AppSizes.sm.w),
                 itemBuilder: (context, index) {
                   final coin = items[index];
                   return _SearchResultCard(
@@ -353,7 +349,7 @@ class _MarketSearchRow extends StatelessWidget {
     child: SizedBox(
       height: 76,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: AppSizes.md.w),
+        padding: EdgeInsets.symmetric(horizontal: AppSizes.md.w),
         child: Row(
           children: [
             CoinAvatar(
@@ -361,7 +357,7 @@ class _MarketSearchRow extends StatelessWidget {
               imageUrl: coin.image,
               enableHero: false,
             ),
-            const SizedBox(width: AppSizes.sm.w),
+            SizedBox(width: AppSizes.sm.w),
             Expanded(
               flex: 4,
               child: Column(
@@ -404,7 +400,7 @@ class _MarketSearchRow extends StatelessWidget {
                       fontFeatures: const [FontFeature.tabularFigures()],
                     ),
                   ),
-                  const SizedBox(height: AppSizes.xs.w),
+                  SizedBox(height: AppSizes.xs.w),
                   ChangePill(
                     change: coin.change24hPct,
                     compact: true,
@@ -437,7 +433,7 @@ class _SearchResultCard extends StatelessWidget {
     child: SizedBox(
       height: 76,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: AppSizes.md.w),
+        padding: EdgeInsets.symmetric(horizontal: AppSizes.md.w),
         child: Row(
           children: [
             CoinAvatar(
@@ -445,7 +441,7 @@ class _SearchResultCard extends StatelessWidget {
               imageUrl: coin.image,
               enableHero: false,
             ),
-            const SizedBox(width: AppSizes.sm.w),
+            SizedBox(width: AppSizes.sm.w),
             Expanded(
               flex: 5,
               child: Column(
@@ -488,7 +484,7 @@ class _SearchResultCard extends StatelessWidget {
                       fontFeatures: const [FontFeature.tabularFigures()],
                     ),
                   ),
-                  const SizedBox(height: AppSizes.xs.w),
+                  SizedBox(height: AppSizes.xs.w),
                   ChangePill(
                     change: marketData?.change24hPct,
                     compact: true,

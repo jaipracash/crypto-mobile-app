@@ -10,6 +10,8 @@ import 'package:gecko_lite/shared/widgets/app_loader.dart';
 import 'package:gecko_lite/shared/widgets/error_view.dart';
 import 'package:gecko_lite/shared/widgets/simulated_price_banner.dart';
 
+import 'helpers/screen_util_test_wrapper.dart';
+
 void main() {
   testWidgets('CoinTile shows coin identity and market price', (tester) async {
     const coin = Coin(
@@ -22,9 +24,11 @@ void main() {
       isWatchlisted: true,
     );
     await tester.pumpWidget(
-      MaterialApp(
-        home: Scaffold(
-          body: CoinTile(coin: coin, currency: 'usd', onTap: () {}),
+      screenUtilTestWrapper(
+        MaterialApp(
+          home: Scaffold(
+            body: CoinTile(coin: coin, currency: 'usd', onTap: () {}),
+          ),
         ),
       ),
     );
@@ -50,7 +54,9 @@ void main() {
       ),
     );
 
-    await tester.pumpWidget(view(const AsyncLoading<List<int>>()));
+    await tester.pumpWidget(
+      screenUtilTestWrapper(view(const AsyncLoading<List<int>>())),
+    );
     expect(find.byType(AppLoader), findsOneWidget);
     expect(
       find.descendant(
@@ -61,19 +67,25 @@ void main() {
     );
 
     await tester.pumpWidget(
-      view(AsyncError<List<int>>(Exception('offline'), StackTrace.current)),
+      screenUtilTestWrapper(
+        view(AsyncError<List<int>>(Exception('offline'), StackTrace.current)),
+      ),
     );
     await tester.pumpAndSettle();
     expect(find.text('Try again'), findsOneWidget);
 
-    await tester.pumpWidget(view(const AsyncData<List<int>>([])));
+    await tester.pumpWidget(
+      screenUtilTestWrapper(view(const AsyncData<List<int>>([]))),
+    );
     await tester.pumpAndSettle();
     expect(find.text('No data'), findsOneWidget);
 
     await tester.pumpWidget(
-      view(
-        const AsyncLoading<List<int>>().copyWithPrevious(
-          AsyncError<List<int>>(Exception('offline'), StackTrace.empty),
+      screenUtilTestWrapper(
+        view(
+          const AsyncLoading<List<int>>().copyWithPrevious(
+            AsyncError<List<int>>(Exception('offline'), StackTrace.empty),
+          ),
         ),
       ),
     );
@@ -85,11 +97,13 @@ void main() {
     tester,
   ) async {
     await tester.pumpWidget(
-      MaterialApp(
-        home: Scaffold(
-          body: ErrorView(
-            error: const Failure(FailureType.noInternet, 'offline'),
-            onRetry: () {},
+      screenUtilTestWrapper(
+        MaterialApp(
+          home: Scaffold(
+            body: ErrorView(
+              error: const Failure(FailureType.noInternet, 'offline'),
+              onRetry: () {},
+            ),
           ),
         ),
       ),
@@ -103,9 +117,11 @@ void main() {
 
   testWidgets('demo notice text is readable in dark theme', (tester) async {
     await tester.pumpWidget(
-      MaterialApp(
-        theme: ThemeData.dark(),
-        home: const Scaffold(body: SimulatedPriceBanner()),
+      screenUtilTestWrapper(
+        MaterialApp(
+          theme: ThemeData.dark(),
+          home: const Scaffold(body: SimulatedPriceBanner()),
+        ),
       ),
     );
 
@@ -121,11 +137,13 @@ void main() {
     tester,
   ) async {
     await tester.pumpWidget(
-      MaterialApp(
-        home: Scaffold(
-          body: ErrorView(
-            error: Exception('internal technical detail'),
-            onRetry: () {},
+      screenUtilTestWrapper(
+        MaterialApp(
+          home: Scaffold(
+            body: ErrorView(
+              error: Exception('internal technical detail'),
+              onRetry: () {},
+            ),
           ),
         ),
       ),

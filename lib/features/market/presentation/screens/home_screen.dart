@@ -80,7 +80,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               slivers: [
                 SliverToBoxAdapter(
                   child: Padding(
-                    padding: const EdgeInsets.fromLTRB(
+                    padding: EdgeInsets.fromLTRB(
                       AppSizes.screenPadding.w,
                       AppSizes.sm.w,
                       AppSizes.screenPadding.w,
@@ -89,7 +89,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     child: Column(
                       children: [
                         _searchSection(),
-                        const SizedBox(height: AppSizes.md.w),
+                        SizedBox(height: AppSizes.md.w),
                         const GlobalStatsStrip(),
                       ],
                     ),
@@ -198,7 +198,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     return AsyncValueView<MarketSnapshot>(
       value: overview,
       onRetry: () => ref.read(globalStatsControllerProvider.notifier).refresh(),
-      loading: const SizedBox(
+      loading: SizedBox(
         height: AppSizes.marketCardHeight.h * 2,
         child: Center(child: AppLoader()),
       ),
@@ -219,7 +219,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         const SimulatedPriceBanner(),
       if (coins.isEmpty)
         Padding(
-          padding: const EdgeInsets.all(AppSizes.xl.w),
+          padding: EdgeInsets.all(AppSizes.xl.w),
           child: EmptyView(
             title: tab == HomeTab.trending
                 ? AppStrings.noTrending
@@ -274,7 +274,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     minHeight: 48,
                   ),
                   prefixIcon: Padding(
-                    padding: const EdgeInsets.only(
+                    padding: EdgeInsets.only(
                       left: AppSizes.md.w,
                       right: AppSizes.xs.w,
                     ),
@@ -483,11 +483,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     ),
   );
 
-  Widget _controlIcon(String asset, {double size = AppSizes.iconLarge.w}) =>
+  Widget _controlIcon(String asset, {double size = AppSizes.iconLarge}) =>
       SvgPicture.asset(
         asset,
-        width: size,
-        height: size,
+        width: size.w,
+        height: size.w,
         fit: BoxFit.contain,
         colorFilter: ColorFilter.mode(
           Theme.of(context).colorScheme.onSurfaceVariant,
@@ -570,7 +570,7 @@ class GlobalStatsStrip extends ConsumerWidget {
         Expanded(
           child: _OverviewTap(snapshot: snapshot, child: cap),
         ),
-        const SizedBox(width: AppSizes.sm.w),
+        SizedBox(width: AppSizes.sm.w),
         Expanded(
           child: _OverviewTap(snapshot: snapshot, child: volume),
         ),
@@ -602,7 +602,7 @@ class _MetricCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Container(
     height: AppSizes.marketCardHeight.h,
-    padding: const EdgeInsets.all(AppSizes.md.w),
+    padding: EdgeInsets.all(AppSizes.md.w),
     decoration: BoxDecoration(
       color: Theme.of(context).colorScheme.surface,
       borderRadius: BorderRadius.circular(AppSizes.radiusMd.r),
@@ -613,7 +613,7 @@ class _MetricCard extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Text(label, style: Theme.of(context).textTheme.bodySmall),
-        const SizedBox(height: AppSizes.xs.w),
+        SizedBox(height: AppSizes.xs.w),
         Row(
           children: [
             Expanded(
@@ -640,12 +640,12 @@ class _MetricSkeleton extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Container(
     height: AppSizes.marketCardHeight.h,
-    padding: const EdgeInsets.all(AppSizes.md.w),
+    padding: EdgeInsets.all(AppSizes.md.w),
     decoration: BoxDecoration(
       color: Theme.of(context).colorScheme.surface,
       borderRadius: BorderRadius.circular(AppSizes.radiusMd.r),
     ),
-    child: const Column(
+    child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisAlignment: MainAxisAlignment.center,
       children: [

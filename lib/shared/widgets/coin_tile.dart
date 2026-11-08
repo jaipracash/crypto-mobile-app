@@ -28,7 +28,7 @@ class CoinTile extends StatelessWidget {
       child: SizedBox(
         height: AppSizes.coinTileHeight.h,
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: AppSizes.sm.w),
+          padding: EdgeInsets.symmetric(horizontal: AppSizes.sm.w),
           child: Row(
             children: [
               SizedBox(
@@ -39,9 +39,9 @@ class CoinTile extends StatelessWidget {
                   style: theme.textTheme.bodySmall,
                 ),
               ),
-              const SizedBox(width: AppSizes.sm.w),
+              SizedBox(width: AppSizes.sm.w),
               CoinAvatar(symbol: coin.symbol, imageUrl: coin.image),
-              const SizedBox(width: AppSizes.md.w),
+              SizedBox(width: AppSizes.md.w),
               Expanded(
                 flex: 5,
                 child: Column(
@@ -77,12 +77,12 @@ class CoinTile extends StatelessWidget {
                         fontWeight: FontWeight.w600,
                       ),
                     ),
-                    const SizedBox(height: AppSizes.xs.w),
+                    SizedBox(height: AppSizes.xs.w),
                     ChangePill(change: coin.change24hPct, compact: true),
                   ],
                 ),
               ),
-              const SizedBox(width: AppSizes.sm.w),
+              SizedBox(width: AppSizes.sm.w),
               Sparkline(
                 values: coin.sparkline7d,
                 positive: (coin.change24hPct ?? 0) >= 0,

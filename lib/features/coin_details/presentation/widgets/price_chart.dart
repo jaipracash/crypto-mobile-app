@@ -115,7 +115,7 @@ class PriceChart extends StatelessWidget {
                 interval: yInterval,
                 reservedSize: 56,
                 getTitlesWidget: (value, _) => Padding(
-                  padding: const EdgeInsets.only(right: AppSizes.xs.w),
+                  padding: EdgeInsets.only(right: AppSizes.xs.w),
                   child: Text(
                     Formatters.compact(value, currencyCode: currency),
                     maxLines: 1,
@@ -135,7 +135,7 @@ class PriceChart extends StatelessWidget {
                   final index = value.round().clamp(0, points.length - 1);
                   final pattern = chart.days <= 1 ? 'HH:mm' : 'MMM d';
                   return Padding(
-                    padding: const EdgeInsets.only(top: AppSizes.xs.w),
+                    padding: EdgeInsets.only(top: AppSizes.xs.w),
                     child: Text(
                       DateFormat(pattern)
                           .format(points[index].timestamp.toLocal()),

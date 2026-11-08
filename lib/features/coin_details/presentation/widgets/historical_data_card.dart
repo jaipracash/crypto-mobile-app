@@ -20,7 +20,7 @@ class HistoricalDataCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Container(
-    padding: const EdgeInsets.all(AppSizes.lg.w),
+    padding: EdgeInsets.all(AppSizes.lg.w),
     decoration: BoxDecoration(
       color: Colors.white,
       border: Border.all(color: Theme.of(context).dividerColor),
@@ -36,7 +36,7 @@ class HistoricalDataCard extends StatelessWidget {
             fontWeight: FontWeight.w700,
           ),
         ),
-        const SizedBox(height: AppSizes.lg.w),
+        SizedBox(height: AppSizes.lg.w),
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -46,7 +46,7 @@ class HistoricalDataCard extends StatelessWidget {
                 value: Formatters.currency(details.high24h, currency),
               ),
             ),
-            const SizedBox(width: AppSizes.md.w),
+            SizedBox(width: AppSizes.md.w),
             Expanded(
               child: _HistoricalValue(
                 label: AppStrings.low24h,
@@ -55,7 +55,7 @@ class HistoricalDataCard extends StatelessWidget {
             ),
           ],
         ),
-        const SizedBox(height: AppSizes.xl.w),
+        SizedBox(height: AppSizes.xl.w),
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -67,7 +67,7 @@ class HistoricalDataCard extends StatelessWidget {
                 date: details.athDate,
               ),
             ),
-            const SizedBox(width: AppSizes.md.w),
+            SizedBox(width: AppSizes.md.w),
             Expanded(
               child: _HistoricalValue(
                 label: AppStrings.allTimeLow,
@@ -109,7 +109,7 @@ class _HistoricalValue extends StatelessWidget {
           style: Theme.of(context).textTheme.bodyMedium
               ?.copyWith(color: AppColors.lightTextSecondary),
         ),
-        const SizedBox(height: AppSizes.xs.w),
+        SizedBox(height: AppSizes.xs.w),
         Wrap(
           crossAxisAlignment: WrapCrossAlignment.center,
           spacing: AppSizes.xs.w,

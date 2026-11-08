@@ -41,7 +41,7 @@ class BottomSheetScaffold extends StatelessWidget {
   Widget build(BuildContext context) => Material(
     color: Theme.of(context).colorScheme.surface,
     shape: RoundedRectangleBorder(
-      borderRadius: const BorderRadius.vertical(
+      borderRadius: BorderRadius.vertical(
         top: Radius.circular(AppSizes.radiusLg.r),
       ),
     ),
@@ -51,7 +51,7 @@ class BottomSheetScaffold extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const SizedBox(height: AppSizes.md.w),
+          SizedBox(height: AppSizes.md.w),
           Container(
             width: AppSizes.sheetHandleWidth.w,
             height: AppSizes.sheetHandleHeight.h,
@@ -61,9 +61,9 @@ class BottomSheetScaffold extends StatelessWidget {
               borderRadius: BorderRadius.circular(AppSizes.radiusPill.r),
             ),
           ),
-          const SizedBox(height: AppSizes.sm.w),
+          SizedBox(height: AppSizes.sm.w),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: AppSizes.lg.w),
+            padding: EdgeInsets.symmetric(horizontal: AppSizes.lg.w),
             child: SizedBox(
               width: double.infinity,
               child: Center(
@@ -74,11 +74,11 @@ class BottomSheetScaffold extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(height: AppSizes.sm.w),
+          SizedBox(height: AppSizes.sm.w),
           Flexible(fit: FlexFit.loose, child: child),
           if (footer != null)
             Padding(
-              padding: const EdgeInsets.only(bottom: AppSizes.lg.w),
+              padding: EdgeInsets.only(bottom: AppSizes.lg.w),
               child: footer!,
             ),
         ],
@@ -96,9 +96,7 @@ class PeriodSheet extends ConsumerWidget {
     return BottomSheetScaffold(
       title: AppStrings.changePeriod,
       child: Padding(
-        padding: const EdgeInsets.symmetric(
-          horizontal: AppSizes.screenPadding.w,
-        ),
+        padding: EdgeInsets.symmetric(horizontal: AppSizes.screenPadding.w),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: ChangePeriod.values
@@ -145,9 +143,7 @@ class _FilterSheetState extends ConsumerState<FilterSheet> {
   Widget build(BuildContext context) => BottomSheetScaffold(
     title: AppStrings.filter,
     footer: Padding(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSizes.sheetContentInset.w,
-      ),
+      padding: EdgeInsets.symmetric(horizontal: AppSizes.sheetContentInset.w),
       child: Row(
         children: [
           Expanded(
@@ -163,7 +159,7 @@ class _FilterSheetState extends ConsumerState<FilterSheet> {
               child: const Text(AppStrings.reset),
             ),
           ),
-          const SizedBox(width: AppSizes.sm.w),
+          SizedBox(width: AppSizes.sm.w),
           Expanded(
             child: FilledButton(
               onPressed: () {
@@ -178,7 +174,7 @@ class _FilterSheetState extends ConsumerState<FilterSheet> {
       ),
     ),
     child: SingleChildScrollView(
-      padding: const EdgeInsets.fromLTRB(
+      padding: EdgeInsets.fromLTRB(
         AppSizes.sheetContentInset.w,
         AppSizes.sm.w,
         AppSizes.sheetContentInset.w,
@@ -227,7 +223,7 @@ class _FilterSheetState extends ConsumerState<FilterSheet> {
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
       Padding(
-        padding: const EdgeInsets.only(bottom: AppSizes.sm.w),
+        padding: EdgeInsets.only(bottom: AppSizes.sm.w),
         child: Text(
           title,
           style: Theme.of(context).textTheme.titleSmall
@@ -247,7 +243,7 @@ class _FilterSheetState extends ConsumerState<FilterSheet> {
           );
         }).toList(),
       ),
-      const SizedBox(height: AppSizes.lg.w),
+      SizedBox(height: AppSizes.lg.w),
     ],
   );
 }
@@ -275,9 +271,7 @@ class _SortSheetState extends ConsumerState<SortSheet> {
   Widget build(BuildContext context) => BottomSheetScaffold(
     title: AppStrings.sortCoins,
     footer: Padding(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSizes.sheetContentInset.w,
-      ),
+      padding: EdgeInsets.symmetric(horizontal: AppSizes.sheetContentInset.w),
       child: SizedBox(
         width: double.infinity,
         child: FilledButton(
@@ -297,7 +291,7 @@ class _SortSheetState extends ConsumerState<SortSheet> {
       ),
     ),
     child: Padding(
-      padding: const EdgeInsets.only(
+      padding: EdgeInsets.only(
         left: AppSizes.sheetContentInset.w,
         top: AppSizes.lg.w,
         right: AppSizes.sheetContentInset.w,
@@ -312,7 +306,7 @@ class _SortSheetState extends ConsumerState<SortSheet> {
             style: Theme.of(context).textTheme.titleSmall
                 ?.copyWith(fontWeight: FontWeight.w600),
           ),
-          const SizedBox(height: AppSizes.sm.w),
+          SizedBox(height: AppSizes.sm.w),
           Wrap(
             spacing: AppSizes.sm.w,
             runSpacing: AppSizes.xs.w,
@@ -326,13 +320,13 @@ class _SortSheetState extends ConsumerState<SortSheet> {
               );
             }).toList(),
           ),
-          const SizedBox(height: AppSizes.lg.w),
+          SizedBox(height: AppSizes.lg.w),
           Text(
             AppStrings.order,
             style: Theme.of(context).textTheme.titleSmall
                 ?.copyWith(fontWeight: FontWeight.w600),
           ),
-          const SizedBox(height: AppSizes.sm.w),
+          SizedBox(height: AppSizes.sm.w),
           Wrap(
             spacing: AppSizes.sm.w,
             children: [
@@ -377,8 +371,8 @@ Widget _sheetChoiceChip(
   onSelected: (_) => onSelected(),
   showCheckmark: false,
   materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-  padding: const EdgeInsets.symmetric(horizontal: AppSizes.sm.w),
-  labelPadding: const EdgeInsets.symmetric(horizontal: AppSizes.xs.w),
+  padding: EdgeInsets.symmetric(horizontal: AppSizes.sm.w),
+  labelPadding: EdgeInsets.symmetric(horizontal: AppSizes.xs.w),
   selectedColor: Theme.of(context).colorScheme.primary,
   backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
   shape: const StadiumBorder(),
@@ -393,7 +387,7 @@ ButtonStyle _sheetButtonStyle(
   backgroundColor: backgroundColor,
   foregroundColor: foregroundColor ?? Colors.white,
   minimumSize: const Size(0, 44),
-  padding: const EdgeInsets.symmetric(horizontal: AppSizes.md.w),
+  padding: EdgeInsets.symmetric(horizontal: AppSizes.md.w),
   shape: RoundedRectangleBorder(
     borderRadius: BorderRadius.circular(AppSizes.radiusMd.r),
   ),
@@ -421,12 +415,12 @@ class MarketOverviewPanel extends StatelessWidget {
     ].any((value) => value != null && value > 0);
 
     return Padding(
-      padding: const EdgeInsets.all(AppSizes.screenPadding.w),
+      padding: EdgeInsets.all(AppSizes.screenPadding.w),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(AppStrings.globalMarket, style: theme.textTheme.titleLarge),
-          const SizedBox(height: AppSizes.md.w),
+          SizedBox(height: AppSizes.md.w),
           Row(
             children: [
               Expanded(
@@ -440,7 +434,7 @@ class MarketOverviewPanel extends StatelessWidget {
                   change: snapshot.marketCapChange24hPct,
                 ),
               ),
-              const SizedBox(width: AppSizes.sm.w),
+              SizedBox(width: AppSizes.sm.w),
               Expanded(
                 child: _overviewMetric(
                   context,
@@ -453,10 +447,10 @@ class MarketOverviewPanel extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: AppSizes.md.w),
+          SizedBox(height: AppSizes.md.w),
           Container(
             width: double.infinity,
-            padding: const EdgeInsets.all(AppSizes.lg.w),
+            padding: EdgeInsets.all(AppSizes.lg.w),
             decoration: BoxDecoration(
               color: theme.colorScheme.surface,
               borderRadius: BorderRadius.circular(AppSizes.radiusMd.r),
@@ -469,7 +463,7 @@ class MarketOverviewPanel extends StatelessWidget {
                   AppStrings.marketDominance,
                   style: theme.textTheme.titleMedium,
                 ),
-                const SizedBox(height: AppSizes.md.w),
+                SizedBox(height: AppSizes.md.w),
                 if (hasDominance)
                   Row(
                     children: [
@@ -491,7 +485,7 @@ class MarketOverviewPanel extends StatelessWidget {
                           ),
                         ),
                       ),
-                      const SizedBox(width: AppSizes.md.w),
+                      SizedBox(width: AppSizes.md.w),
                       Expanded(
                         child: Column(
                           children: [
@@ -520,9 +514,7 @@ class MarketOverviewPanel extends StatelessWidget {
                   )
                 else
                   Padding(
-                    padding: const EdgeInsets.symmetric(
-                      vertical: AppSizes.xl.w,
-                    ),
+                    padding: EdgeInsets.symmetric(vertical: AppSizes.xl.w),
                     child: Center(
                       child: Text(
                         AppStrings.notAvailable,
@@ -560,7 +552,7 @@ class MarketOverviewPanel extends StatelessWidget {
     double? change,
   }) => Container(
     height: 112,
-    padding: const EdgeInsets.all(AppSizes.md.w),
+    padding: EdgeInsets.all(AppSizes.md.w),
     decoration: BoxDecoration(
       color: Theme.of(context).colorScheme.surface,
       borderRadius: BorderRadius.circular(AppSizes.radiusMd.r),
@@ -571,7 +563,7 @@ class MarketOverviewPanel extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Text(label, style: Theme.of(context).textTheme.bodySmall),
-        const SizedBox(height: AppSizes.sm.w),
+        SizedBox(height: AppSizes.sm.w),
         Text(
           value,
           maxLines: 1,
@@ -579,7 +571,7 @@ class MarketOverviewPanel extends StatelessWidget {
           style: Theme.of(context).textTheme.titleMedium,
         ),
         if (change != null) ...[
-          const SizedBox(height: AppSizes.xs.w),
+          SizedBox(height: AppSizes.xs.w),
           ChangePill(change: change, compact: true),
         ],
       ],
@@ -600,11 +592,11 @@ class MarketOverviewPanel extends StatelessWidget {
     double? value,
     Color color,
   ) => Padding(
-    padding: const EdgeInsets.symmetric(vertical: AppSizes.xs.w),
+    padding: EdgeInsets.symmetric(vertical: AppSizes.xs.w),
     child: Row(
       children: [
         Icon(Icons.circle, size: AppSizes.legendDot.w, color: color),
-        const SizedBox(width: AppSizes.sm.w),
+        SizedBox(width: AppSizes.sm.w),
         Expanded(child: Text(label)),
         Text(
           value == null
@@ -635,7 +627,7 @@ class _SelectionTile extends StatelessWidget {
     title: Text(title),
     trailing: selected
         ? Icon(Icons.check, color: Theme.of(context).colorScheme.onSurface)
-        : const SizedBox(width: AppSizes.iconMedium.w),
+        : SizedBox(width: AppSizes.iconMedium.w),
     onTap: onTap,
   );
 }
@@ -648,7 +640,7 @@ class MarketOverviewSheet extends StatelessWidget {
   Widget build(BuildContext context) => BottomSheetScaffold(
     title: AppStrings.marketOverview,
     child: Padding(
-      padding: const EdgeInsets.symmetric(horizontal: AppSizes.screenPadding.w),
+      padding: EdgeInsets.symmetric(horizontal: AppSizes.screenPadding.w),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -684,7 +676,7 @@ class MarketOverviewSheet extends StatelessWidget {
             snapshot?.othersDominance,
             AppColors.other,
           ),
-          const SizedBox(height: AppSizes.lg.w),
+          SizedBox(height: AppSizes.lg.w),
           _metric(
             context,
             AppStrings.activeCoins,
@@ -716,7 +708,7 @@ class MarketOverviewSheet extends StatelessWidget {
   ) => Row(
     children: [
       Icon(Icons.circle, size: AppSizes.legendDot.w, color: color),
-      const SizedBox(width: AppSizes.sm.w),
+      SizedBox(width: AppSizes.sm.w),
       Expanded(child: Text(label)),
       Text(
         value == null

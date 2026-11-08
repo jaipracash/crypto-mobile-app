@@ -19,7 +19,7 @@ class ErrorView extends StatelessWidget {
         failure is Failure && failure.type == FailureType.noInternet;
     return Center(
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(
+        padding: EdgeInsets.fromLTRB(
           AppSizes.xl.w,
           AppSizes.xl.w + AppSizes.md.w,
           AppSizes.xl.w,
@@ -34,7 +34,7 @@ class ErrorView extends StatelessWidget {
                 textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.titleMedium,
               ),
-              const SizedBox(height: AppSizes.sm.w),
+              SizedBox(height: AppSizes.sm.w),
               SvgPicture.asset(
                 'assets/no_interente.svg',
                 width: 140,
@@ -42,7 +42,7 @@ class ErrorView extends StatelessWidget {
                 fit: BoxFit.contain,
                 semanticsLabel: AppStrings.noInternetConnection,
               ),
-              const SizedBox(height: AppSizes.sm.w),
+              SizedBox(height: AppSizes.sm.w),
               Text(
                 AppStrings.checkInternetConnection,
                 textAlign: TextAlign.center,
@@ -56,7 +56,7 @@ class ErrorView extends StatelessWidget {
                 fit: BoxFit.contain,
                 semanticsLabel: AppStrings.somethingWentWrong,
               ),
-              const SizedBox(height: AppSizes.md.w),
+              SizedBox(height: AppSizes.md.w),
               Text(
                 AppStrings.somethingWentWrong,
                 textAlign: TextAlign.center,
@@ -68,7 +68,7 @@ class ErrorView extends StatelessWidget {
                 style: Theme.of(context).textTheme.bodyMedium,
               ),
             ],
-            const SizedBox(height: AppSizes.lg.w),
+            SizedBox(height: AppSizes.lg.w),
             FilledButton.icon(
               style: FilledButton.styleFrom(
                 backgroundColor: Theme.of(context).colorScheme.primary,

@@ -10,6 +10,8 @@ import 'package:gecko_lite/features/coin_details/presentation/widgets/stats_grid
 import 'package:gecko_lite/features/market/domain/coin.dart';
 import 'package:gecko_lite/shared/widgets/coin_avatar.dart';
 
+import '../../helpers/screen_util_test_wrapper.dart';
+
 void main() {
   test('coin chart reports the range requested from the repository', () {
     final chart = CoinChartDto(
@@ -95,9 +97,11 @@ void main() {
     );
 
     await tester.pumpWidget(
-      const MaterialApp(
-        home: Scaffold(
-          body: StatsGrid(details: details, currency: 'usd'),
+      screenUtilTestWrapper(
+        const MaterialApp(
+          home: Scaffold(
+            body: StatsGrid(details: details, currency: 'usd'),
+          ),
         ),
       ),
     );
@@ -130,9 +134,11 @@ void main() {
     );
 
     await tester.pumpWidget(
-      MaterialApp(
-        home: Scaffold(
-          body: HistoricalDataCard(details: details, currency: 'usd'),
+      screenUtilTestWrapper(
+        MaterialApp(
+          home: Scaffold(
+            body: HistoricalDataCard(details: details, currency: 'usd'),
+          ),
         ),
       ),
     );
@@ -167,9 +173,11 @@ void main() {
     );
 
     await tester.pumpWidget(
-      MaterialApp(
-        home: Scaffold(
-          body: PriceChart(chart: chart, currency: 'usd', onTouch: (_) {}),
+      screenUtilTestWrapper(
+        MaterialApp(
+          home: Scaffold(
+            body: PriceChart(chart: chart, currency: 'usd', onTouch: (_) {}),
+          ),
         ),
       ),
     );
@@ -195,9 +203,11 @@ void main() {
     );
 
     await tester.pumpWidget(
-      const MaterialApp(
-        home: Scaffold(
-          body: PriceChart(chart: chart, currency: 'usd', onTouch: _noTouch),
+      screenUtilTestWrapper(
+        const MaterialApp(
+          home: Scaffold(
+            body: PriceChart(chart: chart, currency: 'usd', onTouch: _noTouch),
+          ),
         ),
       ),
     );
@@ -222,13 +232,15 @@ void main() {
     );
 
     await tester.pumpWidget(
-      MaterialApp(
-        home: Scaffold(
-          body: PriceChart(
-            chart: chart,
-            currency: 'usd',
-            series: PriceChartSeries.marketCap,
-            onTouch: (_) {},
+      screenUtilTestWrapper(
+        MaterialApp(
+          home: Scaffold(
+            body: PriceChart(
+              chart: chart,
+              currency: 'usd',
+              series: PriceChartSeries.marketCap,
+              onTouch: (_) {},
+            ),
           ),
         ),
       ),
@@ -272,13 +284,15 @@ void main() {
     );
 
     await tester.pumpWidget(
-      MaterialApp(
-        home: Scaffold(
-          body: PriceChart(
-            chart: chart,
-            currency: 'usd',
-            style: PriceChartStyle.candles,
-            onTouch: (_) {},
+      screenUtilTestWrapper(
+        MaterialApp(
+          home: Scaffold(
+            body: PriceChart(
+              chart: chart,
+              currency: 'usd',
+              style: PriceChartStyle.candles,
+              onTouch: (_) {},
+            ),
           ),
         ),
       ),
@@ -296,13 +310,19 @@ void main() {
   ) async {
     const imageUrl = 'https://example.com/bitcoin.png';
     await tester.pumpWidget(
-      const MaterialApp(
-        home: Scaffold(
-          body: Row(
-            children: [
-              CoinAvatar(symbol: 'btc', imageUrl: imageUrl),
-              CoinAvatar(symbol: 'btc', imageUrl: imageUrl, enableHero: false),
-            ],
+      screenUtilTestWrapper(
+        const MaterialApp(
+          home: Scaffold(
+            body: Row(
+              children: [
+                CoinAvatar(symbol: 'btc', imageUrl: imageUrl),
+                CoinAvatar(
+                  symbol: 'btc',
+                  imageUrl: imageUrl,
+                  enableHero: false,
+                ),
+              ],
+            ),
           ),
         ),
       ),

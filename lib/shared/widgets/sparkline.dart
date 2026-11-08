@@ -9,20 +9,22 @@ class Sparkline extends StatelessWidget {
   const Sparkline({
     required this.values,
     this.positive = true,
-    this.width = AppSizes.sparklineWidth.w,
-    this.height = AppSizes.sparklineHeight.h,
+    this.width,
+    this.height,
     this.filled = false,
     super.key,
   });
 
   final List<double> values;
   final bool positive;
-  final double width;
-  final double height;
+  final double? width;
+  final double? height;
   final bool filled;
 
   @override
   Widget build(BuildContext context) {
+    final width = this.width ?? AppSizes.sparklineWidth.w;
+    final height = this.height ?? AppSizes.sparklineHeight.h;
     if (values.length < 2) {
       return SizedBox(width: width, height: height);
     }
