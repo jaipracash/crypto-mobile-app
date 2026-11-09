@@ -39,6 +39,20 @@ flutter test
 flutter analyze
 ```
 
+## Android APK builds
+
+Every push to `main` (including a pull request merge) runs the
+[Android APK workflow](.github/workflows/android-apk.yml). It analyzes the app,
+runs tests, builds a release-mode APK, and stores it as a GitHub Actions
+artifact for 30 days. Open the successful workflow run under the repository's
+**Actions** tab and download the `crypto-research-release-...` artifact.
+You can also start a build manually from the workflow's **Run workflow** option.
+
+The Android release build currently uses the debug signing configuration in
+`android/app/build.gradle.kts`; use this APK for testing, not Play Store
+distribution. Configure a protected production keystore and release signing
+before publishing.
+
 ## Architecture
 
 ```text

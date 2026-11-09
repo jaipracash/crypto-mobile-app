@@ -34,6 +34,9 @@ class HomeScreen extends ConsumerStatefulWidget {
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
   final ScrollController _tabsController = ScrollController();
+  final Map<HomeTab, GlobalKey> _homeTabKeys = {
+    for (final tab in HomeTab.values) tab: GlobalKey(),
+  };
   Offset? _tabSwipeStart;
   int _tabSlideDirection = 1;
 
@@ -81,16 +84,27 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 SliverToBoxAdapter(
                   child: Padding(
                     padding: EdgeInsets.fromLTRB(
-                      AppSizes.screenPadding.w,
+                      0,
                       AppSizes.sm.w,
-                      AppSizes.screenPadding.w,
+                      0,
                       AppSizes.sm.w,
                     ),
                     child: Column(
                       children: [
-                        _searchSection(),
+                        Padding(
+                          padding: EdgeInsets.only(
+                            left: AppSizes.screenPadding.w,
+                            right: AppSizes.xs.w,
+                          ),
+                          child: _searchSection(),
+                        ),
                         SizedBox(height: AppSizes.md.w),
-                        const GlobalStatsStrip(),
+                        Padding(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: AppSizes.screenPadding.w,
+                          ),
+                          child: const GlobalStatsStrip(),
+                        ),
                       ],
                     ),
                   ),
@@ -98,8 +112,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 SliverPersistentHeader(
                   pinned: true,
                   delegate: _HomeControlsDelegate(
-                    minHeight: AppSizes.homePinnedHeaderHeight.h,
-                    maxHeight: AppSizes.homePinnedHeaderHeight.h,
+                    minHeight: AppSizes.homeTabHeight.h + 2,
+                    maxHeight: AppSizes.homeTabHeight.h + 2,
                     child: _homeControls(tab, filters),
                   ),
                 ),
@@ -191,6 +205,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final nextIndex = HomeTab.values.indexOf(tab);
     _tabSlideDirection = direction ?? (nextIndex > currentIndex ? 1 : -1);
     ref.read(homeTabProvider.notifier).select(tab);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final tabContext = _homeTabKeys[tab]?.currentContext;
+      if (tabContext == null || !_tabsController.hasClients) return;
+      final renderObject = tabContext.findRenderObject();
+      if (renderObject == null) return;
+      _tabsController.position.ensureVisible(
+        renderObject,
+        alignment: 0.5,
+        duration: const Duration(milliseconds: 220),
+        curve: Curves.easeOut,
+      );
+    });
   }
 
   Widget _overviewSection(String currency) {
@@ -305,6 +331,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     borderSide: BorderSide.none,
                   ),
                   isDense: true,
+                  constraints: const BoxConstraints(minHeight: 44),
+                  contentPadding: EdgeInsets.symmetric(vertical: AppSizes.xs.h),
                 ),
               ),
             ),
@@ -318,7 +346,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               const SnackBar(content: Text(AppStrings.noNotifications)),
             );
           },
-          icon: _controlIcon('assets/notification-6-svgrepo-com.svg', size: 36),
+          icon: _controlIcon('assets/notification-6-svgrepo-com.svg', size: 32),
         ),
       ],
     );
@@ -332,156 +360,171 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           bottom: BorderSide(color: Theme.of(context).dividerColor, width: 0.5),
         ),
       ),
-      child: Column(
-        children: [
-          Row(
-            children: [
-              Expanded(
-                child: SizedBox(
-                  height: AppSizes.homeTabHeight.h,
-                  child: Stack(
-                    fit: StackFit.expand,
-                    children: [
-                      SingleChildScrollView(
-                        controller: _tabsController,
-                        scrollDirection: Axis.horizontal,
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: HomeTab.values
-                              .map((item) => _homeTab(item, tab))
-                              .toList(),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final compact = constraints.maxWidth < 380;
+          final actionWidth = compact
+              ? AppSizes.filterButtonExtent.w * 0.85
+              : AppSizes.filterButtonExtent.w;
+          return SizedBox(
+            height: AppSizes.homeTabHeight.h,
+            child: Row(
+              children: [
+                Expanded(
+                  child: SizedBox(
+                    height: AppSizes.homeTabHeight.h,
+                    child: Stack(
+                      fit: StackFit.expand,
+                      children: [
+                        SingleChildScrollView(
+                          controller: _tabsController,
+                          scrollDirection: Axis.horizontal,
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: HomeTab.values
+                                .map(
+                                  (item) =>
+                                      _homeTab(item, tab, compact: compact),
+                                )
+                                .toList(),
+                          ),
                         ),
-                      ),
-                      Positioned(
-                        top: 0,
-                        bottom: 0,
-                        right: 0,
-                        child: IgnorePointer(
-                          child: Container(
-                            width: AppSizes.xxl.w,
-                            decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                                begin: Alignment.centerLeft,
-                                end: Alignment.centerRight,
-                                colors: [
-                                  Theme.of(context).colorScheme.surface
-                                      .withValues(alpha: 0),
-                                  Theme.of(context).colorScheme.surface,
-                                ],
+                        Positioned(
+                          top: 0,
+                          bottom: 0,
+                          right: 0,
+                          child: IgnorePointer(
+                            child: Container(
+                              width: AppSizes.xxl.w,
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  begin: Alignment.centerLeft,
+                                  end: Alignment.centerRight,
+                                  colors: [
+                                    Theme.of(context).colorScheme.surface
+                                        .withValues(alpha: 0),
+                                    Theme.of(context).colorScheme.surface,
+                                  ],
+                                ),
                               ),
                             ),
                           ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  height: AppSizes.homeTabHeight.h,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      SizedBox(
+                        width: actionWidth,
+                        height: AppSizes.homeTabHeight.h,
+                        child: IconButton(
+                          tooltip: AppStrings.sortCoins,
+                          onPressed: () => _openSheet(const SortSheet()),
+                          icon: _controlIcon(
+                            'assets/sort-vertical-svgrepo-com.svg',
+                          ),
+                          padding: EdgeInsets.zero,
+                          visualDensity: VisualDensity.compact,
+                        ),
+                      ),
+                      SizedBox(
+                        width: actionWidth,
+                        child: Stack(
+                          clipBehavior: Clip.none,
+                          children: [
+                            IconButton(
+                              tooltip: AppStrings.filter,
+                              onPressed: () => _openSheet(const FilterSheet()),
+                              icon: _controlIcon(
+                                'assets/filter-svgrepo-com.svg',
+                                size: AppSizes.iconMedium.w,
+                              ),
+                              padding: EdgeInsets.zero,
+                              visualDensity: VisualDensity.compact,
+                            ),
+                            if (filters.activeCount > 0)
+                              Positioned(
+                                top: 2,
+                                right: 2,
+                                child: CircleAvatar(
+                                  radius: AppSizes.filterBadgeRadius.r,
+                                  backgroundColor: Theme.of(context)
+                                      .colorScheme
+                                      .surfaceContainerHighest,
+                                  child: Text(
+                                    '${filters.activeCount}',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .labelSmall
+                                        ?.copyWith(
+                                          fontSize:
+                                              AppSizes.filterBadgeTextSize.sp,
+                                        ),
+                                  ),
+                                ),
+                              ),
+                          ],
                         ),
                       ),
                     ],
                   ),
                 ),
-              ),
-              SizedBox(
-                height: AppSizes.homeTabHeight.h,
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    SizedBox(
-                      width: AppSizes.filterButtonExtent.w,
-                      height: AppSizes.homeTabHeight.h,
-                      child: IconButton(
-                        tooltip: AppStrings.sortCoins,
-                        onPressed: () => _openSheet(const SortSheet()),
-                        icon: _controlIcon(
-                          'assets/sort-vertical-svgrepo-com.svg',
-                        ),
-                        padding: EdgeInsets.zero,
-                        visualDensity: VisualDensity.compact,
-                      ),
-                    ),
-                    SizedBox(
-                      width: AppSizes.filterButtonExtent.w,
-                      child: Stack(
-                        clipBehavior: Clip.none,
-                        children: [
-                          IconButton(
-                            tooltip: AppStrings.filter,
-                            onPressed: () => _openSheet(const FilterSheet()),
-                            icon: _controlIcon(
-                              'assets/filter-svgrepo-com.svg',
-                              size: AppSizes.iconMedium.w,
-                            ),
-                            padding: EdgeInsets.zero,
-                            visualDensity: VisualDensity.compact,
-                          ),
-                          if (filters.activeCount > 0)
-                            Positioned(
-                              top: 2,
-                              right: 2,
-                              child: CircleAvatar(
-                                radius: AppSizes.filterBadgeRadius.r,
-                                backgroundColor: Theme.of(context)
-                                    .colorScheme
-                                    .surfaceContainerHighest,
-                                child: Text(
-                                  '${filters.activeCount}',
-                                  style: Theme.of(context).textTheme.labelSmall
-                                      ?.copyWith(
-                                        fontSize:
-                                            AppSizes.filterBadgeTextSize.sp,
-                                      ),
-                                ),
-                              ),
-                            ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ],
+              ],
+            ),
+          );
+        },
       ),
     ),
   );
 
-  Widget _homeTab(HomeTab item, HomeTab selectedTab) => InkWell(
-    onTap: () => _selectTab(item),
-    child: SizedBox(
-      width: switch (item) {
-        HomeTab.overview => 82,
-        HomeTab.all => 54,
-        HomeTab.trending => 78,
-        HomeTab.gainers => 108,
-        HomeTab.losers => 66,
-      },
-      height: AppSizes.homeTabHeight.h,
-      child: Stack(
-        alignment: Alignment.bottomCenter,
-        children: [
-          Center(
-            child: Text(
-              _tabLabel(item),
-              style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                color: item == selectedTab
-                    ? Theme.of(context).colorScheme.primary
-                    : Theme.of(context).colorScheme.onSurfaceVariant,
-                fontWeight: item == selectedTab
-                    ? FontWeight.w700
-                    : FontWeight.w600,
+  Widget _homeTab(HomeTab item, HomeTab selectedTab, {required bool compact}) =>
+      InkWell(
+        key: _homeTabKeys[item],
+        onTap: () => _selectTab(item),
+        child: SizedBox(
+          width: switch (item) {
+            HomeTab.overview => compact ? 72.0 : 82.0,
+            HomeTab.all => compact ? 48.0 : 54.0,
+            HomeTab.trending => compact ? 68.0 : 78.0,
+            HomeTab.gainers => compact ? 94.0 : 108.0,
+            HomeTab.losers => compact ? 58.0 : 66.0,
+          },
+          height: AppSizes.homeTabHeight.h,
+          child: Stack(
+            alignment: Alignment.bottomCenter,
+            children: [
+              Center(
+                child: Text(
+                  _tabLabel(item),
+                  style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                    fontSize: compact ? 13 : null,
+                    color: item == selectedTab
+                        ? Theme.of(context).colorScheme.primary
+                        : Theme.of(context).colorScheme.onSurfaceVariant,
+                    fontWeight: item == selectedTab
+                        ? FontWeight.w700
+                        : FontWeight.w600,
+                  ),
+                ),
               ),
-            ),
+              if (item == selectedTab)
+                Container(
+                  width: AppSizes.tabIndicatorWidth.w,
+                  height: AppSizes.homeTabUnderlineHeight.h,
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.primary,
+                    borderRadius: BorderRadius.circular(AppSizes.radiusPill.r),
+                  ),
+                ),
+            ],
           ),
-          if (item == selectedTab)
-            Container(
-              width: AppSizes.tabIndicatorWidth.w,
-              height: AppSizes.homeTabUnderlineHeight.h,
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.primary,
-                borderRadius: BorderRadius.circular(AppSizes.radiusPill.r),
-              ),
-            ),
-        ],
-      ),
-    ),
-  );
+        ),
+      );
 
   Widget _controlIcon(String asset, {double size = AppSizes.iconLarge}) =>
       SvgPicture.asset(
@@ -601,14 +644,20 @@ class _MetricCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Container(
-    height: AppSizes.marketCardHeight.h,
-    padding: EdgeInsets.all(AppSizes.md.w),
+    constraints: BoxConstraints(
+      minHeight: (AppSizes.marketCardHeight - AppSizes.sm).h,
+    ),
+    padding: EdgeInsets.symmetric(
+      horizontal: AppSizes.md.w,
+      vertical: AppSizes.sm.w,
+    ),
     decoration: BoxDecoration(
       color: Theme.of(context).colorScheme.surface,
       borderRadius: BorderRadius.circular(AppSizes.radiusMd.r),
       border: Border.all(color: Theme.of(context).dividerColor),
     ),
     child: Column(
+      mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -639,13 +688,19 @@ class _MetricSkeleton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Container(
-    height: AppSizes.marketCardHeight.h,
-    padding: EdgeInsets.all(AppSizes.md.w),
+    constraints: BoxConstraints(
+      minHeight: (AppSizes.marketCardHeight - AppSizes.sm).h,
+    ),
+    padding: EdgeInsets.symmetric(
+      horizontal: AppSizes.md.w,
+      vertical: AppSizes.sm.w,
+    ),
     decoration: BoxDecoration(
       color: Theme.of(context).colorScheme.surface,
       borderRadius: BorderRadius.circular(AppSizes.radiusMd.r),
     ),
     child: Column(
+      mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisAlignment: MainAxisAlignment.center,
       children: [

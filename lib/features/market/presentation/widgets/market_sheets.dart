@@ -50,15 +50,19 @@ class BottomSheetScaffold extends StatelessWidget {
       top: false,
       child: Column(
         mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           SizedBox(height: AppSizes.md.w),
-          Container(
-            width: AppSizes.sheetHandleWidth.w,
-            height: AppSizes.sheetHandleHeight.h,
-            decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.onSurfaceVariant
-                  .withValues(alpha: 0.4),
-              borderRadius: BorderRadius.circular(AppSizes.radiusPill.r),
+          Align(
+            alignment: Alignment.center,
+            child: Container(
+              width: AppSizes.sheetHandleWidth.w,
+              height: AppSizes.sheetHandleHeight.h,
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.onSurfaceVariant
+                    .withValues(alpha: 0.4),
+                borderRadius: BorderRadius.circular(AppSizes.radiusPill.r),
+              ),
             ),
           ),
           SizedBox(height: AppSizes.sm.w),
@@ -143,7 +147,7 @@ class _FilterSheetState extends ConsumerState<FilterSheet> {
   Widget build(BuildContext context) => BottomSheetScaffold(
     title: AppStrings.filter,
     footer: Padding(
-      padding: EdgeInsets.symmetric(horizontal: AppSizes.sheetContentInset.w),
+      padding: EdgeInsets.symmetric(horizontal: AppSizes.lg.w),
       child: Row(
         children: [
           Expanded(
@@ -175,9 +179,9 @@ class _FilterSheetState extends ConsumerState<FilterSheet> {
     ),
     child: SingleChildScrollView(
       padding: EdgeInsets.fromLTRB(
-        AppSizes.sheetContentInset.w,
+        AppSizes.lg.w,
         AppSizes.sm.w,
-        AppSizes.sheetContentInset.w,
+        AppSizes.lg.w,
         AppSizes.lg.w,
       ),
       child: Column(
@@ -687,6 +691,7 @@ class MarketOverviewSheet extends StatelessWidget {
             AppStrings.marketCapChange,
             Formatters.percent(snapshot?.marketCapChange24hPct),
           ),
+          SizedBox(height: AppSizes.xl.w),
         ],
       ),
     ),

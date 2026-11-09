@@ -174,7 +174,7 @@ class _CoinDetailsScreenState extends ConsumerState<CoinDetailsScreen>
                   ),
                 ),
                 padding: EdgeInsets.zero,
-                constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
+                constraints: const BoxConstraints(minWidth: 32, minHeight: 40),
                 visualDensity: VisualDensity.compact,
               ),
               IconButton(
@@ -184,15 +184,15 @@ class _CoinDetailsScreenState extends ConsumerState<CoinDetailsScreen>
                 ),
                 icon: SvgPicture.asset(
                   'assets/notification-6-svgrepo-com.svg',
-                  width: 22,
-                  height: 22,
+                  width: 26,
+                  height: 26,
                   colorFilter: const ColorFilter.mode(
                     AppColors.lightTextSecondary,
                     BlendMode.srcIn,
                   ),
                 ),
                 padding: EdgeInsets.zero,
-                constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
+                constraints: const BoxConstraints(minWidth: 32, minHeight: 40),
                 visualDensity: VisualDensity.compact,
               ),
               IconButton(
@@ -209,8 +209,8 @@ class _CoinDetailsScreenState extends ConsumerState<CoinDetailsScreen>
                   scale: _favoriteScale,
                   child: SvgPicture.asset(
                     watched ? 'assets/star-filled.svg' : 'assets/star.svg',
-                    width: 18,
-                    height: 18,
+                    width: 20,
+                    height: 20,
                     colorFilter: ColorFilter.mode(
                       watched
                           ? AppColors.watchlistStar
@@ -220,8 +220,12 @@ class _CoinDetailsScreenState extends ConsumerState<CoinDetailsScreen>
                   ),
                 ),
                 padding: EdgeInsets.zero,
-                constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
+                constraints: const BoxConstraints(minWidth: 32, minHeight: 40),
                 visualDensity: VisualDensity.compact,
+                style: const ButtonStyle(
+                  splashFactory: NoSplash.splashFactory,
+                  overlayColor: WidgetStatePropertyAll(Colors.transparent),
+                ),
               ),
             ],
           ),
@@ -308,6 +312,10 @@ class _CoinDetailsScreenState extends ConsumerState<CoinDetailsScreen>
     final isPositive = (selectedChange ?? coin.change24hPct ?? 0) >= 0;
     final color = isPositive ? AppColors.lightGain : AppColors.lightLoss;
     return ListView(
+      physics: const BouncingScrollPhysics(
+        parent: AlwaysScrollableScrollPhysics(),
+      ),
+      dragStartBehavior: DragStartBehavior.down,
       padding: EdgeInsets.fromLTRB(
         AppSizes.screenPadding.w,
         AppSizes.sm.w,
@@ -464,6 +472,10 @@ class _CoinDetailsScreenState extends ConsumerState<CoinDetailsScreen>
     String currency,
   ) {
     return ListView(
+      physics: const BouncingScrollPhysics(
+        parent: AlwaysScrollableScrollPhysics(),
+      ),
+      dragStartBehavior: DragStartBehavior.down,
       padding: EdgeInsets.fromLTRB(
         AppSizes.screenPadding.w,
         AppSizes.lg.w,

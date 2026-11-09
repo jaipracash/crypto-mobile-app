@@ -1,19 +1,23 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:gecko_lite/core/constants/app_sizes.dart';
 import 'package:gecko_lite/core/constants/app_strings.dart';
 import 'package:gecko_lite/features/market/domain/coin.dart';
 import 'package:gecko_lite/features/market/domain/market_filters.dart';
 import 'package:gecko_lite/features/market/domain/market_models.dart';
 import 'package:gecko_lite/features/market/presentation/controllers/market_controller.dart';
+import 'package:gecko_lite/features/market/presentation/screens/home_screen.dart';
 import 'package:gecko_lite/features/market/presentation/screens/search_screen.dart';
 import 'package:gecko_lite/features/market/presentation/widgets/coin_row.dart';
 import 'package:gecko_lite/features/market/presentation/widgets/market_sheets.dart';
 import 'package:gecko_lite/features/settings/domain/app_settings.dart';
 import 'package:gecko_lite/features/settings/presentation/controllers/settings_controller.dart';
 import 'package:gecko_lite/shared/widgets/change_pill.dart';
+import 'package:gecko_lite/shared/widgets/shimmer_box.dart';
 import 'package:gecko_lite/shared/widgets/sparkline.dart';
 
 import '../../helpers/screen_util_test_wrapper.dart';
@@ -43,7 +47,78 @@ class _SearchTestSettingsController extends SettingsController {
   Future<AppSettings> build() async => const AppSettings();
 }
 
+class _HomeTestGlobalStatsController extends GlobalStatsController {
+  @override
+  Future<MarketSnapshot> build() async => const MarketSnapshot(
+    totalMarketCap: 2500000000000,
+    totalVolume24h: 95000000000,
+    marketCapChange24hPct: 2.5,
+  );
+}
+
 void main() {
+  testWidgets('home controls fit a short narrow screen without overflow', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(325, 560);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(
+      ScreenUtilInit(
+        designSize: const Size(390, 844),
+        minTextAdapt: true,
+        splitScreenMode: true,
+        builder: (_, child) => child!,
+        child: ProviderScope(
+          overrides: [
+            coinListControllerProvider.overrideWith(
+              _SearchTestCoinListController.new,
+            ),
+            trendingControllerProvider.overrideWith(
+              _SearchTestTrendingController.new,
+            ),
+            globalStatsControllerProvider.overrideWith(
+              _HomeTestGlobalStatsController.new,
+            ),
+            settingsControllerProvider.overrideWith(
+              _SearchTestSettingsController.new,
+            ),
+          ],
+          child: const MaterialApp(home: HomeScreen()),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(
+      tester.getSize(find.byType(TextField)).height,
+      greaterThanOrEqualTo(44),
+    );
+    final searchRect = tester.getRect(find.byType(TextField));
+    final notificationRect = tester.getRect(
+      find.byTooltip(AppStrings.notifications),
+    );
+    expect(notificationRect.right, greaterThan(317));
+    expect(searchRect.right, lessThan(notificationRect.left));
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('Coin row skeleton omits rank-column shimmer', (tester) async {
+    await tester.pumpWidget(
+      screenUtilTestWrapper(
+        const MaterialApp(
+          home: Scaffold(body: SizedBox(width: 390, child: CoinRowSkeleton())),
+        ),
+      ),
+    );
+
+    expect(find.byType(ShimmerBox), findsNWidgets(5));
+    final avatar = tester.getRect(find.byType(ShimmerBox).first);
+    expect(avatar.left, closeTo(AppSizes.screenPadding.w, 0.1));
+  });
+
   testWidgets('CoinRow renders coin data without a favorite control', (
     tester,
   ) async {
@@ -141,6 +216,60 @@ void main() {
     expect(find.textContaining('BTC'), findsOneWidget);
     expect(find.textContaining('1.3T'), findsOneWidget);
     expect(find.byType(VerticalDivider), findsNothing);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('market table compacts price and columns on narrow screens', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(320, 640);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    const coin = Coin(
+      id: 'bitcoin',
+      symbol: 'btc',
+      name: 'Bitcoin',
+      rank: 1,
+      price: 67420,
+      marketCap: 1300000000000,
+      change24hPct: 2.4,
+      sparkline7d: [65000, 66500, 65800, 67420],
+    );
+    await tester.pumpWidget(
+      screenUtilTestWrapper(
+        MaterialApp(
+          home: Scaffold(
+            body: SizedBox(
+              width: 320,
+              child: Column(
+                children: [
+                  CoinTableHeader(period: ChangePeriod.day, onPeriodTap: () {}),
+                  CoinRow(
+                    coin: coin,
+                    currency: 'usd',
+                    period: ChangePeriod.day,
+                    onTap: () {},
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    final priceStyles = tester
+        .widgetList<AnimatedDefaultTextStyle>(
+          find.byType(AnimatedDefaultTextStyle),
+        )
+        .map((style) => style.style.fontSize);
+    expect(priceStyles, contains(12));
+    expect(
+      tester.widget<Sparkline>(find.byType(Sparkline)).width,
+      lessThan(50),
+    );
     expect(tester.takeException(), isNull);
   });
 
@@ -345,6 +474,74 @@ void main() {
     expect(container.read(marketFiltersProvider).marketCap, 'any');
   });
 
+  testWidgets('FilterSheet stays within narrow screen horizontal bounds', (
+    tester,
+  ) async {
+    final container = ProviderContainer();
+    addTearDown(container.dispose);
+    tester.view.physicalSize = const Size(320, 640);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(
+      screenUtilTestWrapper(
+        UncontrolledProviderScope(
+          container: container,
+          child: MaterialApp(
+            home: Scaffold(
+              body: Builder(
+                builder: (context) => TextButton(
+                  onPressed: () =>
+                      showMarketSheet(context, const FilterSheet()),
+                  child: const Text(AppStrings.filter),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.tap(find.text(AppStrings.filter));
+    await tester.pumpAndSettle();
+
+    final resetButton = find.widgetWithText(FilledButton, AppStrings.reset);
+    final applyButton = find.widgetWithText(FilledButton, 'Apply (0)');
+    final resetRect = tester.getRect(resetButton);
+    final applyRect = tester.getRect(applyButton);
+    final horizontalInset = AppSizes.lg.w;
+    expect(resetRect.left, closeTo(horizontalInset, 0.1));
+    expect(applyRect.right, closeTo(320 - horizontalInset, 0.1));
+    final contentPadding =
+        tester
+                .widget<SingleChildScrollView>(
+                  find.byType(SingleChildScrollView),
+                )
+                .padding!
+            as EdgeInsets;
+    expect(contentPadding.left, horizontalInset);
+    expect(contentPadding.right, horizontalInset);
+    final showTopRect = tester.getRect(find.text(AppStrings.showTop));
+    expect(showTopRect.left, closeTo(resetRect.left, 0.1));
+    final footerPadding = tester
+        .widgetList<Padding>(find.byType(Padding))
+        .firstWhere((padding) {
+          final child = padding.child;
+          return child is Row &&
+              child.children.any((widget) => widget is Expanded);
+        })
+        .padding
+        .resolve(TextDirection.ltr);
+    expect(footerPadding.left, horizontalInset);
+    expect(footerPadding.right, horizontalInset);
+    for (final chip in find.byType(ChoiceChip).evaluate()) {
+      final rect = tester.getRect(find.byWidget(chip.widget));
+      expect(rect.left, greaterThanOrEqualTo(horizontalInset));
+      expect(rect.right, lessThanOrEqualTo(320 - horizontalInset));
+    }
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('FilterSheet applies top count from its draft', (tester) async {
     final container = ProviderContainer();
     addTearDown(container.dispose);
@@ -451,6 +648,39 @@ void main() {
     expect(find.text(AppStrings.marketDominance), findsOneWidget);
     expect(find.text(AppStrings.activeCoins), findsOneWidget);
     expect(find.text('12000'), findsOneWidget);
+  });
+
+  testWidgets('Market overview sheet leaves space below market cap change', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      screenUtilTestWrapper(
+        MaterialApp(
+          home: Scaffold(
+            body: Builder(
+              builder: (context) => TextButton(
+                onPressed: () => showMarketSheet(
+                  context,
+                  const MarketOverviewSheet(
+                    snapshot: MarketSnapshot(marketCapChange24hPct: 2.5),
+                  ),
+                ),
+                child: const Text(AppStrings.marketOverview),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.tap(find.text(AppStrings.marketOverview));
+    await tester.pumpAndSettle();
+
+    final sheetBottom = tester.getRect(find.byType(BottomSheetScaffold)).bottom;
+    final finalMetricBottom = tester
+        .getRect(find.text(AppStrings.marketCapChange))
+        .bottom;
+    expect(sheetBottom - finalMetricBottom, greaterThanOrEqualTo(9));
+    expect(tester.takeException(), isNull);
   });
 
   testWidgets('PeriodSheet selection rows have horizontal inset', (
