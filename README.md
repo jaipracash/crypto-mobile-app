@@ -6,6 +6,35 @@ supports market browsing, coin details and charts, global market metrics, a
 per-device watchlist, and persisted display preferences. The Home screen loads a
 single top-N market page and applies sorting and filters locally.
 
+## Features
+
+- Browse paginated market and trending coin data; filter and sort the loaded
+  market list locally.
+- Search coins with debounced API requests.
+- View coin market statistics, historical data, line/candlestick charts, and
+  selectable chart ranges.
+- Inspect global market capitalization, volume, and dominance.
+- Maintain a per-device watchlist and choose currency, theme, and refresh
+  preferences.
+- Use responsive loading, error, offline, and empty states throughout the app.
+
+The backend may serve live CoinGecko data, cached data, or mock fixtures. The
+app surfaces the API's data-source indicator. Its real-time-looking price
+updates are simulated demo data, not live exchange prices.
+
+## Technology stack
+
+- **Flutter / Dart** for the mobile and web-capable client.
+- **Riverpod** for application state and feature controllers.
+- **GoRouter** for navigation.
+- **Dio** for REST requests; `web_socket_channel` for the demo price stream.
+- **fl_chart** for market charts; Flutter SVG and cached network images for
+  assets.
+- **SharedPreferences** for the device identifier and persisted preferences.
+- **flutter_screenutil**, Material, Google Fonts, `intl`, and Shimmer for
+  responsive UI and presentation.
+- **Flutter test** and `flutter_lints` for testing and static analysis.
+
 ## Requirements
 
 - Flutter SDK compatible with Dart 3.13 or later
@@ -39,6 +68,9 @@ flutter test
 flutter analyze
 ```
 
+The test suite includes widget tests for responsive market screens, settings,
+watchlist interactions, chart widgets, and repository/provider behavior.
+
 ## Android APK builds
 
 Every push to `main` (including a pull request merge) runs the
@@ -53,26 +85,25 @@ The Android release build currently uses the debug signing configuration in
 distribution. Configure a protected production keystore and release signing
 before publishing.
 
-## Architecture
+## App architecture
 
 ```text
-Presentation (screens, widgets, Notifier / AsyncNotifier controllers)
-             │ watches state; controllers depend on interfaces only
+Screens and feature widgets
              ▼
-Domain (entities and abstract repository contracts)
-             ▲
-             │ repository implementations map DTOs and failures
-Data (DTOs, remote data sources, repository implementations)
-             │
+Riverpod controllers
              ▼
-Core Dio client ── FastAPI /api endpoints
+Feature repositories and domain contracts
+             ▼
+Dio client ── FastAPI /api endpoints
 ```
 
-Each feature owns its domain contracts, data mapping, and presentation code.
-Riverpod providers bind repository interfaces to their implementations.
-`X-Device-ID` is generated once and stored in SharedPreferences; the Dio client
-adds it to every request. Settings are persisted locally. API failures are
-mapped to typed `Failure` values, and source headers are surfaced in the UI.
+Each feature keeps its domain, data, and presentation code together. Repository
+providers connect controllers to repository implementations; reusable
+components and coin API mapping live under `lib/shared/`, and app-wide
+infrastructure lives under `lib/core/`. The `X-Device-ID` value is generated
+once and persisted in SharedPreferences. The Dio client sends it with requests
+so the backend can scope watchlists to the app installation. API errors map to
+typed failures and response data-source headers are surfaced in the UI.
 
 ## Folder overview
 
