@@ -9,8 +9,8 @@ import 'features/market/presentation/controllers/live_price_controller.dart';
 import 'features/settings/presentation/controllers/settings_controller.dart';
 import 'features/settings/presentation/controllers/theme_controller.dart';
 
-class GeckoLiteApp extends ConsumerWidget {
-  const GeckoLiteApp({super.key});
+class CryptoResearchApp extends ConsumerWidget {
+  const CryptoResearchApp({super.key});
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final currency =

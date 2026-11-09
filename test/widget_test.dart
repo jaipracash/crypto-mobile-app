@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:gecko_lite/core/error/failure.dart';
-import 'package:gecko_lite/features/market/domain/coin.dart';
-import 'package:gecko_lite/shared/widgets/async_value_view.dart';
-import 'package:gecko_lite/shared/widgets/coin_tile.dart';
-import 'package:gecko_lite/shared/widgets/app_loader.dart';
-import 'package:gecko_lite/shared/widgets/error_view.dart';
-import 'package:gecko_lite/shared/widgets/simulated_price_banner.dart';
+import 'package:crypto_research_app/core/error/failure.dart';
+import 'package:crypto_research_app/features/market/domain/coin.dart';
+import 'package:crypto_research_app/shared/widgets/async_value_view.dart';
+import 'package:crypto_research_app/shared/widgets/coin_tile.dart';
+import 'package:crypto_research_app/shared/widgets/app_loader.dart';
+import 'package:crypto_research_app/shared/widgets/error_view.dart';
+import 'package:crypto_research_app/shared/widgets/simulated_price_banner.dart';
 
 import 'helpers/screen_util_test_wrapper.dart';
 

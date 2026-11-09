@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fl_chart/fl_chart.dart';
-import 'package:gecko_lite/core/constants/app_strings.dart';
-import 'package:gecko_lite/features/coin_details/data/coin_details_dto.dart';
-import 'package:gecko_lite/features/coin_details/domain/coin_details.dart';
-import 'package:gecko_lite/features/coin_details/presentation/widgets/coin_info_tab.dart';
-import 'package:gecko_lite/features/coin_details/presentation/widgets/historical_data_card.dart';
-import 'package:gecko_lite/features/coin_details/presentation/widgets/price_chart.dart';
-import 'package:gecko_lite/features/coin_details/presentation/widgets/stats_grid.dart';
-import 'package:gecko_lite/features/market/domain/coin.dart';
-import 'package:gecko_lite/shared/widgets/coin_avatar.dart';
+import 'package:crypto_research_app/core/constants/app_strings.dart';
+import 'package:crypto_research_app/features/coin_details/data/coin_details_dto.dart';
+import 'package:crypto_research_app/features/coin_details/domain/coin_details.dart';
+import 'package:crypto_research_app/features/coin_details/presentation/widgets/coin_info_tab.dart';
+import 'package:crypto_research_app/features/coin_details/presentation/widgets/historical_data_card.dart';
+import 'package:crypto_research_app/features/coin_details/presentation/widgets/price_chart.dart';
+import 'package:crypto_research_app/features/coin_details/presentation/widgets/stats_grid.dart';
+import 'package:crypto_research_app/features/market/domain/coin.dart';
+import 'package:crypto_research_app/shared/widgets/coin_avatar.dart';
 
 import '../../helpers/screen_util_test_wrapper.dart';
 

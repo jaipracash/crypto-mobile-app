@@ -21,7 +21,7 @@ Future<void> main() async {
         sharedPreferencesProvider.overrideWithValue(preferences),
         deviceIdProvider.overrideWithValue(deviceId),
       ],
-      child: const GeckoLiteApp(),
+      child: const CryptoResearchApp(),
     ),
   );
 }

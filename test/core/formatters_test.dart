@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:gecko_lite/core/utils/formatters.dart';
+import 'package:crypto_research_app/core/utils/formatters.dart';
 
 void main() {
   group('Formatters', () {

@@ -1,8 +1,8 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:gecko_lite/core/error/failure.dart';
-import 'package:gecko_lite/features/watchlist/data/watchlist_remote_datasource.dart';
-import 'package:gecko_lite/features/watchlist/data/watchlist_repository_impl.dart';
+import 'package:crypto_research_app/core/error/failure.dart';
+import 'package:crypto_research_app/features/watchlist/data/watchlist_remote_datasource.dart';
+import 'package:crypto_research_app/features/watchlist/data/watchlist_repository_impl.dart';
 
 class _FakeWatchlistRemoteDataSource implements WatchlistRemoteDataSource {
   _FakeWatchlistRemoteDataSource({this.fail = false});

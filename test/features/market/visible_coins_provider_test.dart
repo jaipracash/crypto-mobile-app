@@ -1,12 +1,12 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:gecko_lite/features/market/domain/coin.dart';
-import 'package:gecko_lite/features/market/domain/market_filters.dart';
-import 'package:gecko_lite/features/market/presentation/controllers/market_controller.dart';
-import 'package:gecko_lite/features/market/presentation/controllers/live_price_controller.dart';
-import 'package:gecko_lite/features/market/presentation/controllers/visible_coins_provider.dart';
-import 'package:gecko_lite/features/watchlist/domain/watchlist_repository.dart';
-import 'package:gecko_lite/features/watchlist/presentation/controllers/watchlist_controller.dart';
+import 'package:crypto_research_app/features/market/domain/coin.dart';
+import 'package:crypto_research_app/features/market/domain/market_filters.dart';
+import 'package:crypto_research_app/features/market/presentation/controllers/market_controller.dart';
+import 'package:crypto_research_app/features/market/presentation/controllers/live_price_controller.dart';
+import 'package:crypto_research_app/features/market/presentation/controllers/visible_coins_provider.dart';
+import 'package:crypto_research_app/features/watchlist/domain/watchlist_repository.dart';
+import 'package:crypto_research_app/features/watchlist/presentation/controllers/watchlist_controller.dart';
 
 const _coins = [
   Coin(

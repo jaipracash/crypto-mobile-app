@@ -1,6 +1,6 @@
-# GeckoLite
+# Crypto Research App
 
-GeckoLite is a Flutter crypto research app built with Flutter Riverpod 2.x and a
+Crypto Research App is a Flutter app built with Flutter Riverpod 2.x and a
 feature-first clean architecture. It consumes the companion FastAPI service and
 supports market browsing, coin details and charts, global market metrics, a
 per-device watchlist, and persisted display preferences. The Home screen loads a

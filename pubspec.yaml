@@ -1,4 +1,4 @@
-name: gecko_lite
+name: crypto_research_app
 description: A polished crypto research app powered by a FastAPI backend.
 publish_to: 'none'
 version: 1.0.0+1

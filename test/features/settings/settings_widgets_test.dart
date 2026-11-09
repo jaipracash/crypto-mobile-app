@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:gecko_lite/core/constants/app_strings.dart';
-import 'package:gecko_lite/core/providers/repository_providers.dart';
-import 'package:gecko_lite/features/settings/domain/app_settings.dart';
-import 'package:gecko_lite/features/settings/domain/settings_repository.dart';
-import 'package:gecko_lite/features/settings/presentation/screens/settings_screen.dart';
+import 'package:crypto_research_app/core/constants/app_strings.dart';
+import 'package:crypto_research_app/core/providers/repository_providers.dart';
+import 'package:crypto_research_app/features/settings/domain/app_settings.dart';
+import 'package:crypto_research_app/features/settings/domain/settings_repository.dart';
+import 'package:crypto_research_app/features/settings/presentation/screens/settings_screen.dart';
 
 import '../../helpers/screen_util_test_wrapper.dart';
 
