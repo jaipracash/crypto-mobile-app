@@ -22,7 +22,7 @@ import '../../../settings/presentation/controllers/settings_controller.dart';
 import '../../../watchlist/presentation/controllers/watchlist_controller.dart';
 import '../../domain/coin_details.dart';
 import '../controllers/coin_details_controller.dart';
-import '../widgets/historical_data_card.dart';
+import '../widgets/coin_info_tab.dart';
 import '../widgets/price_chart.dart';
 import '../widgets/stats_grid.dart';
 
@@ -288,7 +288,11 @@ class _CoinDetailsScreenState extends ConsumerState<CoinDetailsScreen>
           chartData,
           currency,
         ),
-        _buildInfo(context, data, coinWithCurrentPrice, currency),
+        CoinInfoTab(
+          details: data,
+          coin: coinWithCurrentPrice,
+          currency: currency,
+        ),
       ],
     );
   }
@@ -461,50 +465,6 @@ class _CoinDetailsScreenState extends ConsumerState<CoinDetailsScreen>
         ),
         SizedBox(height: AppSizes.sm.w),
         StatsGrid(details: data, currency: currency),
-      ],
-    );
-  }
-
-  Widget _buildInfo(
-    BuildContext context,
-    CoinDetails data,
-    Coin coin,
-    String currency,
-  ) {
-    return ListView(
-      physics: const BouncingScrollPhysics(
-        parent: AlwaysScrollableScrollPhysics(),
-      ),
-      dragStartBehavior: DragStartBehavior.down,
-      padding: EdgeInsets.fromLTRB(
-        AppSizes.screenPadding.w,
-        AppSizes.lg.w,
-        AppSizes.screenPadding.w,
-        AppSizes.xxl.w,
-      ),
-      children: [
-        Text(
-          AppStrings.info,
-          style: Theme.of(context).textTheme.titleMedium
-              ?.copyWith(fontWeight: FontWeight.w700),
-        ),
-        SizedBox(height: AppSizes.md.w),
-        StatsGrid(details: data, currency: currency),
-        SizedBox(height: AppSizes.xl.w),
-        HistoricalDataCard(details: data, currency: currency),
-        SizedBox(height: AppSizes.xl.w),
-        Text(
-          '${AppStrings.aboutCoin} ${coin.name}',
-          style: Theme.of(context).textTheme.titleMedium
-              ?.copyWith(fontWeight: FontWeight.w700),
-        ),
-        SizedBox(height: AppSizes.sm.w),
-        Text(
-          data.description.isEmpty
-              ? AppStrings.descriptionUnavailable
-              : data.description,
-          style: Theme.of(context).textTheme.bodyMedium,
-        ),
       ],
     );
   }

@@ -1,9 +1,9 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gecko_lite/core/error/failure.dart';
-import 'package:gecko_lite/features/market/data/coin_dto.dart';
 import 'package:gecko_lite/features/market/data/market_remote_datasource.dart';
 import 'package:gecko_lite/features/market/data/market_repository_impl.dart';
+import 'package:gecko_lite/shared/data/coin_dto.dart';
 
 class FakeMarketRemoteDataSource implements MarketRemoteDataSource {
   FakeMarketRemoteDataSource({this.fail = false});

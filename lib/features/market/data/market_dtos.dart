@@ -1,6 +1,6 @@
 import '../domain/market_models.dart';
 
-import 'coin_dto.dart';
+import '../../../shared/data/coin_dto.dart';
 
 class CoinPageDto {
   const CoinPageDto(this.json, this.dataSource);

@@ -1,4 +1,4 @@
-import '../domain/coin.dart';
+import '../../features/market/domain/coin.dart';
 
 class CoinDto {
   const CoinDto(this.json);

@@ -1,4 +1,4 @@
-import '../../market/data/coin_dto.dart';
+import '../../../shared/data/coin_dto.dart';
 import '../domain/coin_details.dart';
 
 class CoinDetailsDto {

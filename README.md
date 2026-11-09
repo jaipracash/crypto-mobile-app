@@ -78,8 +78,8 @@ mapped to typed `Failure` values, and source headers are surfaced in the UI.
 
 - `lib/core/`: design tokens, themes, routing, Dio, error types, providers, and
   formatting helpers.
-- `lib/shared/widgets/`: common loading, error, empty, market tile, chart, and
-  connectivity UI.
+- `lib/shared/`: reusable components, including shared widgets and coin API
+  mapping.
 - `lib/features/market/`: Home market list, filtering, sorting, search, bottom
   sheets, controllers, and its repository.
 - `lib/features/coin_details/`: coin fundamentals, price chart, and links.

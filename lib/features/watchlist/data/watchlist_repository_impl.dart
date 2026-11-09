@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
 
-import '../../market/data/coin_dto.dart';
-import '../../market/data/market_repository_impl.dart';
+import '../../../core/error/dio_failure_mapper.dart';
+import '../../../shared/data/coin_dto.dart';
 import '../domain/watchlist_repository.dart';
 import 'watchlist_remote_datasource.dart';
 

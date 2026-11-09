@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
 
-import '../../market/data/market_repository_impl.dart';
+import '../../../core/error/dio_failure_mapper.dart';
 import '../domain/coin_details.dart';
 import '../domain/coin_details_repository.dart';
 import 'coin_details_dto.dart';

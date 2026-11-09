@@ -15,8 +15,10 @@ import '../../../../shared/widgets/simulated_price_banner.dart';
 import '../../../settings/presentation/controllers/settings_controller.dart';
 import '../../domain/coin.dart';
 import '../../domain/market_models.dart';
+import '../controllers/search_controller.dart';
 import '../controllers/market_controller.dart';
 import '../controllers/live_price_controller.dart';
+import '../controllers/visible_coins_provider.dart';
 
 class SearchScreen extends ConsumerStatefulWidget {
   const SearchScreen({this.animateFromHome = false, super.key});

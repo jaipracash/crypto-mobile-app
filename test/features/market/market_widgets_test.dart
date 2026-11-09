@@ -10,6 +10,8 @@ import 'package:gecko_lite/features/market/domain/coin.dart';
 import 'package:gecko_lite/features/market/domain/market_filters.dart';
 import 'package:gecko_lite/features/market/domain/market_models.dart';
 import 'package:gecko_lite/features/market/presentation/controllers/market_controller.dart';
+import 'package:gecko_lite/features/market/presentation/controllers/search_controller.dart';
+import 'package:gecko_lite/features/market/presentation/controllers/visible_coins_provider.dart';
 import 'package:gecko_lite/features/market/presentation/screens/home_screen.dart';
 import 'package:gecko_lite/features/market/presentation/screens/search_screen.dart';
 import 'package:gecko_lite/features/market/presentation/widgets/coin_row.dart';

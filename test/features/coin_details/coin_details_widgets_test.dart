@@ -4,6 +4,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:gecko_lite/core/constants/app_strings.dart';
 import 'package:gecko_lite/features/coin_details/data/coin_details_dto.dart';
 import 'package:gecko_lite/features/coin_details/domain/coin_details.dart';
+import 'package:gecko_lite/features/coin_details/presentation/widgets/coin_info_tab.dart';
 import 'package:gecko_lite/features/coin_details/presentation/widgets/historical_data_card.dart';
 import 'package:gecko_lite/features/coin_details/presentation/widgets/price_chart.dart';
 import 'package:gecko_lite/features/coin_details/presentation/widgets/stats_grid.dart';
@@ -13,6 +14,32 @@ import 'package:gecko_lite/shared/widgets/coin_avatar.dart';
 import '../../helpers/screen_util_test_wrapper.dart';
 
 void main() {
+  testWidgets('coin info tab renders the description and statistics', (
+    tester,
+  ) async {
+    const coin = Coin(id: 'bitcoin', symbol: 'btc', name: 'Bitcoin', price: 1);
+    const details = CoinDetails(coin: coin, description: 'Bitcoin overview');
+
+    await tester.pumpWidget(
+      screenUtilTestWrapper(
+        const MaterialApp(
+          home: Scaffold(
+            body: CoinInfoTab(details: details, coin: coin, currency: 'usd'),
+          ),
+        ),
+      ),
+    );
+
+    expect(find.text(AppStrings.info), findsOneWidget);
+
+    await tester.drag(find.byType(ListView), const Offset(0, -700));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Bitcoin overview'), findsOneWidget);
+    expect(find.textContaining(AppStrings.aboutCoin), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
   test('coin chart reports the range requested from the repository', () {
     final chart = CoinChartDto(
       const {
